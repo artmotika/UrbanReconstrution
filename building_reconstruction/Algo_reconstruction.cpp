@@ -1,7 +1,7 @@
 #include "Algo_reconstruction.h"
 
 namespace algo_rec {
-    void compute_poisson(const PCLPointCloud2::ConstPtr &input, PolygonMesh &output,
+    void computePoisson(const PCLPointCloud2::ConstPtr &input, PolygonMesh &output,
                          int depth, int solver_divide, int iso_divide, float point_weight) {
         PointCloud<PointNormal>::Ptr xyz_cloud(new PointCloud<PointNormal>());
         fromPCLPointCloud2(*input, *xyz_cloud);
@@ -25,7 +25,7 @@ namespace algo_rec {
         print_info(" ms]\n");
     }
 
-    void compute_poisson(PointCloud<PointNormal>::Ptr &input, PolygonMesh &output,
+    void computePoisson(PointCloud<PointNormal>::Ptr &input, PolygonMesh &output,
                          int depth, int solver_divide, int iso_divide, float point_weight) {
         print_info("Using parameters: depth %d, solverDivide %d, isoDivide %d\n", depth, solver_divide, iso_divide);
 
@@ -46,7 +46,7 @@ namespace algo_rec {
         print_info(" ms]\n");
     }
 
-    void compute_greedy_triangulation(const PCLPointCloud2::ConstPtr &input, PolygonMesh &output,
+    void computeGreedyTriangulation(const PCLPointCloud2::ConstPtr &input, PolygonMesh &output,
                                       double mu, double radius) {
         TicToc tt;
         tt.tic();
@@ -80,7 +80,7 @@ namespace algo_rec {
         print_info(" polygons]\n");
     }
 
-    void compute_hull(const PCLPointCloud2::ConstPtr &cloud_in,
+    void computeHull(const PCLPointCloud2::ConstPtr &cloud_in,
                       bool convex_concave_hull,
                       float alpha,
                       PolygonMesh &mesh_out) {
@@ -101,7 +101,7 @@ namespace algo_rec {
         }
     }
 
-    void compute_hull(const PointCloud<PointXYZ>::ConstPtr &cloud_in,
+    void computeHull(const PointCloud<PointXYZ>::ConstPtr &cloud_in,
                       bool convex_concave_hull,
                       float alpha,
                       PolygonMesh &mesh_out) {

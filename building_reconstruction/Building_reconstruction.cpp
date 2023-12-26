@@ -1,6 +1,6 @@
 #include "Building_reconstruction.h"
 
-void urban_rec::Building_reconstruction::upsample_by_mesh(PointCloud<PointXYZ>::Ptr &cloud_in, PolygonMesh mesh) {
+void urban_rec::Building_reconstruction::upsampleByMesh(PointCloud<PointXYZ>::Ptr &cloud_in, PolygonMesh mesh) {
     PointCloud<PointXYZ>::Ptr all_vertices_surf(new PointCloud<PointXYZ>());
     fromPCLPointCloud2(mesh.cloud, *all_vertices_surf);
 
@@ -193,7 +193,7 @@ double urban_rec::Building_reconstruction::getFilterRadius() {
     return filter_radius;
 }
 
-PolygonMesh urban_rec::Building_reconstruction::filter_mesh_by_mesh(PolygonMesh mesh_input, PolygonMesh mesh_filter) {
+PolygonMesh urban_rec::Building_reconstruction::filterMeshByMesh(PolygonMesh mesh_input, PolygonMesh mesh_filter) {
     TicToc tt;
     tt.tic();
 
@@ -280,7 +280,7 @@ PolygonMesh urban_rec::Building_reconstruction::filter_mesh_by_mesh(PolygonMesh 
 }
 
 PolygonMesh
-urban_rec::Building_reconstruction::filter_mesh_by_points(PolygonMesh mesh_input,
+urban_rec::Building_reconstruction::filterMeshByPoints(PolygonMesh mesh_input,
                                                           const PCLPointCloud2::ConstPtr &points_filter,
                                                           double filter_radius) {
     TicToc tt;
@@ -331,7 +331,7 @@ urban_rec::Building_reconstruction::filter_mesh_by_points(PolygonMesh mesh_input
     return mesh_input;
 }
 
-PolygonMesh urban_rec::Building_reconstruction::filter_mesh_poisson_by_points(PolygonMesh mesh_input,
+PolygonMesh urban_rec::Building_reconstruction::filterMeshPoissonByPoints(PolygonMesh mesh_input,
                                                                               const PCLPointCloud2::ConstPtr &points_filter,
                                                                               double filter_radius) {
     TicToc tt;
@@ -390,7 +390,7 @@ PolygonMesh urban_rec::Building_reconstruction::filter_mesh_poisson_by_points(Po
     return mesh_input;
 }
 
-PolygonMesh urban_rec::Building_reconstruction::filter_mesh_poisson_by_points_no_extra(PolygonMesh mesh_input,
+PolygonMesh urban_rec::Building_reconstruction::filterMeshPoissonByPointsNoExtra(PolygonMesh mesh_input,
                                                                                        const PCLPointCloud2::ConstPtr &points_filter,
                                                                                        double filter_radius) {
     TicToc tt;
@@ -536,7 +536,7 @@ PolygonMesh urban_rec::Building_reconstruction::filter_mesh_poisson_by_points_no
 }
 
 PointCloud<PointXYZ>::Ptr
-urban_rec::Building_reconstruction::filter_points_by_points(PolygonMesh mesh_input,
+urban_rec::Building_reconstruction::filterPointsByPoints(PolygonMesh mesh_input,
                                                             const PCLPointCloud2::ConstPtr &points_filter,
                                                             double filter_radius) {
     TicToc tt;
@@ -572,7 +572,7 @@ urban_rec::Building_reconstruction::filter_points_by_points(PolygonMesh mesh_inp
     return points_filtered_xyz;
 }
 
-PointCloud<PointXYZ>::Ptr urban_rec::Building_reconstruction::filter_points_by_mesh(PolygonMesh mesh_input) {
+PointCloud<PointXYZ>::Ptr urban_rec::Building_reconstruction::filterPointsByMesh(PolygonMesh mesh_input) {
     TicToc tt;
     tt.tic();
 
@@ -625,7 +625,7 @@ PointCloud<PointXYZ>::Ptr urban_rec::Building_reconstruction::filter_points_by_m
 }
 
 void
-urban_rec::Building_reconstruction::upsample_mesh(PointCloud<PointXYZ>::Ptr &cloud_in, PolygonMesh mesh,
+urban_rec::Building_reconstruction::upsampleMesh(PointCloud<PointXYZ>::Ptr &cloud_in, PolygonMesh mesh,
                                                   double max_polygon_size,
                                                   double max_polygon_side) {
     std::vector <polygon_struct> new_polygons{};
@@ -752,7 +752,7 @@ urban_rec::Building_reconstruction::upsample_mesh(PointCloud<PointXYZ>::Ptr &clo
 }
 
 std::pair<unsigned long, double>
-urban_rec::Building_reconstruction::calculate_repeatability_metric(PCLPointCloud2::Ptr cloud_ideal,
+urban_rec::Building_reconstruction::calculateRepeatabilityMetric(PCLPointCloud2::Ptr cloud_ideal,
                                                                    PCLPointCloud2::Ptr cloud_repeat,
                                                                    double max_mistake,
                                                                    std::string cloud_not_repeat_path) {
@@ -790,7 +790,7 @@ urban_rec::Building_reconstruction::calculate_repeatability_metric(PCLPointCloud
 }
 
 std::pair<unsigned long, double>
-urban_rec::Building_reconstruction::calculate_hole_metric(PCLPointCloud2::Ptr cloud_ideal,
+urban_rec::Building_reconstruction::calculateHoleMetric(PCLPointCloud2::Ptr cloud_ideal,
                                                           PCLPointCloud2::Ptr cloud_repeat,
                                                           double max_mistake,
                                                           std::string cloud_hole_path) {
@@ -844,18 +844,18 @@ PolygonMesh urban_rec::Building_reconstruction::reconstruct2() {
     fromPCLPointCloud2(surfaces_mesh.cloud, *cloud_surfaces);
 
     PolygonMesh hull_mesh;
-    algo_rec::compute_hull(cloud_surfaces, convex_concave_hull, concave_hull_alpha_upsample, hull_mesh);
+    algo_rec::computeHull(cloud_surfaces, convex_concave_hull, concave_hull_alpha_upsample, hull_mesh);
     Io_pcl::saveCloud("../data/hull_mesh_plane.ply", hull_mesh);
 
     PointCloud<PointXYZ>::Ptr upsample_cloud(new PointCloud<PointXYZ>());
     copyPointCloud(*cloud_surfaces, *upsample_cloud);
     Io_pcl::saveCloud("../data/hull_mesh1_cloud1.ply", *upsample_cloud);
 
-    upsample_by_mesh(upsample_cloud, surfaces_mesh);
+    upsampleByMesh(upsample_cloud, surfaces_mesh);
 
     Io_pcl::saveCloud("../data/hull_mesh1_cloud2.ply", *upsample_cloud);
     PolygonMesh upsample_hull_mesh;
-    algo_rec::compute_hull(upsample_cloud, convex_concave_hull, concave_hull_alpha_upsample, upsample_hull_mesh);
+    algo_rec::computeHull(upsample_cloud, convex_concave_hull, concave_hull_alpha_upsample, upsample_hull_mesh);
     Io_pcl::saveCloud("../data/concave_hull.ply", upsample_hull_mesh);
 
     PointCloud<PointXYZ>::Ptr new_vertices(new PointCloud <PointXYZ>);
@@ -921,7 +921,7 @@ PolygonMesh urban_rec::Building_reconstruction::reconstruct2() {
 
     // Apply the Poisson surface reconstruction algorithm
     PolygonMesh poisson_mesh;
-    algo_rec::compute_poisson(new_vertices_normals, poisson_mesh, poisson_depth, solver_divide, iso_divide,
+    algo_rec::computePoisson(new_vertices_normals, poisson_mesh, poisson_depth, solver_divide, iso_divide,
                               poisson_point_weight);
 
     print_info("[done, ");
@@ -965,7 +965,7 @@ PolygonMesh urban_rec::Building_reconstruction::reconstruct() {
 
     // Apply the Poisson surface reconstruction algorithm
     PolygonMesh poisson_mesh;
-    algo_rec::compute_poisson(new_vertices, poisson_mesh, poisson_depth, solver_divide, iso_divide,
+    algo_rec::computePoisson(new_vertices, poisson_mesh, poisson_depth, solver_divide, iso_divide,
                               poisson_point_weight);
     print_info("[done, ");
     print_value("%g", tt.toc());

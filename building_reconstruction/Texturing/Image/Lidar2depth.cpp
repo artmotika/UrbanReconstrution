@@ -45,7 +45,7 @@ void urban_rec::Lidar2depth::readCamPoses(vector<Camera> *cams, vector<boost::fi
 
     for (int i = 0; i < filenames->size(); i++) {
         Camera cam;
-        urban_rec::Texturing_mapping::read_cam_pose_file((*filenames)[i].string(), cam);
+        urban_rec::Texturing_mapping::readCamPoseFile((*filenames)[i].string(), cam);
         cams->push_back(cam);
     }
 }

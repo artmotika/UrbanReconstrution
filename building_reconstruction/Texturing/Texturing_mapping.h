@@ -32,9 +32,9 @@ namespace urban_rec {
 
         PolygonMesh getInputPolygonMesh();
 
-        void texture_mesh(vector <string> argv);
+        void textureMesh(vector <string> argv);
 
-        static bool read_cam_pose_file(string filename,
+        static bool readCamPoseFile(string filename,
                                 TextureMapping<pcl::PointXYZ>::Camera &cam);
 
         static bool getPointUVCoords(const PointXYZ &pt, const pcl::TextureMapping<pcl::PointXYZ>::Camera &cam,
