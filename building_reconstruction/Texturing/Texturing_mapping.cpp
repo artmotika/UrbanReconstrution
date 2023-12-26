@@ -256,7 +256,7 @@ bool urban_rec::Texturing_mapping::getPointUVCoords(const PointXYZ &pt, const pc
     return (false); // point was not visible by the camera
 }
 
-bool urban_rec::Texturing_mapping::read_cam_pose_file(std::string filename,
+bool urban_rec::Texturing_mapping::readCamPoseFile(std::string filename,
                                                       pcl::TextureMapping<pcl::PointXYZ>::Camera &cam) {
     std::ifstream myReadFile;
     myReadFile.open(filename.c_str(), ios::in);
@@ -323,7 +323,7 @@ bool urban_rec::Texturing_mapping::read_cam_pose_file(std::string filename,
     return true;
 }
 
-void urban_rec::Texturing_mapping::texture_mesh(vector <string> argv) {
+void urban_rec::Texturing_mapping::textureMesh(vector <string> argv) {
     pcl::PolygonMesh triangles;
     if (input_polygon_mesh != nullptr) {
         triangles = *input_polygon_mesh;
@@ -368,7 +368,7 @@ void urban_rec::Texturing_mapping::texture_mesh(vector <string> argv) {
     for (int i = 0; i < filenames.size(); ++i) {
         std::cout << filenames[i].string() << std::endl;
         pcl::TextureMapping<pcl::PointXYZ>::Camera cam;
-        read_cam_pose_file(filenames[i].string(), cam);
+        readCamPoseFile(filenames[i].string(), cam);
         cam.texture_file = filenames[i].stem().string() + ".jpg"; //".png"
         my_cams.push_back(cam);
     }

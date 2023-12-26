@@ -73,34 +73,34 @@ namespace urban_rec {
 
         double getFilterRadius();
 
-        PolygonMesh filter_mesh_by_mesh(PolygonMesh mesh_input, PolygonMesh mesh_filter);
+        PolygonMesh filterMeshByMesh(PolygonMesh mesh_input, PolygonMesh mesh_filter);
 
         PolygonMesh
-        filter_mesh_by_points(PolygonMesh mesh_input, const PCLPointCloud2::ConstPtr &points_filter,
+        filterMeshByPoints(PolygonMesh mesh_input, const PCLPointCloud2::ConstPtr &points_filter,
                               double filter_radius);
 
-        PolygonMesh filter_mesh_poisson_by_points(PolygonMesh mesh_input, const PCLPointCloud2::ConstPtr &points_filter,
+        PolygonMesh filterMeshPoissonByPoints(PolygonMesh mesh_input, const PCLPointCloud2::ConstPtr &points_filter,
                                                   double filter_radius);
 
         PolygonMesh
-        filter_mesh_poisson_by_points_no_extra(PolygonMesh mesh_input, const PCLPointCloud2::ConstPtr &points_filter,
+        filterMeshPoissonByPointsNoExtra(PolygonMesh mesh_input, const PCLPointCloud2::ConstPtr &points_filter,
                                                double filter_radius);
 
         PointCloud<PointXYZ>::Ptr
-        filter_points_by_points(PolygonMesh mesh_input, const PCLPointCloud2::ConstPtr &points_filter,
+        filterPointsByPoints(PolygonMesh mesh_input, const PCLPointCloud2::ConstPtr &points_filter,
                                 double filter_radius);
 
-        PointCloud<PointXYZ>::Ptr filter_points_by_mesh(PolygonMesh mesh_input);
+        PointCloud<PointXYZ>::Ptr filterPointsByMesh(PolygonMesh mesh_input);
 
-        void upsample_mesh(PointCloud<PointXYZ>::Ptr &cloud_in, PolygonMesh mesh, double max_polygon_size,
+        void upsampleMesh(PointCloud<PointXYZ>::Ptr &cloud_in, PolygonMesh mesh, double max_polygon_size,
                            double max_polygon_side);
 
         std::pair<unsigned long, double>
-        calculate_repeatability_metric(PCLPointCloud2::Ptr cloud_ideal, PCLPointCloud2::Ptr cloud_repeat,
+        calculateRepeatabilityMetric(PCLPointCloud2::Ptr cloud_ideal, PCLPointCloud2::Ptr cloud_repeat,
                                        double max_mistake, std::string cloud_not_repeat_path);
 
         std::pair<unsigned long, double>
-        calculate_hole_metric(PCLPointCloud2::Ptr cloud_ideal, PCLPointCloud2::Ptr cloud_repeat, double max_mistake,
+        calculateHoleMetric(PCLPointCloud2::Ptr cloud_ideal, PCLPointCloud2::Ptr cloud_repeat, double max_mistake,
                               std::string cloud_hole_path);
 
         PolygonMesh reconstruct();
@@ -121,7 +121,7 @@ namespace urban_rec {
         bool convex_concave_hull = true;
         double filter_radius = 0.5;
 
-        void upsample_by_mesh(PointCloud<PointXYZ>::Ptr &cloud_in, PolygonMesh mesh);
+        void upsampleByMesh(PointCloud<PointXYZ>::Ptr &cloud_in, PolygonMesh mesh);
     };
 }
 
