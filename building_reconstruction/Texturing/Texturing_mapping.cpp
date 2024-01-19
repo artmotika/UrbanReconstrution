@@ -82,16 +82,14 @@ int saveOBJFile(const std::string &file_name,
     // Write vertex normals
     for (int i = 0; i < nr_points; ++i) {
         int xyz = 0;
-        // "vn" just be written one
         bool v_written = false;
         for (size_t d = 0; d < tex_mesh.cloud.fields.size(); ++d) {
             int count = tex_mesh.cloud.fields[d].count;
             if (count == 0)
-                count = 1;          // we simply cannot tolerate 0 counts (coming from older converter code)
+                count = 1; // we simply cannot tolerate 0 counts (coming from older converter code)
             int c = 0;
             // adding vertex
-            if ((//tex_mesh.cloud.fields[d].datatype == sensor_msgs::PointField::FLOAT32) && (
-                    tex_mesh.cloud.fields[d].name == "normal_x" ||
+            if ((   tex_mesh.cloud.fields[d].name == "normal_x" ||
                     tex_mesh.cloud.fields[d].name == "normal_y" ||
                     tex_mesh.cloud.fields[d].name == "normal_z")) {
                 if (!v_written) {
@@ -139,7 +137,6 @@ int saveOBJFile(const std::string &file_name,
 
         if (tex_mesh.tex_materials.size() != 0) {
             fs << "# The material will be used for mesh " << m << std::endl;
-            //TODO pbl here with multi texture and unseen faces
             fs << "usemtl " << tex_mesh.tex_materials[m].tex_name << std::endl;
             fs << "# Faces" << std::endl;
         }
@@ -169,7 +166,7 @@ int saveOBJFile(const std::string &file_name,
     /* Write material defination for OBJ file*/
     // Open file
     PCL_INFO("Writing material files\n");
-    //dont do it if no material to write
+    // dont do it if no material to write
     if (tex_mesh.tex_materials.size() == 0)
         return (0);
 
@@ -338,7 +335,7 @@ void urban_rec::Texturing_mapping::textureMesh(vector <string> argv) {
     mesh.cloud = triangles.cloud;
     vector <pcl::Vertices> polygon_1;
 
-    // push faces into the texturemesh object
+    // Push faces into the texturemesh object
     polygon_1.resize(triangles.polygons.size());
     for (size_t i = 0; i < triangles.polygons.size(); ++i) {
         polygon_1[i] = triangles.polygons[i];

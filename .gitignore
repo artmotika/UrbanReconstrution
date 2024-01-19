@@ -1,0 +1,14 @@
+.idea
+build
+data
+example_data_set
+example_mini
+examples
+example_mini2
+example_mini3
+example_mini4
+example_mini5
+Testing
+*.ply
+cmake-build-release
+cmake-build-debug

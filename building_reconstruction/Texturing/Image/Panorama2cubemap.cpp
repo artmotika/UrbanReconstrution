@@ -20,16 +20,6 @@ double Panorama2cubemap::degree_to_radian(double degree) {
     return degree * M_PI / 180.0;
 }
 
-float Panorama2cubemap::getTheta(float x, float y) {
-    float rtn = 0;
-    if (y < 0) {
-        rtn = atan2(y, x) * -1;
-    } else {
-        rtn = M_PI + (M_PI - atan2(y, x));
-    }
-    return rtn;
-}
-
 void Panorama2cubemap::setInputImagePath(std::string image_path) {
     input_image_path = image_path;
 }
@@ -215,14 +205,14 @@ void Panorama2cubemap::createDescriptionFile(DestinationType type, std::string o
 
 void Panorama2cubemap::transform() {
     setImagePanorama(input_image_path);
-    const int sqr = imagePanorama.cols / 4.0;
-    const int output_width = sqr * 3;
-    const int output_height = sqr * 2;
+    const int r = imagePanorama.cols / 4.0;
+    const int output_width = r * 3;
+    const int output_height = r * 2;
 
     // Placeholder image for the result
     vector <cv::Mat> destinations;
     for (int i = 0; i < 6; i++) {
-        cv::Mat destination(sqr, sqr, CV_8UC3, cv::Scalar(255, 255, 255));
+        cv::Mat destination(r, r, CV_8UC3, cv::Scalar(255, 255, 255));
         destinations.push_back(destination);
     }
 
@@ -239,70 +229,62 @@ void Panorama2cubemap::transform() {
             float y = 0.0;
             float z = 0.0;
 
-            if (i < sqr + 1) {   // top half
-                if (j < sqr + 1) { // top left box [Y+]
+            if (i < r + 1) { // top half
+                if (j < r + 1) { // +Y (left face)
                     destImageType = DestinationType::Yplus;
                     tx = j;
                     ty = i;
-                    x = tx - 0.5 * sqr;
-                    y = 0.5 * sqr;
-                    z = ty - 0.5 * sqr;
-                } else if (j < 2 * sqr + 1) { // top middle [X+]
+                    x = tx - 0.5 * r;
+                    y = 0.5 * r;
+                    z = ty - 0.5 * r;
+                } else if (j < 2 * r + 1) { // +X (front face)
                     destImageType = DestinationType::Xplus;
-                    tx = j - sqr;
+                    tx = j - r;
                     ty = i;
-                    x = 0.5 * sqr;
-                    y = (tx - 0.5 * sqr) * -1;
-                    z = ty - 0.5 * sqr;
-                } else { // top right [Y-]
+                    x = 0.5 * r;
+                    y = 0.5 * r - tx;
+                    z = ty - 0.5 * r;
+                } else { // -Y (right face)
                     destImageType = DestinationType::Yminus;
-                    tx = j - sqr * 2;
+                    tx = j - r * 2;
                     ty = i;
-                    x = (tx - 0.5 * sqr) * -1;
-                    y = -0.5 * sqr;
-                    z = ty - 0.5 * sqr;
+                    x = 0.5 * r - tx;
+                    y = -0.5 * r;
+                    z = ty - 0.5 * r;
                 }
-            } else {             // bottom half
-                if (j < sqr + 1) { // bottom left box [X-]
+            } else { // bottom half
+                if (j < r + 1) { // -X (back face)
                     destImageType = DestinationType::Xminus;
                     tx = j;
-                    ty = i - sqr;
-                    x = int(-0.5 * sqr);
-                    y = int(tx - 0.5 * sqr);
-                    z = int(ty - 0.5 * sqr);
-                } else if (j < 2 * sqr + 1) { // bottom middle [Z-]
+                    ty = i - r;
+                    x = -0.5 * r;
+                    y = tx - 0.5 * r;
+                    z = ty - 0.5 * r;
+                } else if (j < 2 * r + 1) { // -Z (bottom face)
                     destImageType = DestinationType::Zminus;
-                    tx = j - sqr;
-                    ty = i - sqr;
-                    x = (ty - 0.5 * sqr) * -1;
-                    y = (tx - 0.5 * sqr) * -1;
-                    z = 0.5 * sqr; // was -0.5 might be due to phi being reversed
-                } else { // bottom right [Z+]
+                    tx = j - r;
+                    ty = i - r;
+                    x = 0.5 * r - ty;
+                    y = 0.5 * r - tx;
+                    z = 0.5 * r;
+                } else { // +Z (top face)
                     destImageType = DestinationType::Zplus;
-                    tx = j - sqr * 2;
-                    ty = i - sqr;
-                    x = ty - 0.5 * sqr;
-                    y = (tx - 0.5 * sqr) * -1;
-                    z = -0.5 * sqr; // was +0.5 might be due to phi being reversed
+                    tx = j - r * 2;
+                    ty = i - r;
+                    x = ty - 0.5 * r;
+                    y = 0.5 * r - tx;
+                    z = -0.5 * r;
                 }
             }
 
             // now find out the polar coordinates
             float rho = sqrt(x * x + y * y + z * z);
-            float normTheta = getTheta(x, y) / (2 * M_PI); // /(2*M_PI) normalise theta
-            float normPhi = (M_PI - acos(z / rho)) / M_PI; // /M_PI normalise phi
+            float normTheta = (2*M_PI - atan2(y, x)) / (2*M_PI); // /(2*M_PI) normalise theta
+            float normPhi = (M_PI - acos(z / rho)) / (M_PI); // /M_PI normalise phi
 
             // use this for coordinates
             float iX = normTheta * input_width;
             float iY = normPhi * input_height;
-
-            // catch possible overflows
-            if (iX >= input_width) {
-                iX = iX - (input_width);
-            }
-            if (iY >= input_height) {
-                iY = iY - (input_height);
-            }
 
             destinations[destImageType].at<cv::Vec3b>(ty, tx) = imagePanorama.at<cv::Vec3b>(int(iY), int(iX));
         }
@@ -375,136 +357,6 @@ void Panorama2cubemap::transform_dir(std::string file_extension) {
                   << std::endl;
 
         imagePanorama.release();
-        setImagePanorama(input_image_path);
-
-        const int sqr = imagePanorama.cols / 4.0;
-        const int output_width = sqr * 3;
-        const int output_height = sqr * 2;
-
-        // Placeholder image for the result
-        vector <cv::Mat> destinations;
-        for (int i = 0; i < 6; i++) {
-            cv::Mat destination(sqr, sqr, CV_8UC3, cv::Scalar(255, 255, 255));
-            destinations.push_back(destination);
-        }
-
-        auto begin = chrono::high_resolution_clock::now();
-
-#pragma omp parallel for
-        for (int j = 0; j < output_width; j++) {
-            // #pragma omp parallel for
-            for (int i = 0; i < output_height; i++) {
-                DestinationType destImageType;
-                float tx = 0.0;
-                float ty = 0.0;
-                float x = 0.0;
-                float y = 0.0;
-                float z = 0.0;
-
-                if (i < sqr + 1) {   // top half
-                    if (j < sqr + 1) { // top left box [Y+]
-                        destImageType = DestinationType::Yplus;
-                        tx = j;
-                        ty = i;
-                        x = tx - 0.5 * sqr;
-                        y = 0.5 * sqr;
-                        z = ty - 0.5 * sqr;
-                    } else if (j < 2 * sqr + 1) { // top middle [X+]
-                        destImageType = DestinationType::Xplus;
-                        tx = j - sqr;
-                        ty = i;
-                        x = 0.5 * sqr;
-                        y = (tx - 0.5 * sqr) * -1;
-                        z = ty - 0.5 * sqr;
-                    } else { // top right [Y-]
-                        destImageType = DestinationType::Yminus;
-                        tx = j - sqr * 2;
-                        ty = i;
-                        x = (tx - 0.5 * sqr) * -1;
-                        y = -0.5 * sqr;
-                        z = ty - 0.5 * sqr;
-                    }
-                } else {             // bottom half
-                    if (j < sqr + 1) { // bottom left box [X-]
-                        destImageType = DestinationType::Xminus;
-                        tx = j;
-                        ty = i - sqr;
-                        x = int(-0.5 * sqr);
-                        y = int(tx - 0.5 * sqr);
-                        z = int(ty - 0.5 * sqr);
-                    } else if (j < 2 * sqr + 1) { // bottom middle [Z-]
-                        destImageType = DestinationType::Zminus;
-                        tx = j - sqr;
-                        ty = i - sqr;
-                        x = (ty - 0.5 * sqr) * -1;
-                        y = (tx - 0.5 * sqr) * -1;
-                        z = 0.5 * sqr; // was -0.5 might be due to phi being reversed
-                    } else { // bottom right [Z+]
-                        destImageType = DestinationType::Zplus;
-                        tx = j - sqr * 2;
-                        ty = i - sqr;
-                        x = ty - 0.5 * sqr;
-                        y = (tx - 0.5 * sqr) * -1;
-                        z = -0.5 * sqr; // was +0.5 might be due to phi being reversed
-                    }
-                }
-
-                // now find out the polar coordinates
-                float rho = sqrt(x * x + y * y + z * z);
-                float normTheta = getTheta(x, y) / (2 * M_PI); // /(2*M_PI) normalise theta
-                float normPhi = (M_PI - acos(z / rho)) / M_PI; // /M_PI normalise phi
-
-                // use this for coordinates
-                float iX = normTheta * input_width;
-                float iY = normPhi * input_height;
-
-                // catch possible overflows
-                if (iX >= input_width) {
-                    iX = iX - (input_width);
-                }
-                if (iY >= input_height) {
-                    iY = iY - (input_height);
-                }
-
-                destinations[destImageType].at<cv::Vec3b>(ty, tx) = imagePanorama.at<cv::Vec3b>(int(iY), int(iX));
-            }
-        }
-        auto end = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> diff = end - begin;
-
-        std::ostringstream oss;
-        std::string output_image_subpath1;
-        std::string output_image_subpath2;
-        dot_index = path_utils::getIndexBeforeChar(output_image_path, '.');
-        output_image_subpath1 = output_image_path.substr(0, dot_index);
-        output_image_subpath2 = output_image_path.substr(dot_index, output_image_path.size());
-
-        oss << output_image_subpath1 << "Yplus" << output_image_subpath2;
-        std::cout << oss.str() << std::endl;
-        cv::imwrite(oss.str(), destinations[DestinationType::Yplus]);
-        oss.str("");
-        oss << output_image_subpath1 << "Xplus" << output_image_subpath2;
-        std::cout << oss.str() << std::endl;
-        cv::imwrite(oss.str(), destinations[DestinationType::Xplus]);
-        oss.str("");
-        oss << output_image_subpath1 << "Yminus" << output_image_subpath2;
-        std::cout << oss.str() << std::endl;
-        cv::imwrite(oss.str(), destinations[DestinationType::Yminus]);
-        oss.str("");
-        oss << output_image_subpath1 << "Xminus" << output_image_subpath2;
-        std::cout << oss.str() << std::endl;
-        cv::imwrite(oss.str(), destinations[DestinationType::Xminus]);
-        oss.str("");
-        oss << output_image_subpath1 << "Zminus" << output_image_subpath2;
-        std::cout << oss.str() << std::endl;
-        cv::imwrite(oss.str(), destinations[DestinationType::Zminus]);
-        oss.str("");
-        oss << output_image_subpath1 << "Zplus" << output_image_subpath2;
-        std::cout << oss.str() << std::endl;
-        cv::imwrite(oss.str(), destinations[DestinationType::Zplus]);
-
-        if (description_file_option) createDescriptionFiles(output_image_subpath1);
-
-        cout << "Processing time: " << diff.count() << " s" << endl;
+        transform();
     }
 }
