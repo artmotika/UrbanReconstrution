@@ -28,30 +28,30 @@ int main() {
     panorama2CubemapObject.setCsvFile("../example_mini/reference.csv", 0, 1, '\t');
     panorama2CubemapObject.transform_dir(".jpg");
 
-    // Shift coordinates
-    const PCLPointCloud2::Ptr input_cloud_in(new PCLPointCloud2);
-    Io_pcl::loadCloud("../example_mini/obj_shift_n_02-12.pcd", *input_cloud_in); // 02-12 -> obj_shift_n_subsample ; obj_shift_n_part_building_o.pcd
-    PCLPointCloud2::ConstPtr input_cloud = input_cloud_in;
-
-    PointCloud<PointNormal>::Ptr points_shifted = urban_rec::shiftCoord(input_cloud, shift);
-    Io_pcl::saveCloudPCD("../example_mini/obj_shift_n_02-12.pcd", *points_shifted); // 02-12 -> obj_shift_n_part_building_shifted
-
-    const PCLPointCloud2::Ptr input_cloud_shifted(new PCLPointCloud2);
-    Io_pcl::loadCloud("../example_mini/obj_shift_n_02-12_invertednormals.pcd", *input_cloud_shifted); // 02-12 -> obj_shift_n_part_building_shifted.pcd
-
-    // Apply the Poisson surface reconstruction algorithm
-    PolygonMesh poisson_mesh;
-    int poisson_depth = 10; // 10
-    int solver_divide = 8; // 8
-    int iso_divide = 10; // 8
-    float poisson_point_weight = 10.0f; // 4.0f
-    algo_rec::computePoisson(input_cloud_shifted, poisson_mesh, poisson_depth, solver_divide, iso_divide,
-                              poisson_point_weight);
-    urban_rec::Building_reconstruction building_rec;
-    poisson_mesh = building_rec.filterMeshPoissonByPoints(poisson_mesh,
-                                                              input_cloud_shifted,
-                                                              0.5);
-    Io_pcl::saveCloud("../example_mini/obj2_mesh_invertednormals.ply", poisson_mesh); // check file obj2_mesh.ply
+//    // Shift coordinates
+//    const PCLPointCloud2::Ptr input_cloud_in(new PCLPointCloud2);
+//    Io_pcl::loadCloud("../example_mini/obj_shift_n_02-12.pcd", *input_cloud_in); // 02-12 -> obj_shift_n_subsample ; obj_shift_n_part_building_o.pcd
+//    PCLPointCloud2::ConstPtr input_cloud = input_cloud_in;
+//
+//    PointCloud<PointNormal>::Ptr points_shifted = urban_rec::shiftCoord(input_cloud, shift);
+//    Io_pcl::saveCloudPCD("../example_mini/obj_shift_n_02-12.pcd", *points_shifted); // 02-12 -> obj_shift_n_part_building_shifted
+//
+//    const PCLPointCloud2::Ptr input_cloud_shifted(new PCLPointCloud2);
+//    Io_pcl::loadCloud("../example_mini/obj_shift_n_02-12_invertednormals.pcd", *input_cloud_shifted); // 02-12 -> obj_shift_n_part_building_shifted.pcd
+//
+//    // Apply the Poisson surface reconstruction algorithm
+//    PolygonMesh poisson_mesh;
+//    int poisson_depth = 10; // 10
+//    int solver_divide = 8; // 8
+//    int iso_divide = 10; // 8
+//    float poisson_point_weight = 10.0f; // 4.0f
+//    algo_rec::computePoisson(input_cloud_shifted, poisson_mesh, poisson_depth, solver_divide, iso_divide,
+//                              poisson_point_weight);
+//    urban_rec::Building_reconstruction building_rec;
+//    poisson_mesh = building_rec.filterMeshPoissonByPoints(poisson_mesh,
+//                                                              input_cloud_shifted,
+//                                                              0.5);
+//    Io_pcl::saveCloud("../example_mini/obj2_mesh_invertednormals.ply", poisson_mesh); // check file obj2_mesh.ply
 
     // Texturing Mesh
     urban_rec::Texturing_mapping texturing_mapping = urban_rec::Texturing_mapping();

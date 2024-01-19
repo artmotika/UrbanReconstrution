@@ -91,8 +91,6 @@ namespace urban_rec {
 
         double degree_to_radian(double degree);
 
-        float getTheta(float x, float y);
-
         void createDescriptionFiles(std::string output_image_subpath1);
 
         void createDescriptionFile(DestinationType type, std::string output_path);
