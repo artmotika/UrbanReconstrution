@@ -28,6 +28,9 @@ PCL_INSTANTIATE_PRODUCT(NormalEstimation, ((pcl::PointXYZRGBNormal))((pcl::Norma
 namespace urban_rec {
     class Texturing_mapping {
     public:
+        using Camera = pcl::texture_mapping::Camera;
+        using UvIndex = pcl::texture_mapping::UvIndex;
+
         void setInputPolygonMesh(PolygonMesh polygon_mesh);
 
         PolygonMesh getInputPolygonMesh();
@@ -42,6 +45,29 @@ namespace urban_rec {
 
     private:
         PolygonMesh::Ptr input_polygon_mesh{nullptr};
+
+        void
+        textureMeshwithMultipleCameras (pcl::TextureMesh &mesh,
+                                        const pcl::texture_mapping::CameraVector &cameras);
+
+        inline void
+        getTriangleCircumcenterAndSize(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3,
+                                       pcl::PointXY &circomcenter, double &radius);
+
+        inline void
+        getTriangleCircumcscribedCircleCentroid(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3,
+                                                pcl::PointXY &circumcenter, double &radius);
+
+        inline bool
+        getPointUVCoordinates(const pcl::PointXYZ &pt, const Camera &cam, pcl::PointXY &UV_coordinates);
+
+        inline bool
+        checkPointInsideTriangle(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3,
+                                 const pcl::PointXY &pt);
+
+        inline bool
+        isFaceProjected (const Camera &camera, const pcl::PointXYZ &p1, const pcl::PointXYZ &p2, const pcl::PointXYZ &p3,
+                         pcl::PointXY &proj1, pcl::PointXY &proj2, pcl::PointXY &proj3);
 
     };
 }

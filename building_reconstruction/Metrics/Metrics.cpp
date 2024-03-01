@@ -193,7 +193,7 @@ namespace Metrics {
      */
     double SSIM(cv::Mat image1, cv::Mat image2, int partition) {
         if (partition != 8 && partition != 16 && partition != 1) {
-            throw invalid_argument("Partition must be equals 8 or 16 or 1 but it equals " + std::to_string(partition));
+            throw invalid_argument("Partition must be equals 8 or 16 or 1 but it doesn't equal" + std::to_string(partition));
         }
         // mean of the brightness of the image1
         vector<vector<double>> mean1 = meanBrightness(image1, partition);
