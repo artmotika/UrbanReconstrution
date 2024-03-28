@@ -92,3 +92,97 @@ double Geometry_pcl::dist_between_two_points(Eigen::Vector2i p1, Eigen::Vector2i
     return sqrt(pow(p1(0) - p2(0), 2) + pow(p1(1) - p2(1), 2));
 }
 
+//bool Geometry_pcl::arePointsCollinear(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c) {
+////    float epsilon = std::numeric_limits<float>::epsilon() * 2.0;
+//    float epsilon = 1.0;
+//    double vectorAB_x = b.x - a.x;
+//    double vectorAB_y = b.y - a.y;
+//    double vectorAB_z = b.z - a.z;
+//
+//    double vectorAC_x = c.x - a.x;
+//    double vectorAC_y = c.y - a.y;
+//    double vectorAC_z = c.z - a.z;
+//
+//    double crossProduct_x = (vectorAB_y * vectorAC_z) - (vectorAB_z * vectorAC_y);
+//    double crossProduct_y = (vectorAB_z * vectorAC_x) - (vectorAB_x * vectorAC_z);
+//    double crossProduct_z = (vectorAB_x * vectorAC_y) - (vectorAB_y * vectorAC_x);
+//
+//    return (crossProduct_x < epsilon && crossProduct_x > -epsilon
+//            && crossProduct_y < epsilon && crossProduct_y > -epsilon
+//            && crossProduct_z < epsilon && crossProduct_z > -epsilon);
+//}
+
+bool Geometry_pcl::arePointsCollinear(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c) {
+    float epsilon = std::numeric_limits<float>::epsilon();
+    return triangle_area_geron(a, b, c) < epsilon;
+}
+
+bool Geometry_pcl::isPointInsideSegment(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ p) {
+    float epsilon = std::numeric_limits<float>::epsilon();
+    return p.x >= fmin(a.x, b.x) - epsilon && p.x <= fmax(a.x, b.x) + epsilon &&
+           p.y >= fmin(a.y, b.y) - epsilon && p.y <= fmax(a.y, b.y) + epsilon &&
+           p.z >= fmin(a.z, b.z) - epsilon && p.z <= fmax(a.z, b.z) + epsilon;
+}
+
+double Geometry_pcl::distanceToSegment(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ p) {
+    float epsilon = std::numeric_limits<float>::epsilon();
+    double l2 = (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y) + (a.z - b.z)*(a.z - b.z);
+    if (l2 < epsilon) {
+        return sqrt((p.x - a.x)*(p.x - a.x) + (p.y - a.y)*(p.y - a.y) + (p.z - a.z)*(p.z - a.z));
+    }
+
+    double t = ((p.x - a.x)*(b.x - a.x) + (p.y - a.y)*(b.y - a.y) + (p.z - a.z)*(b.z - a.z)) / l2;
+    t = std::max(0.0, std::min(1.0, t));
+
+    double x = a.x + t * (b.x - a.x);
+    double y = a.y + t * (b.y - a.y);
+    double z = a.z + t * (b.z - a.z);
+
+    return sqrt((p.x - x)*(p.x - x) + (p.y - y)*(p.y - y) + (p.z - z)*(p.z - z));
+}
+
+
+bool Geometry_pcl::isSegmentOnSegment(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c, pcl::PointXYZ d) {
+    if (!arePointsCollinear(a, b, c) || !arePointsCollinear(a, b, d)) {
+        return false;
+    }
+    return isPointInsideSegment(a, b, c) && isPointInsideSegment(a, b, d) ||
+           isPointInsideSegment(c, d, a) && isPointInsideSegment(c, d, b);
+}
+
+bool Geometry_pcl::arePointsEqual(pcl::PointXYZ a, pcl::PointXYZ b) {
+    float epsilon = std::numeric_limits<float>::epsilon();
+    return abs(a.x - b.x) < epsilon && abs(a.y - b.y) < epsilon && abs(a.z - b.z) < epsilon;
+}
+
+pcl::PointXYZ Geometry_pcl::getTriangleCenterOfMass(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c) {
+    float x = (a.x + b.x + c.x) / 3.0;
+    float y = (a.y + b.y + c.y) / 3.0;
+    float z = (a.z + b.z + c.z) / 3.0;
+    pcl::PointXYZ center(x, y, z);
+    return center;
+}
+
+bool Geometry_pcl::checkPointInsideTriangle(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3, const pcl::PointXY &pt)
+{
+    // Compute vectors
+    Eigen::Vector2d v0, v1, v2;
+    v0(0) = p3.x - p1.x; v0(1) = p3.y - p1.y; // v0= C - A
+    v1(0) = p2.x - p1.x; v1(1) = p2.y - p1.y; // v1= B - A
+    v2(0) = pt.x - p1.x; v2(1) = pt.y - p1.y; // v2= P - A
+
+    // Compute dot products
+    double dot00 = v0.dot(v0); // dot00 = dot(v0, v0)
+    double dot01 = v0.dot(v1); // dot01 = dot(v0, v1)
+    double dot02 = v0.dot(v2); // dot02 = dot(v0, v2)
+    double dot11 = v1.dot(v1); // dot11 = dot(v1, v1)
+    double dot12 = v1.dot(v2); // dot12 = dot(v1, v2)
+
+    // Compute barycentric coordinates
+    double invDenom = 1.0 / (dot00*dot11 - dot01*dot01);
+    double u = (dot11*dot02 - dot01*dot12) * invDenom;
+    double v = (dot00*dot12 - dot01*dot02) * invDenom;
+
+    // Check if point is in triangle
+    return ((u >= 0) && (v >= 0) && (u + v < 1));
+}

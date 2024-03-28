@@ -8,18 +8,26 @@ project(Polygonal_surface_reconstruction_Examples)
 #set(CMAKE_CXX_COMPILER "g++-13")
 #set(CMAKE_CXX_COMPILER "clang")
 
+set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+set(CMAKE_HAVE_THREADS_LIBRARY 1)
+set(CMAKE_USE_WIN32_THREADS_INIT 0)
+set(CMAKE_USE_PTHREADS_INIT 1)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+
 # OPENMP variables
 set(OpenMP_C_FLAGS "-fopenmp=lomp")
 set(OpenMP_CXX_FLAGS "-fopenmp=lomp")
 set(OpenMP_C_LIB_NAMES "libomp")
 set(OpenMP_CXX_LIB_NAMES "libomp")
-set(OpenMP_libomp_LIBRARY "/usr/local/Cellar/libomp/17.0.2/lib/libomp.dylib")
-set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp /usr/local/Cellar/libomp/17.0.2/lib/libomp.dylib -I/usr/local/Cellar/libomp/17.0.2/include")
-set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp /usr/local/Cellar/libomp/17.0.2/lib/libomp.dylib -I/usr/local/Cellar/libomp/17.0.2/include")
+set(OpenMP_libomp_LIBRARY "/usr/local/Cellar/libomp/17.0.6/lib/libomp.dylib")
+set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp /usr/local/Cellar/libomp/17.0.6/lib/libomp.dylib -I/usr/local/Cellar/libomp/17.0.6/include")
+set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp /usr/local/Cellar/libomp/17.0.6/lib/libomp.dylib -I/usr/local/Cellar/libomp/17.0.6/include")
 
 #add_compile_options(-std=c++11)
 
 find_package(Vulkan)
+
+#find_package(Threads REQUIRED)
 
 find_package(OpenMP)
 if (OPENMP_FOUND)
@@ -107,6 +115,7 @@ add_library(texturing_mapping STATIC Texturing/Texturing_mapping.h Texturing/Tex
         Texturing/Image/Lidar2depth.h Texturing/Image/Lidar2depth.cpp)
 add_library(metrics STATIC Metrics/Metrics.h Metrics/Metrics.cpp
             Metrics/BlurEstimation.h Metrics/BlurEstimation.cpp)
+add_library(color_transfer STATIC ColorTransfer/ColorTransferMeanLocal.h ColorTransfer/ColorTransferMeanLocal.cpp)
 create_single_source_cgal_program("texturing_map_example.cpp")
 create_single_source_cgal_program("metric_image_compare_example.cpp")
 #add_library(surface_reconstruction STATIC surface_reconstruction.cpp)
@@ -118,6 +127,7 @@ foreach (
         target
         metrics
         texturing_mapping
+        color_transfer
 )
     target_link_libraries(${target} PUBLIC ${OpenCV_LIBS})
 endforeach ()
@@ -134,6 +144,7 @@ foreach (
         metrics
         #        surface_reconstruction
         building_reconstruction
+        color_transfer
 )
     target_link_libraries(${target} PUBLIC CGAL::Eigen3_support ${PCL_LIBRARIES})
     if (TARGET CGAL::SCIP_support)
@@ -144,6 +155,7 @@ foreach (
 endforeach ()
 
 target_link_libraries(metric_image_compare_example PUBLIC metrics)
+target_link_libraries(texturing_mapping PUBLIC color_transfer)
 
 foreach (
         target
@@ -158,6 +170,7 @@ foreach (
     #  target_link_libraries(${target} PUBLIC surface_reconstruction)
     target_link_libraries(${target} PUBLIC building_reconstruction)
     target_link_libraries(${target} PUBLIC texturing_mapping)
+    target_link_libraries(${target} PUBLIC color_transfer)
     target_link_libraries(${target} PUBLIC CGAL::Eigen3_support ${PCL_LIBRARIES})
     if (TARGET CGAL::SCIP_support)
         target_link_libraries(${target} PUBLIC CGAL::SCIP_support)

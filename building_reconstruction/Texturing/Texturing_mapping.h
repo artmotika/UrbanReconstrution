@@ -19,6 +19,10 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/features/impl/normal_3d.hpp> // make sure to include the .hpp file
 
+#include <opencv2/opencv.hpp>
+
+#include "../StringUtils/PathUtils.h"
+
 using namespace std;
 using namespace pcl;
 
@@ -35,7 +39,7 @@ namespace urban_rec {
 
         PolygonMesh getInputPolygonMesh();
 
-        void textureMesh(vector <string> argv);
+        tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> textureMesh(vector <string> argv);
 
         static bool readCamPoseFile(string filename,
                                 TextureMapping<pcl::PointXYZ>::Camera &cam);

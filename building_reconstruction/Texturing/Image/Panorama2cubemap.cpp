@@ -11,7 +11,7 @@ void Panorama2cubemap::setImagePanorama(std::string image_path) {
     if (side_ratio != 2) {
         std::ostringstream oss;
         oss << "Input imagePanorama must have width 8000px and height 4000px,"
-               " but have width " << input_width << "and height " << input_height << "!\n";
+            << " but have width " << input_width << "and height " << input_height << "!\n";
         throw std::domain_error(oss.str());
     }
 }
