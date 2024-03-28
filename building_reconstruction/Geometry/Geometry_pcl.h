@@ -29,6 +29,20 @@ namespace Geometry_pcl {
 
     double dist_between_two_points(Eigen::Vector2i p1, Eigen::Vector2i p2);
 
+    bool arePointsCollinear(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c);
+
+    bool isPointInsideSegment(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ p);
+
+    double distanceToSegment(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ p);
+
+    bool isSegmentOnSegment(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c, pcl::PointXYZ d);
+
+    bool arePointsEqual(pcl::PointXYZ a, pcl::PointXYZ b);
+
+    pcl::PointXYZ getTriangleCenterOfMass(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c);
+
+    bool checkPointInsideTriangle(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3, const pcl::PointXY &pt);
+
 }
 
 
