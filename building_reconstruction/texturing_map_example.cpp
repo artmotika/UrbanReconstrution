@@ -7,6 +7,7 @@
 #include "PointClouds/Shift.h"
 #include "Building_reconstruction.h"
 #include "ColorTransfer/ColorTransferMeanLocal.h"
+#include "ColorTransfer/ColorTransferMeanSamePolygons.h"
 
 #include <opencv2/core/types.hpp>
 #include <tuple>
@@ -65,13 +66,17 @@ int main() {
     argv.push_back(output_ply_file_path);
     argv.push_back(config_path);
 
+    pcl::PolygonMesh triangles;
+    pcl::io::loadPolygonFilePLY(argv[0], triangles);
+    texturing_mapping.setInputPolygonMesh(triangles);
     tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> res = texturing_mapping.textureMesh(argv);
-
     pcl::TextureMesh tm = get<0>(res);
     pcl::texture_mapping::CameraVector cams = get<1>(res);
-    ColorTransferMeanLocal color_transfer_local = ColorTransferMeanLocal(tm, "../example_mini5/", cams);
-    color_transfer_local.setNumberCams(tm.tex_materials.size()-1);
-    color_transfer_local.transfer();
+
+    vector<pcl::TextureMesh> tms = texturing_mapping.textureMeshes(argv);
+    ColorTransferMeanSamePolygons color_transfer_same_polygons
+        = ColorTransferMeanSamePolygons(triangles, tm, tms, "../example_mini5/");
+    color_transfer_same_polygons.transfer();
 
 ////    urban_rec::Lidar2depth l2dimg = urban_rec::Lidar2depth(config_path, input_ply_file_path);
 ////    l2dimg.createDepthImages();

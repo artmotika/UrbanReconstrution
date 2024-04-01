@@ -186,3 +186,10 @@ bool Geometry_pcl::checkPointInsideTriangle(const pcl::PointXY &p1, const pcl::P
     // Check if point is in triangle
     return ((u >= 0) && (v >= 0) && (u + v < 1));
 }
+
+double Geometry_pcl::triangle_area(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3) {
+    return 0.5 * abs((p2.x - p1.x)*(p3.y - p1.y) - (p3.x - p1.x)*(p2.y - p1.y));
+}
+
+
+

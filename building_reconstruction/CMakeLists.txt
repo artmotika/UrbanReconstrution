@@ -115,7 +115,8 @@ add_library(texturing_mapping STATIC Texturing/Texturing_mapping.h Texturing/Tex
         Texturing/Image/Lidar2depth.h Texturing/Image/Lidar2depth.cpp)
 add_library(metrics STATIC Metrics/Metrics.h Metrics/Metrics.cpp
             Metrics/BlurEstimation.h Metrics/BlurEstimation.cpp)
-add_library(color_transfer STATIC ColorTransfer/ColorTransferMeanLocal.h ColorTransfer/ColorTransferMeanLocal.cpp)
+add_library(color_transfer STATIC ColorTransfer/ColorTransferMeanLocal.h ColorTransfer/ColorTransferMeanLocal.cpp
+            ColorTransfer/ColorTransferMeanSamePolygons.h ColorTransfer/ColorTransferMeanSamePolygons.cpp)
 create_single_source_cgal_program("texturing_map_example.cpp")
 create_single_source_cgal_program("metric_image_compare_example.cpp")
 #add_library(surface_reconstruction STATIC surface_reconstruction.cpp)

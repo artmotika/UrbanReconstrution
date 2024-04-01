@@ -35,11 +35,13 @@ namespace urban_rec {
         using Camera = pcl::texture_mapping::Camera;
         using UvIndex = pcl::texture_mapping::UvIndex;
 
-        void setInputPolygonMesh(PolygonMesh polygon_mesh);
+        void setInputPolygonMesh(PolygonMesh &polygon_mesh);
 
         PolygonMesh getInputPolygonMesh();
 
         tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> textureMesh(vector <string> argv);
+
+        vector<pcl::TextureMesh> textureMeshes(vector <string> argv);
 
         static bool readCamPoseFile(string filename,
                                 TextureMapping<pcl::PointXYZ>::Camera &cam);

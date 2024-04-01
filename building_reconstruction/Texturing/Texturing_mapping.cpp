@@ -206,7 +206,7 @@ int saveOBJFile(const std::string &file_name,
     return (0);
 }
 
-void urban_rec::Texturing_mapping::setInputPolygonMesh(pcl::PolygonMesh polygon_mesh) {
+void urban_rec::Texturing_mapping::setInputPolygonMesh(pcl::PolygonMesh &polygon_mesh) {
     input_polygon_mesh = std::make_shared<pcl::PolygonMesh>(polygon_mesh);
 }
 
@@ -780,75 +780,6 @@ tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> urban_rec::Texturing
 //    pcl::TextureMapping <pcl::PointXYZ> tm;  // TextureMapping object that will perform the sort
     textureMeshwithMultipleCameras(mesh, my_cams);
 
-//    // ––– texture patches coloring in black
-//    // Placeholder image for the result
-//    vector <cv::Mat> destinations;
-//
-//    for (int current_cam = 0; current_cam < my_cams.size() + 1; current_cam++) {
-//        std::ostringstream oss_in;
-//        std::ostringstream oss_dest;
-//
-//        oss_in << argv[2] << mesh.tex_materials[current_cam].tex_file;
-//
-//        string image_path = oss_in.str();
-//
-//        int dot_index = path_utils::getIndexBeforeChar(image_path, '.');
-//        string image_subpath1 = image_path.substr(0, dot_index);
-//        string image_subpath2 = image_path.substr(dot_index, image_path.size());
-//
-//        oss_dest << image_subpath1 << "_Tpatch" << image_subpath2;
-//        string destination_path = oss_dest.str();
-//
-//        cout << image_path << endl;
-//        cout << destination_path << endl;
-//
-//        cv::Mat imagePatch = cv::imread(image_path, cv::IMREAD_COLOR);
-//        int input_height = imagePatch.rows;
-//        int input_width = imagePatch.cols;
-//        cv::Mat destination(input_height, input_width, CV_8UC3, cv::Scalar(255, 255, 255));
-//        destinations.push_back(destination);
-//        for (int face_idx = 0; face_idx < mesh.tex_coordinates[current_cam].size() / 3; face_idx++) {
-//            // face is visible by the current camera copy UV coordinates
-//            pcl::PointXY p0 = PointXY(mesh.tex_coordinates[current_cam][face_idx * 3](0),
-//                                      mesh.tex_coordinates[current_cam][face_idx * 3](1));
-//            pcl::PointXY p1 = PointXY(mesh.tex_coordinates[current_cam][face_idx * 3 + 1](0),
-//                                      mesh.tex_coordinates[current_cam][face_idx * 3 + 1](1));
-//            pcl::PointXY p2 = PointXY(mesh.tex_coordinates[current_cam][face_idx * 3 + 2](0),
-//                                      mesh.tex_coordinates[current_cam][face_idx * 3 + 2](1));
-//            int x0 = int(p0.x * input_width);
-//            int y0 = int(p0.y * input_height);
-//            int x1 = int(p1.x * input_width);
-//            int y1 = int(p1.y * input_height);
-//            int x2 = int(p2.x * input_width);
-//            int y2 = int(p2.y * input_height);
-//            // Проверка, что UV-координаты не равны -1.0, то есть не occluded
-//            if (x0 > 0 && x1 > 0 && x2 > 0) {
-//                // Лучше будет отсортировать!!!
-//                int maxX = std::max( x0, std::max( x1, x2) );
-//                int maxY = std::max( y0, std::max( y1, y2) );
-//                int minX = std::min( x0, std::min( x1, x2) );
-//                int minY = std::min( y0, std::min( y1, y2) );
-//                for (int x = minX; x <= maxX; x++) {
-//                    for (int y = minY; y <= maxY; y++) {
-////                        cout << "minX: " << minX << " maxX: " << maxX << " minY: " << minY << " maxY: " << maxY
-////                        << " x : " << x << " y : " << y << endl;
-//                        pcl::PointXY pt(float(x)/float(input_width), float(y)/float(input_height));
-////                        cout << " x : " << pt.x << " y : " << pt.y << endl;
-//                        if (checkPointInsideTriangle(p0, p1, p2, pt)) {
-//                            destinations[current_cam].at<cv::Vec3b>(input_height - y, x) = cv::Vec3b(0, 0, 0);
-//                        } else {
-////                            destinations[current_cam].at<cv::Vec3b>(int(y), int(x)) = imagePatch.at<cv::Vec3b>(int(y), int(x));
-//                        }
-//                    }
-//                }
-//            }
-////            cout << "current_cam = " << current_cam << " x0: " << x0 << " y0: " << y0 << " x1: " << x1 << " y1: "
-////            << y1 << " x2: " << x2 << " y2: " << y2 << endl;
-//        }
-//        cv::imwrite(destination_path, destinations[current_cam]);
-//    }
-
-
     // Compute normals for the mesh
     pcl::NormalEstimation <pcl::PointXYZ, pcl::Normal> n;
     pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud <pcl::Normal>);
@@ -868,4 +799,131 @@ tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> urban_rec::Texturing
     saveOBJFile(argv[1], mesh, 5);
 
     return make_tuple(mesh, my_cams);
+}
+
+vector<pcl::TextureMesh> urban_rec::Texturing_mapping::textureMeshes(vector <string> argv) {
+    pcl::PolygonMesh triangles;
+    if (input_polygon_mesh != nullptr) {
+        triangles = *input_polygon_mesh;
+    } else {
+        pcl::io::loadPolygonFilePLY(argv[0], triangles);
+    }
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new PointCloud <PointXYZ>);
+    pcl::fromPCLPointCloud2(triangles.cloud, *cloud);
+
+    // Read images with txt files cam's parameters
+    const boost::filesystem::path base_dir(argv[2]);
+    std::string extension(".txt");
+    std::vector <boost::filesystem::path> filenames;
+    try {
+        for (boost::filesystem::directory_iterator it(base_dir);
+             it != boost::filesystem::directory_iterator(); ++it) {
+            if (boost::filesystem::is_regular_file(it->status()) &&
+                boost::filesystem::extension(it->path()) == extension) {
+                filenames.push_back(it->path());
+            }
+        }
+    } catch (const boost::filesystem::filesystem_error &e) {
+        cerr << e.what() << endl;
+    }
+    std::sort(filenames.begin(), filenames.end());
+
+    // Create the texturemesh object that will contain our UV-mapped mesh
+    vector<pcl::TextureMesh> mesh(filenames.size());
+    for (int i = 0; i < filenames.size(); i++) {
+        mesh[i].cloud = triangles.cloud;
+    }
+
+    vector <pcl::Vertices> polygon_1;
+    // Push faces into the texturemesh object
+    for (int i = 0; i < filenames.size(); i++) {
+        polygon_1.resize(triangles.polygons.size());
+        for (size_t i = 0; i < triangles.polygons.size(); ++i) {
+            polygon_1[i] = triangles.polygons[i];
+        }
+        mesh[i].tex_polygons.push_back(polygon_1);
+    }
+
+    // Load textures and cameras poses and intrinsics
+    vector<pcl::texture_mapping::CameraVector> my_cams(filenames.size());
+
+    for (int i = 0; i < filenames.size(); ++i) {
+        std::cout << filenames[i].string() << std::endl;
+        pcl::TextureMapping<pcl::PointXYZ>::Camera cam;
+        readCamPoseFile(filenames[i].string(), cam);
+        cam.texture_file = filenames[i].stem().string() + ".jpg"; //".png"
+        my_cams[i].push_back(cam);
+    }
+
+    // Create materials for each texture (and one extra for occluded faces)
+    for (int i = 0; i < filenames.size(); ++i) {
+        mesh[i].tex_materials.resize(2);
+    }
+    for (int i = 0; i <= my_cams.size(); ++i) {
+        pcl::TexMaterial mesh_material;
+        mesh_material.tex_Ka.r = 0.2f;
+        mesh_material.tex_Ka.g = 0.2f;
+        mesh_material.tex_Ka.b = 0.2f;
+
+        mesh_material.tex_Kd.r = 0.8f;
+        mesh_material.tex_Kd.g = 0.8f;
+        mesh_material.tex_Kd.b = 0.8f;
+
+        mesh_material.tex_Ks.r = 1.0f;
+        mesh_material.tex_Ks.g = 1.0f;
+        mesh_material.tex_Ks.b = 1.0f;
+
+        mesh_material.tex_d = 1.0f;
+        mesh_material.tex_Ns = 75.0f;
+        mesh_material.tex_illum = 2;
+
+        std::stringstream tex_name;
+        tex_name << "material_" << i;
+        tex_name >> mesh_material.tex_name;
+
+        if (i < my_cams.size()) {
+            mesh_material.tex_file = my_cams[i][0].texture_file;
+            mesh[i].tex_materials[0] = mesh_material;
+        } else {
+            mesh_material.tex_file = "occluded.jpg";
+            for (int j = 0; j < filenames.size(); ++j) {
+                mesh[j].tex_materials[1] = mesh_material;
+            }
+        }
+    }
+
+    // Sort faces
+    for (int i = 0; i < filenames.size(); ++i) {
+        //    pcl::TextureMapping <pcl::PointXYZ> tm;  // TextureMapping object that will perform the sort
+        textureMeshwithMultipleCameras(mesh[i], my_cams[i]);
+        cout << "Ended..." << endl;
+    }
+
+    // Compute normals for the mesh
+    pcl::NormalEstimation <pcl::PointXYZ, pcl::Normal> n;
+    pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud <pcl::Normal>);
+    pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree <pcl::PointXYZ>);
+    tree->setInputCloud(cloud);
+    n.setInputCloud(cloud);
+    n.setSearchMethod(tree);
+    n.setKSearch(20);
+    n.compute(*normals);
+
+    // Concatenate XYZ and normal fields
+    pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals(new pcl::PointCloud <pcl::PointNormal>);
+    pcl::concatenateFields(*cloud, *normals, *cloud_with_normals);
+
+    // Creating pathes for obj files
+    int dot_index = path_utils::getIndexBeforeChar(argv[1], '.');
+    string obj_subpath1 = argv[1].substr(0, dot_index);
+    string obj_subpath2 = argv[1].substr(dot_index, argv[1].size());
+
+    for (int i = 0; i < filenames.size(); ++i) {
+        pcl::toPCLPointCloud2(*cloud_with_normals, mesh[i].cloud);
+        std::ostringstream oss_dest;
+        oss_dest << obj_subpath1 << "_" << i << obj_subpath2;
+        saveOBJFile(oss_dest.str(), mesh[i], 5);
+    }
+
+    return mesh;
 }

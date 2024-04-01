@@ -43,6 +43,8 @@ namespace Geometry_pcl {
 
     bool checkPointInsideTriangle(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3, const pcl::PointXY &pt);
 
+    double triangle_area(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3);
+
 }
 
 
