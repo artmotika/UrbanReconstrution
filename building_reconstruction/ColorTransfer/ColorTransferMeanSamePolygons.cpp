@@ -29,6 +29,10 @@ void ColorTransferMeanSamePolygons::setInputTextureMesh(pcl::TextureMesh &mesh) 
     main_mesh = mesh;
 }
 
+void ColorTransferMeanSamePolygons::setInputCams(pcl::texture_mapping::CameraVector &input_cams) {
+    cams = input_cams;
+}
+
 void ColorTransferMeanSamePolygons::setInputTextureMeshes(vector<pcl::TextureMesh> &meshes) {
     input_meshes = meshes;
 }
@@ -80,98 +84,32 @@ vector <vector <bool>> ColorTransferMeanSamePolygons::getBorderTp() {
     return border_cams_to_face_idx;
 }
 
-tuple< vector <int>, vector <int>> ColorTransferMeanSamePolygons::getFaceIndexMaps(vector <pcl::Vertices> &polygons,
-                                                            vector <pcl::Vertices> &tex_polygons,
-                                                            int num_points,
-                                                            std::ofstream &output_file) {
-    vector <int> faceIndexMapFullToPart(polygons.size(), -1);
-    vector <int> faceIndexMapPartToFull(tex_polygons.size(), -1);
-    vector <set <int>> pointIndex1ToFaceIndex(num_points);
-    vector <set <int>> pointIndex2ToFaceIndex(num_points);
-    vector <set <int>> pointIndex3ToFaceIndex(num_points);
+void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam,
+                                                                 vector <PolygonTextureCoords> &camToPolygonTextureCoords,
+                                                                 vector <vector <int>> &meshFaceIndexMapInputMeshesFullToPart,
+                                                                 vector <vector <int>> &meshFaceIndexMapInputMeshesPartToFull,
+                                                                 vector <cv::Mat> &textures,
+                                                                 cv::Mat &dest_target, std::ofstream & output_file,
+                                                                 vector <cv::Mat> &destinations) {
+    double lower_bound_area = 0.0;
+    vector <int> area_cams_idx;
 
-    for (int face_idx = 0; face_idx < tex_polygons.size(); face_idx++) {
-        pcl::Vertices polygon = tex_polygons[face_idx];
-        pointIndex1ToFaceIndex[polygon.vertices[0]].insert(face_idx);
-        pointIndex2ToFaceIndex[polygon.vertices[1]].insert(face_idx);
-        pointIndex3ToFaceIndex[polygon.vertices[2]].insert(face_idx);
-    }
-
-//    // ONLY LOG
-//    for (int face_idx = 0; face_idx < tex_polygons.size(); face_idx++) {
-//        pcl::Vertices polygon = tex_polygons[face_idx];
-//        output_file << "index0: " << polygon.vertices[0] << endl;
-//        for (int n : pointIndex1ToFaceIndex[polygon.vertices[0]]) {
-//            output_file << n << " ";
-//        }
-//        output_file << endl;
-//        output_file << "index1: " << polygon.vertices[1] << endl;
-//        for (int n : pointIndex2ToFaceIndex[polygon.vertices[1]]) {
-//            output_file << n << " ";
-//        }
-//        output_file << endl;
-//        output_file << "index2: " << polygon.vertices[2] << endl;
-//        for (int n : pointIndex3ToFaceIndex[polygon.vertices[2]]) {
-//            output_file << n << " ";
-//        }
-//        output_file << endl << endl;
-//    }
-//    // ONLY LOG
-
-    for (int i = 0; i < polygons.size(); i++) {
-        pcl::Vertices polygon = polygons[i];
-        set <int> set1 = pointIndex1ToFaceIndex[polygon.vertices[0]];
-        set <int> set2 = pointIndex2ToFaceIndex[polygon.vertices[1]];
-        set <int> set3 = pointIndex3ToFaceIndex[polygon.vertices[2]];
-        std::set<int> intersection;
-        // Находим пересечение между первыми двумя множествами
-        std::set_intersection(set1.begin(), set1.end(), set2.begin(), set2.end(),
-                              std::inserter(intersection, intersection.begin()));
-        // Находим пересечение между результатом и третьим множеством
-        std::set<int> result_intersection;
-        std::set_intersection(intersection.begin(), intersection.end(), set3.begin(), set3.end(),
-                              std::inserter(result_intersection, result_intersection.begin()));
-
-        if (!result_intersection.empty()) {
-            faceIndexMapFullToPart[i] = *(result_intersection.begin());
-            faceIndexMapPartToFull[*(result_intersection.begin())] = i;
-        }
-    }
-    return make_tuple(faceIndexMapFullToPart, faceIndexMapPartToFull);
-}
-
-void ColorTransferMeanSamePolygons::transferColorBetweenPolygons(int cur_cam,
-                                                          vector <PolygonTextureCoords> &camToPolygonTextureCoords,
-                                                          vector <vector <int>> &meshFaceIndexMapInputMeshesFullToPart,
-                                                          vector <vector <int>> &meshFaceIndexMapInputMeshesPartToFull,
-                                                          vector <cv::Mat> &textures,
-                                                          cv::Mat &dest_target, std::ofstream & output_file,
-                                                          vector <cv::Mat> &destinations) {
-    double max_area = 0.0;
-    int max_area_cam_idx = -1;
-    for (int current_cam = 0; current_cam < number_cams ; current_cam++) { //&& current_cam != cur_cam
-        PolygonTextureCoords polygonTextureCoords = camToPolygonTextureCoords[current_cam];
-        double area = Geometry_pcl::triangle_area(polygonTextureCoords.a, polygonTextureCoords.b, polygonTextureCoords.c);
-//        output_file << "area: " << area << endl;
-//        output_file << "a: " << polygonTextureCoords.a.x << " "  << polygonTextureCoords.a.y
-//        << " b: "<< polygonTextureCoords.b.x << " " << polygonTextureCoords.b.y
-//        << " c: " << polygonTextureCoords.c.x << " " << polygonTextureCoords.c.y << endl;
-        if (max_area < area) {
-            max_area = area;
-            max_area_cam_idx = current_cam;
-        }
-    }
-    if (max_area_cam_idx == -1) return;
-    output_file << "after continue..." << endl;
-
-    PolygonTextureCoords polygonTextureCoordsSrc = camToPolygonTextureCoords[max_area_cam_idx];
     PolygonTextureCoords polygonTextureCoordsTarget = camToPolygonTextureCoords[cur_cam];
-    int t1_x0 = int(polygonTextureCoordsSrc.a.x * texture_width);
-    int t1_y0 = int(texture_height - polygonTextureCoordsSrc.a.y * texture_height);
-    int t1_x1 = int(polygonTextureCoordsSrc.b.x * texture_width);
-    int t1_y1 = int(texture_height - polygonTextureCoordsSrc.b.y * texture_height);
-    int t1_x2 = int(polygonTextureCoordsSrc.c.x * texture_width);
-    int t1_y2 = int(texture_height - polygonTextureCoordsSrc.c.y * texture_height);
+    double area_target = Geometry_pcl::triangle_area(polygonTextureCoordsTarget.a, polygonTextureCoordsTarget.b, polygonTextureCoordsTarget.c);
+    vector <double> quality_metric(number_cams);
+
+    for (int current_cam = 0; current_cam < number_cams; current_cam++) {
+        if (current_cam == cur_cam) continue;
+        PolygonTextureCoords polygonTextureCoords = camToPolygonTextureCoords[current_cam];
+        double area_src = Geometry_pcl::triangle_area(polygonTextureCoords.a, polygonTextureCoords.b, polygonTextureCoords.c);
+        if (lower_bound_area < area_src) {
+            quality_metric[current_cam] = area_src / area_target;
+            if (quality_metric[current_cam] < 0.333333) continue;
+            area_cams_idx.push_back(current_cam);
+        }
+    }
+    if (area_cams_idx.size() == 0) return;
+    output_file << "after continue..." << endl;
 
     int t2_x0 = int(polygonTextureCoordsTarget.a.x * texture_width);
     int t2_y0 = int(texture_height - polygonTextureCoordsTarget.a.y * texture_height);
@@ -179,105 +117,160 @@ void ColorTransferMeanSamePolygons::transferColorBetweenPolygons(int cur_cam,
     int t2_y1 = int(texture_height - polygonTextureCoordsTarget.b.y * texture_height);
     int t2_x2 = int(polygonTextureCoordsTarget.c.x * texture_width);
     int t2_y2 = int(texture_height - polygonTextureCoordsTarget.c.y * texture_height);
-
-    int t1_maxX = std::max( t1_x0, std::max( t1_x1, t1_x2) );
-    int t1_maxY = std::max( t1_y0, std::max( t1_y1, t1_y2) );
-    int t1_minX = std::min( t1_x0, std::min( t1_x1, t1_x2) );
-    int t1_minY = std::min( t1_y0, std::min( t1_y1, t1_y2) );
-
     int t2_maxX = std::max( t2_x0, std::max( t2_x1, t2_x2) );
     int t2_maxY = std::max( t2_y0, std::max( t2_y1, t2_y2) );
     int t2_minX = std::min( t2_x0, std::min( t2_x1, t2_x2) );
     int t2_minY = std::min( t2_y0, std::min( t2_y1, t2_y2) );
 
-//    // Получаем средние значения цветов для исходного и целевого изображения
-//    int blueSumSrc = 0;
-//    int greenSumSrc = 0;
-//    int redSumSrc = 0;
-//    int countSrc = 0;
-//
-    for (int x = t1_minX; x <= t1_maxX; x++) {
-        for (int y = t1_minY; y <= t1_maxY; y++) {
-            // Берем MeanColor не из треугольника, а из прямоугольника, который содержит этот треугольник
-            // (чтобы учесть случай неправильной позиции камеры при дальнем расстоянии)
+    // Получаем средние значения цветов для целевого изображения
+    int blueSumTarget = 0;
+    int greenSumTarget = 0;
+    int redSumTarget = 0;
+    int countTarget = 0;
+    for (int x = t2_minX; x <= t2_maxX; x++) {
+        for (int y = t2_minY; y <= t2_maxY; y++) {
             pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
-            if (checkPointInsideTriangle(polygonTextureCoordsSrc.a, polygonTextureCoordsSrc.b, polygonTextureCoordsSrc.c, pt)) {
-//                cv::Vec3b pixel = textures[max_area_cam_idx].at<cv::Vec3b>(y, x);
-//                blueSumSrc += int(pixel[0]); // синий
-//                greenSumSrc += int(pixel[1]); // зеленый
-//                redSumSrc += int(pixel[2]); // красный
-//                countSrc++;
-                destinations[max_area_cam_idx].at<cv::Vec3b>(y, x) = cv::Vec3b(0, 0, 0);
+            if (checkPointInsideTriangle(polygonTextureCoordsTarget.a, polygonTextureCoordsTarget.b, polygonTextureCoordsTarget.c, pt)) {
+                cv::Vec3b pixel = textures[cur_cam].at<cv::Vec3b>(y, x);
+                blueSumTarget += int(pixel[0]); // синий
+                greenSumTarget += int(pixel[1]); // зеленый
+                redSumTarget += int(pixel[2]); // красный
+                countTarget++;
             }
         }
     }
-//
-//    int blueSumTarget = 0;
-//    int greenSumTarget = 0;
-//    int redSumTarget = 0;
-//    int countTarget = 0;
-//
-//    for (int x = t2_minX; x <= t2_maxX; x++) {
-//        for (int y = t2_minY; y <= t2_maxY; y++) {
-//            pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
-//            if (checkPointInsideTriangle(polygonTextureCoordsTarget.a, polygonTextureCoordsTarget.b, polygonTextureCoordsTarget.c, pt)) {
-//                cv::Vec3b pixel = textures[cur_cam].at<cv::Vec3b>(y, x);
-//                blueSumTarget += int(pixel[0]); // синий
-//                greenSumTarget += int(pixel[1]); // зеленый
-//                redSumTarget += int(pixel[2]); // красный
-//                countTarget++;
-//            }
+
+    if (countTarget == 0
+        || blueSumTarget + greenSumTarget + redSumTarget == 0) {
+        return;
+    }
+
+    double meanBlueTarget = double(blueSumTarget) / double(countTarget);
+    double meanGreenTarget = double(greenSumTarget) / double(countTarget);
+    double meanRedTarget = double(redSumTarget) / double(countTarget);
+
+    // Получаем средние значения цветов для исходного изображения
+    double blueSumSrcAll = 0.0;
+    double greenSumSrcAll = 0.0;
+    double redSumSrcAll = 0.0;
+    double countSrcAll = 0.0;
+    for (int cam_idx : area_cams_idx) {
+        int blueSumSrc = 0;
+        int greenSumSrc = 0;
+        int redSumSrc = 0;
+        int countSrc = 0;
+        PolygonTextureCoords polygonTextureCoordsSrc = camToPolygonTextureCoords[cam_idx];
+        int t1_x0 = int(polygonTextureCoordsSrc.a.x * texture_width);
+        int t1_y0 = int(texture_height - polygonTextureCoordsSrc.a.y * texture_height);
+        int t1_x1 = int(polygonTextureCoordsSrc.b.x * texture_width);
+        int t1_y1 = int(texture_height - polygonTextureCoordsSrc.b.y * texture_height);
+        int t1_x2 = int(polygonTextureCoordsSrc.c.x * texture_width);
+        int t1_y2 = int(texture_height - polygonTextureCoordsSrc.c.y * texture_height);
+        int t1_maxX = std::max( t1_x0, std::max( t1_x1, t1_x2) );
+        int t1_maxY = std::max( t1_y0, std::max( t1_y1, t1_y2) );
+        int t1_minX = std::min( t1_x0, std::min( t1_x1, t1_x2) );
+        int t1_minY = std::min( t1_y0, std::min( t1_y1, t1_y2) );
+        for (int x = t1_minX; x <= t1_maxX; x++) {
+            for (int y = t1_minY; y <= t1_maxY; y++) {
+                // Берем MeanColor не из треугольника, а из прямоугольника, который содержит этот треугольник
+                // (чтобы учесть случай неправильной позиции камеры при дальнем расстоянии)
+                pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
+                if (checkPointInsideTriangle(polygonTextureCoordsSrc.a, polygonTextureCoordsSrc.b, polygonTextureCoordsSrc.c, pt)) {
+                    cv::Vec3b pixel = textures[cam_idx].at<cv::Vec3b>(y, x);
+                    blueSumSrc += int(pixel[0]); // синий
+                    greenSumSrc += int(pixel[1]); // зеленый
+                    redSumSrc += int(pixel[2]); // красный
+                    countSrc++;
+//              // LOG ONLY
+//                destinations[cam_idx].at<cv::Vec3b>(y, x) = cv::Vec3b(255, 255, 255);
+//              // LOG ONLY
+                }
+            }
+        }
+        if (countSrc == 0) continue;
+        if (meanBlueTarget == 0.0 || meanGreenTarget == 0.0 || meanRedTarget == 0.0) {
+            blueSumSrcAll += quality_metric[cam_idx] * (blueSumSrc / countSrc);
+            greenSumSrcAll += quality_metric[cam_idx] * (greenSumSrc / countSrc);
+            redSumSrcAll += quality_metric[cam_idx] * (redSumSrc / countSrc);
+            countSrcAll += quality_metric[cam_idx];
+            continue;
+        }
+        double alphaImage = (double(blueSumSrc) / double(countSrc)) / meanBlueTarget;
+        double betaImage = (double(greenSumSrc) / double(countSrc)) / meanGreenTarget;
+        double gammaImage = (double(redSumSrc) / double(countSrc)) / meanRedTarget;
+
+        // Пропускаем изображение, если оно имеет не реалистично большую разницу с исходным target изображением
+//        if (alphaImage <= 0.55 || alphaImage > 1.8181
+//        || betaImage <= 0.55 || betaImage > 1.8181
+//        || gammaImage <= 0.55 || gammaImage > 1.8181) {
+//            continue;
 //        }
-//    }
-//
-//    if (countTarget == 0 || countSrc == 0
-//        || blueSumSrc + greenSumSrc + redSumSrc == 0
-//        || blueSumTarget + greenSumTarget + redSumTarget == 0) {
-//        return;
-//    }
-//    // Рассчитываем коэффициенты для смешивания цветов
-//    double alpha;
-//    double beta;
-//    double gamma;
-//    double meanBlueSrc = double(blueSumSrc) / double(countSrc);
-//    double meanBlueTarget = double(blueSumTarget) / double(countTarget);
-//    double meanGreenSrc = double(greenSumSrc) / double(countSrc);
-//    double meanGreenTarget = double(greenSumTarget) / double(countTarget);
-//    double meanRedSrc = double(redSumSrc) / double(countSrc);
-//    double meanRedTarget = double(redSumTarget) / double(countTarget);
-//    if (blueSumSrc == 0) {
-//        alpha = 1.0;
-//    } else {
-//        alpha = meanBlueSrc / meanBlueTarget;
-//    }
-//    if (greenSumSrc == 0) {
-//        beta = 1.0;
-//    } else {
-//        beta = meanGreenSrc / meanGreenTarget;
-//    }
-//    if (redSumSrc == 0) {
-//        gamma = 1.0;
-//    } else {
-//        gamma = meanRedSrc / meanRedTarget;
-//    }
+        if (alphaImage <= 0.65 || alphaImage > 1.5384
+            || betaImage <= 0.65 || betaImage > 1.5384
+            || gammaImage <= 0.65 || gammaImage > 1.5384) {
+            continue;
+        }
+        blueSumSrcAll += quality_metric[cam_idx] * (blueSumSrc / countSrc);
+        greenSumSrcAll += quality_metric[cam_idx] * (greenSumSrc / countSrc);
+        redSumSrcAll += quality_metric[cam_idx] * (redSumSrc / countSrc);
+        countSrcAll += quality_metric[cam_idx];
+    }
+
+    if (countSrcAll == 0.0
+        || blueSumSrcAll + greenSumSrcAll + redSumSrcAll < std::numeric_limits<float>::epsilon()) {
+        return;
+    }
+
+    // Рассчитываем коэффициенты для смешивания цветов
+    double alpha;
+    double beta;
+    double gamma;
+    double meanBlueSrc = double(blueSumSrcAll) / countSrcAll;
+    double meanGreenSrc = double(greenSumSrcAll) / countSrcAll;
+    double meanRedSrc = double(redSumSrcAll) / countSrcAll;
+
+    if (blueSumSrcAll == 0 || blueSumTarget == 0) {
+        alpha = 1.0;
+    } else {
+        alpha = meanBlueSrc / meanBlueTarget;
+    }
+    if (greenSumSrcAll == 0 || greenSumTarget == 0) {
+        beta = 1.0;
+    } else {
+        beta = meanGreenSrc / meanGreenTarget;
+    }
+    if (redSumSrcAll == 0 || redSumTarget == 0) {
+        gamma = 1.0;
+    } else {
+        gamma = meanRedSrc / meanRedTarget;
+    }
+
+    // Нереалистично маленькие значения, ошибка в параметрах позы камер
+    if (alpha <= 0.65 || beta <= 0.65 || gamma <= 0.65 || alpha > 1.5384 || beta > 1.5384 || gamma > 1.5384) {
+        return;
+    }
+
+//    cout << "meanBlueSrc: " << meanBlueSrc << " meanBlueTarget: " << meanBlueTarget << " alpha: " << alpha << endl;
+//    cout << "meanGreenSrc: " << meanGreenSrc << " meanGreenTarget: " << meanGreenTarget << " beta: " << beta << endl;
+//    cout << "meanRedSrc: " << meanRedSrc << " meanRedTarget: " << meanRedTarget << " gamma: " << gamma << endl;
 
     for (int x = t2_minX; x <= t2_maxX; x++) {
         for (int y = t2_minY; y <= t2_maxY; y++) {
             pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
             if (checkPointInsideTriangle(polygonTextureCoordsTarget.a, polygonTextureCoordsTarget.b, polygonTextureCoordsTarget.c, pt)) {
-//                cv::Vec3b pixel = dest_target.at<cv::Vec3b>(y, x);
-//                output_file << "pixel[0]: " << double(pixel[0]) << " pixel[1]: " << double(pixel[1])
-//                            << " pixel[2]: " << double(pixel[2]) << endl
-//                            << " alpha: " << alpha
-//                            << " beta: " << beta
-//                            << " gamma: " << gamma << endl;
-//
-//                pixel[0] = saturate_cast<uchar>(double(pixel[0]) * alpha);
-//                pixel[1] = saturate_cast<uchar>(double(pixel[1]) * beta);
-//                pixel[2] = saturate_cast<uchar>(double(pixel[2]) * gamma);
-//                output_file << "pixel[0]: " << double(pixel[0]) << " pixel[1]: " << double(pixel[1])
-//                            << " pixel[2]: " << double(pixel[2]) << endl << endl << endl;
-////                dest_target.at<cv::Vec3b>(y, x) = pixel;
+                cv::Vec3b pixel = dest_target.at<cv::Vec3b>(y, x);
+                output_file << "pixel[0]: " << double(pixel[0]) << " pixel[1]: " << double(pixel[1])
+                            << " pixel[2]: " << double(pixel[2]) << endl
+                            << " alpha: " << alpha
+                            << " beta: " << beta
+                            << " gamma: " << gamma << endl;
+
+                pixel[0] = saturate_cast<uchar>(double(pixel[0]) * alpha);
+                pixel[1] = saturate_cast<uchar>(double(pixel[1]) * beta);
+                pixel[2] = saturate_cast<uchar>(double(pixel[2]) * gamma);
+                output_file << "pixel[0]: " << double(pixel[0]) << " pixel[1]: " << double(pixel[1])
+                            << " pixel[2]: " << double(pixel[2]) << endl << endl << endl;
+                dest_target.at<cv::Vec3b>(y, x) = pixel;
 //                dest_target.at<cv::Vec3b>(y, x) = cv::Vec3b(0, 0, 0);
             }
         }
@@ -285,55 +278,99 @@ void ColorTransferMeanSamePolygons::transferColorBetweenPolygons(int cur_cam,
 }
 
 void ColorTransferMeanSamePolygons::transferColorBetweenTpBorder(vector< vector <bool>> &border_cams_to_face_idx,
+                                                          vector <vector <int>> &meshFaceIndexMapMainMeshFullToPart,
                                                           vector <vector <int>> &meshFaceIndexMapMainMeshPartToFull,
                                                           vector <vector <int>> &meshFaceIndexMapInputMeshesFullToPart,
                                                           vector <vector <int>> &meshFaceIndexMapInputMeshesPartToFull,
+                                                          vector <cv::Mat> &masks,
                                                           vector <cv::Mat> &textures,
                                                           vector <cv::Mat> &destinations) {
+
+    pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+    fromPCLPointCloud2(main_mesh.cloud, *input_cloud);
+    double max_dist = 25.0;
+    urban_rec::Texturing_mapping texturing_mapping = urban_rec::Texturing_mapping(2000, 2000);
     std::ofstream output_file("../example_mini5/log/log3.txt");
+    // LOG ONLY
+    vector <vector <int>> c (number_cams, vector <int> (number_cams, 0));
+    // LOG ONLY
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
         cv::Mat dest_target = destinations[current_cam];
         for (int face_idx = 0; face_idx < main_mesh.tex_polygons[current_cam].size(); face_idx++) {
 //            if (border_cams_to_face_idx[current_cam][face_idx]) {
                 int global_target_face_idx = meshFaceIndexMapMainMeshPartToFull[current_cam][face_idx];
-//                int target_face_idx = meshFaceIndexMapInputMeshesFullToPart[current_cam][global_target_face_idx];
-                int target_face_idx = face_idx;
+                int target_face_idx = meshFaceIndexMapInputMeshesFullToPart[current_cam][global_target_face_idx];
                 output_file << "current_cam: " << current_cam << " face_idx: " << face_idx
                 << " global_target_face_idx: " << global_target_face_idx
                 << " target_face_idx: " << target_face_idx << endl;
                 vector <PolygonTextureCoords> camToPolygonTextureCoords(number_cams);
                 // copy UV coordinates for current_cam of face with face_idx
-                pcl::PointXY p0 = PointXY(input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3](0),
+                pcl::PointXY p0target = PointXY(input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3](0),
                                           input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3](1));
-                pcl::PointXY p1 = PointXY(input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3 + 1](0),
+                pcl::PointXY p1target = PointXY(input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3 + 1](0),
                                           input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3 + 1](1));
-                pcl::PointXY p2 = PointXY(input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3 + 2](0),
+                pcl::PointXY p2target = PointXY(input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3 + 2](0),
                                           input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3 + 2](1));
 //                output_file << "a: " << p0.x << " "  << p0.y
 //                            << " b: "<< p1.x << " " << p1.y
 //                            << " c: " << p2.x << " " << p2.y << endl;
-                PolygonTextureCoords polygonTextureCoords = {p0, p1, p2};
-                camToPolygonTextureCoords[current_cam] = polygonTextureCoords;
-                for (int cam_idx = 0; cam_idx < number_cams ; cam_idx++) { //&& cam_idx != current_cam
-//                    int src_face_idx = meshFaceIndexMapInputMeshesFullToPart[cam_idx][global_target_face_idx];
-                    int src_face_idx = meshFaceIndexMapMainMeshFullToPart[cam_idx][global_target_face_idx];
+                PolygonTextureCoords polygonTextureCoordsTarget = {p0target, p1target, p2target};
+                camToPolygonTextureCoords[current_cam] = polygonTextureCoordsTarget;
+                for (int cam_idx = 0; cam_idx < number_cams; cam_idx++) {
+                    if (cam_idx == current_cam) continue;
+                    int src_face_idx = meshFaceIndexMapInputMeshesFullToPart[cam_idx][global_target_face_idx];
                     if (src_face_idx != -1) {
-                        cout << "src_face_idx: " << src_face_idx << endl;
+                        c[current_cam][cam_idx]++;
                         // copy UV coordinates for current_cam of face with j
-                        pcl::PointXY p0 = PointXY(input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3](0),
+                        pcl::PointXY p0src = PointXY(input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3](0),
                                                   input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3](1));
-                        pcl::PointXY p1 = PointXY(input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3 + 1](0),
+                        pcl::PointXY p1src = PointXY(input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3 + 1](0),
                                                   input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3 + 1](1));
-                        pcl::PointXY p2 = PointXY(input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3 + 2](0),
+                        pcl::PointXY p2src = PointXY(input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3 + 2](0),
                                                   input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3 + 2](1));
-                        output_file << "a: " << p0.x << " "  << p0.y
-                                    << " b: "<< p1.x << " " << p1.y
-                                    << " c: " << p2.x << " " << p2.y << endl << endl;
-                        PolygonTextureCoords polygonTextureCoords = {p0, p1, p2};
-                        camToPolygonTextureCoords[cam_idx] = polygonTextureCoords;
+                        int mask_num = cam_idx % 6;
+                        if (mask_num == 5) continue;
+                        if (texturing_mapping.isFaceOnMask(p0src, p1src, p2src, masks[mask_num])) {
+                            // LOG ONLY
+//                            int x0 = int(p0src.x * texture_width);
+//                            int y0 = int(texture_height - p0src.y * texture_height);
+//                            int x1 = int(p1src.x * texture_width);
+//                            int y1 = int(texture_height - p1src.y * texture_height);
+//                            int x2 = int(p2src.x * texture_width);
+//                            int y2 = int(texture_height - p2src.y * texture_height);
+//                            int t_maxX = std::max( x0, std::max( x1, x2) );
+//                            int t_maxY = std::max( y0, std::max( y1, y2) );
+//                            int t_minX = std::min( x0, std::min( x1, x2) );
+//                            int t_minY = std::min( y0, std::min( y1, y2) );
+//                            for (int x = t_minX; x <= t_maxX; x++) {
+//                                for (int y = t_minY; y <= t_maxY; y++) {
+//                                    pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
+//                                    if (checkPointInsideTriangle(p0src, p1src, p2src, pt)) {
+//                                        destinations[cam_idx].at<cv::Vec3b>(y, x) = cv::Vec3b(255, 255, 255);
+//                                    }
+//                                }
+//                            }
+                            // LOG ONLY
+                            continue;
+                        }
+
+//                        pcl::Vertices polygon = triangles.polygons[global_target_face_idx];
+//                        pcl::PointXYZ p0 = input_cloud->points[polygon.vertices[0]];
+//                        pcl::PointXYZ p1 = input_cloud->points[polygon.vertices[1]];
+//                        pcl::PointXYZ p2 = input_cloud->points[polygon.vertices[2]];
+//                        pcl::PointXYZ camPose(cams[cam_idx].pose(0, 3), cams[cam_idx].pose(1, 3), cams[cam_idx].pose(2, 3));
+//                        pcl::PointXYZ center = Geometry_pcl::getTriangleCenterOfMass(p0, p1, p2);
+//                        if (Geometry_pcl::euclidean_dist_between_two_points(center, camPose) > max_dist) {
+//                            continue;
+//                        }
+//                        output_file << "a: " << p0src.x << " "  << p0src.y
+//                                    << " b: "<< p1src.x << " " << p1src.y
+//                                    << " c: " << p2src.x << " " << p2src.y << endl << endl;
+                        PolygonTextureCoords polygonTextureCoordsSrc = {p0src, p1src, p2src};
+                        camToPolygonTextureCoords[cam_idx] = polygonTextureCoordsSrc;
                     }
                 }
-                transferColorBetweenPolygons(current_cam,
+                transferMeanColorBetweenPolygons(current_cam,
                                              camToPolygonTextureCoords,
                                              meshFaceIndexMapInputMeshesFullToPart,
                                              meshFaceIndexMapInputMeshesPartToFull,
@@ -341,6 +378,15 @@ void ColorTransferMeanSamePolygons::transferColorBetweenTpBorder(vector< vector 
 //            }
         }
     }
+    // LOG ONLY
+    for (int current_cam = 0; current_cam < number_cams; current_cam++) {
+        for (int next_cam = 0; next_cam < number_cams; next_cam++) {
+            if (next_cam == current_cam) continue;
+            cout << "current_cam: " << current_cam << " next_cam: " << next_cam
+                 << " c: " << c[current_cam][next_cam] << endl;
+        }
+    }
+    // LOG ONLY
     output_file.close();
 }
 
@@ -348,6 +394,7 @@ void ColorTransferMeanSamePolygons::transfer() {
     std::ofstream output_file("../example_mini5/log/log2.txt");
     pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     fromPCLPointCloud2(triangles.cloud, *input_cloud);
+
     vector <vector <bool>> border_cams_to_face_idx = getBorderTp();
     vector <vector <int>> meshFaceIndexMapInputMeshesFullToPart(number_cams);
     vector <vector <int>> meshFaceIndexMapMainMeshFullToPart(number_cams);
@@ -357,42 +404,132 @@ void ColorTransferMeanSamePolygons::transfer() {
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
         output_file << "current_cam: " << current_cam
         << "polygons size = " << input_meshes[current_cam].tex_polygons[0].size() << endl;
-        tuple< vector <int>, vector <int>> faceIndexMaps = getFaceIndexMaps(triangles.polygons,
-                                                                            input_meshes[current_cam].tex_polygons[0],
-                                                                            input_cloud->size(), output_file);
-        meshFaceIndexMapInputMeshesFullToPart[current_cam] = get<0>(faceIndexMaps);
-        meshFaceIndexMapInputMeshesPartToFull[current_cam] = get<1>(faceIndexMaps);
+        FaceIndexMaps faceIndexMaps1 = FaceIndexMaps(triangles.polygons,
+                                                    input_meshes[current_cam].tex_polygons[0],
+                                                    input_cloud->size());
+        faceIndexMaps1.getFaceIndexMaps();
+        meshFaceIndexMapInputMeshesFullToPart[current_cam] = faceIndexMaps1.faceIndexMapFullToPart;
+        meshFaceIndexMapInputMeshesPartToFull[current_cam] = faceIndexMaps1.faceIndexMapPartToFull;
                 output_file << "current_cam MAINMESH: " << current_cam
         << "polygons size = " << main_mesh.tex_polygons[current_cam].size() << endl;
-        faceIndexMaps = getFaceIndexMaps(triangles.polygons,
-                                        main_mesh.tex_polygons[current_cam],
-                                        input_cloud->size(), output_file);
-        meshFaceIndexMapMainMeshFullToPart[current_cam] = get<0>(faceIndexMaps);
-        meshFaceIndexMapMainMeshPartToFull[current_cam] = get<1>(faceIndexMaps);
+        FaceIndexMaps faceIndexMaps2 = FaceIndexMaps(triangles.polygons,
+                                                     main_mesh.tex_polygons[current_cam],
+                                                     input_cloud->size());
+        faceIndexMaps2.getFaceIndexMaps();
+        meshFaceIndexMapMainMeshFullToPart[current_cam] = faceIndexMaps2.faceIndexMapFullToPart;
+        meshFaceIndexMapMainMeshPartToFull[current_cam] = faceIndexMaps2.faceIndexMapPartToFull;
     }
 
-    //LOG ONLY
-    for (int current_cam = 0; current_cam < number_cams; current_cam++) {
-        output_file << "current_cam: " << current_cam << endl;
-        vector <int> v1 = meshFaceIndexMapInputMeshesFullToPart[current_cam];
-        vector <int> v2 = meshFaceIndexMapInputMeshesPartToFull[current_cam];
-        vector <int> v3 = meshFaceIndexMapMainMeshFullToPart[current_cam];
-        vector <int> v4 = meshFaceIndexMapMainMeshPartToFull[current_cam];
-        for (int i = 0; i < v1.size(); i++) {
-            output_file << "meshFaceIndexMapInputMeshesFullToPart " << "full: " << i << " part: " << v1[i] << endl;
-        }
-        for (int i = 0; i < v2.size(); i++) {
-            output_file << "meshFaceIndexMapInputMeshesPartToFull " << "part: " << i << " full: " << v2[i] << endl;
-        }
-        for (int i = 0; i < v3.size(); i++) {
-            output_file << "meshFaceIndexMapMainMeshFullToPart " << "full: " << i << " part: " << v3[i] << endl;
-        }
-        for (int i = 0; i < v4.size(); i++) {
-            output_file << "meshFaceIndexMapMainMeshPartToFull " << "part: " << i << " full: " << v4[i] << endl;
-        }
-        output_file << "\n\n\n";
-    }
-    //LOG ONLY
+//    //LOG ONLY
+//    vector<set <int>> mesh_set(number_cams);
+//    vector<set <int>> main_mesh_set(number_cams);
+//    for (int current_cam = 0; current_cam < number_cams; current_cam++) {
+//        set<int> set1;
+//        for (int global_face_idx : meshFaceIndexMapInputMeshesPartToFull[current_cam]) {
+//            if (global_face_idx != -1) {
+//                set1.insert(global_face_idx);
+//            }
+//        }
+//        mesh_set[current_cam] = set1;
+//        set<int> main_set;
+//        for (int global_face_idx : meshFaceIndexMapMainMeshPartToFull[current_cam]) {
+//            if (global_face_idx != -1) {
+//                main_set.insert(global_face_idx);
+//            }
+//        }
+//        main_mesh_set[current_cam] = main_set;
+//    }
+//    vector <vector <int>> c (number_cams, vector <int> (number_cams, 0));
+//    for (int current_cam = 0; current_cam < number_cams; current_cam++) {
+//        for (int face_idx = 0; face_idx < main_mesh.tex_polygons[current_cam].size(); face_idx++) {
+//            int global_target_face_idx = meshFaceIndexMapMainMeshPartToFull[current_cam][face_idx];
+//            for (int next_cam = 0; next_cam < number_cams; next_cam++) {
+//                if (next_cam == current_cam) continue;
+//                int src_face_idx = meshFaceIndexMapInputMeshesFullToPart[next_cam][global_target_face_idx];
+//                if (src_face_idx != -1) c[current_cam][next_cam]++;
+//            }
+//        }
+//    }
+//
+//    for (int current_cam = 0; current_cam < number_cams; current_cam++) {
+//        for (int next_cam = 0; next_cam < number_cams; next_cam++) {
+//            if (next_cam == current_cam) continue;
+//            cout << "current_cam: " << current_cam << " next_cam: " << next_cam
+//                 << " c: " << c[current_cam][next_cam] << endl;
+//        }
+//    }
+//
+//    for (int current_cam = 0; current_cam < number_cams; current_cam++) {
+//        for (int next_cam = 0; next_cam < number_cams; next_cam++) {
+//            set<int> set1 = main_mesh_set[current_cam];
+//            set<int> set2 = mesh_set[next_cam];
+//            std::set<int> intersection;
+//            // Находим пересечение между первыми двумя множествами
+//            std::set_intersection(set1.begin(), set1.end(), set2.begin(), set2.end(),
+//                                  std::inserter(intersection, intersection.begin()));
+//            cout << "current_cam: " << current_cam << " next_cam: " << next_cam
+//                 << " intersection size: " << intersection.size() << endl;
+//        }
+//    }
+//    for (int current_cam = 0; current_cam < number_cams; current_cam++) {
+//        output_file << "current_cam: " << current_cam << endl;
+//        vector <int> v1 = meshFaceIndexMapInputMeshesFullToPart[current_cam];
+//        vector <int> v2 = meshFaceIndexMapInputMeshesPartToFull[current_cam];
+//        vector <int> v3 = meshFaceIndexMapMainMeshFullToPart[current_cam];
+//        vector <int> v4 = meshFaceIndexMapMainMeshPartToFull[current_cam];
+//        for (int i = 0; i < v1.size(); i++) {
+//            output_file << "meshFaceIndexMapInputMeshesFullToPart " << "full: " << i << " part: " << v1[i] << endl;
+//        }
+//        for (int i = 0; i < v2.size(); i++) {
+//            output_file << "meshFaceIndexMapInputMeshesPartToFull " << "part: " << i << " full: " << v2[i] << endl;
+//        }
+//        for (int i = 0; i < v3.size(); i++) {
+//            output_file << "meshFaceIndexMapMainMeshFullToPart " << "full: " << i << " part: " << v3[i] << endl;
+//        }
+//        for (int i = 0; i < v4.size(); i++) {
+//            output_file << "meshFaceIndexMapMainMeshPartToFull " << "part: " << i << " full: " << v4[i] << endl;
+//        }
+//        output_file << "\n\n\n";
+//    }
+//    //LOG ONLY
+
+    vector <cv::Mat> masks;
+    // Сохраняем текстуры маски в матрицы из opencv
+    std::ostringstream oss_masks;
+    oss_masks << dir_path << "masks/mask_Xminus.jpg";
+    string masks_path = oss_masks.str();
+    cout << masks_path << endl;
+    cv::Mat imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
+    masks.push_back(imageMask);
+    cv::imwrite("../example_mini5/mask_Xminus.jpg", imageMask);
+    oss_masks.str("");
+    oss_masks << dir_path << "masks/mask_Xplus.jpg";
+    masks_path = oss_masks.str();
+    cout << masks_path << endl;
+    imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
+    masks.push_back(imageMask);
+    cv::imwrite("../example_mini5/mask_Xplus.jpg", imageMask);
+    oss_masks.str("");
+    oss_masks << dir_path << "masks/mask_Yminus.jpg";
+    masks_path = oss_masks.str();
+    cout << masks_path << endl;
+    imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
+    masks.push_back(imageMask);
+    cv::imwrite("../example_mini5/mask_Yminus.jpg", imageMask);
+    oss_masks.str("");
+    oss_masks << dir_path << "masks/mask_Yplus.jpg";
+    masks_path = oss_masks.str();
+    cout << masks_path << endl;
+    imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
+    masks.push_back(imageMask);
+    cv::imwrite("../example_mini5/mask_Yplus.jpg", imageMask);
+    oss_masks.str("");
+    oss_masks << dir_path << "masks/mask_Zminus.jpg";
+    masks_path = oss_masks.str();
+    cout << masks_path << endl;
+    imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
+    masks.push_back(imageMask);
+    cv::imwrite("../example_mini5/mask_Zminus.jpg", imageMask);
 
     vector <cv::Mat> textures;
     vector <cv::Mat> destinations;
@@ -426,11 +563,47 @@ void ColorTransferMeanSamePolygons::transfer() {
     }
 
     transferColorBetweenTpBorder(border_cams_to_face_idx,
+                                 meshFaceIndexMapMainMeshFullToPart,
                                  meshFaceIndexMapMainMeshPartToFull,
                                  meshFaceIndexMapInputMeshesFullToPart,
                                  meshFaceIndexMapInputMeshesPartToFull,
+                                 masks,
                                  textures,
                                  destinations);
+
+//    // LOG ONLY
+//    for (int current_cam = 0; current_cam < number_cams; current_cam++) {
+//        for (int face_idx = 0; face_idx < input_meshes[current_cam].tex_polygons[0].size(); face_idx++) {
+//            pcl::PointXY a = PointXY(input_meshes[current_cam].tex_coordinates[0][face_idx * 3](0),
+//                                     input_meshes[current_cam].tex_coordinates[0][face_idx * 3](1));
+//            pcl::PointXY b = PointXY(input_meshes[current_cam].tex_coordinates[0][face_idx * 3 + 1](0),
+//                                     input_meshes[current_cam].tex_coordinates[0][face_idx * 3 + 1](1));
+//            pcl::PointXY c = PointXY(input_meshes[current_cam].tex_coordinates[0][face_idx * 3 + 2](0),
+//                                     input_meshes[current_cam].tex_coordinates[0][face_idx * 3 + 2](1));
+//
+//            int t2_x0 = int(a.x * texture_width);
+//            int t2_y0 = int(texture_height - a.y * texture_height);
+//            int t2_x1 = int(b.x * texture_width);
+//            int t2_y1 = int(texture_height - b.y * texture_height);
+//            int t2_x2 = int(c.x * texture_width);
+//            int t2_y2 = int(texture_height - c.y * texture_height);
+//
+//            int t2_maxX = std::max( t2_x0, std::max( t2_x1, t2_x2) );
+//            int t2_maxY = std::max( t2_y0, std::max( t2_y1, t2_y2) );
+//            int t2_minX = std::min( t2_x0, std::min( t2_x1, t2_x2) );
+//            int t2_minY = std::min( t2_y0, std::min( t2_y1, t2_y2) );
+//
+//            for (int x = t2_minX; x <= t2_maxX; x++) {
+//                for (int y = t2_minY; y <= t2_maxY; y++) {
+//                    pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
+//                    if (checkPointInsideTriangle(a, b, c, pt)) {
+//                        destinations[current_cam].at<cv::Vec3b>(y, x) = cv::Vec3b(0, 0, 0);
+//                    }
+//                }
+//            }
+//        }
+//    }
+//    // LOG ONLY
 
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
         cv::imwrite(dest_paths[current_cam], destinations[current_cam]);

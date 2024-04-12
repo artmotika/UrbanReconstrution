@@ -4,10 +4,12 @@
 #include "Algo_reconstruction.h"
 #include "Texturing/Image/Panorama2cubemap.h"
 #include "Texturing/Image/Lidar2depth.h"
+#include "Texturing/MtlUtils.h"
 #include "PointClouds/Shift.h"
 #include "Building_reconstruction.h"
 #include "ColorTransfer/ColorTransferMeanLocal.h"
 #include "ColorTransfer/ColorTransferMeanSamePolygons.h"
+#include "BestFittingTexturing/BestFittingTexturingQuality.h"
 
 #include <opencv2/core/types.hpp>
 #include <tuple>
@@ -56,7 +58,7 @@ int main() {
 //    Io_pcl::saveCloud("../example_mini/obj2_mesh_invertednormals.ply", poisson_mesh); // check file obj2_mesh.ply
 
     // Texturing Mesh
-    urban_rec::Texturing_mapping texturing_mapping = urban_rec::Texturing_mapping();
+    urban_rec::Texturing_mapping texturing_mapping = urban_rec::Texturing_mapping(2000, 2000);
 //    texturing_mapping.setInputPolygonMesh(poisson_mesh);
     std::vector <std::string> argv;
     std::string input_ply_file_path = "../example_mini/obj2_mesh_invertednormals.ply";//obj2_mesh.ply
@@ -74,9 +76,16 @@ int main() {
     pcl::texture_mapping::CameraVector cams = get<1>(res);
 
     vector<pcl::TextureMesh> tms = texturing_mapping.textureMeshes(argv);
+
+    BestFittingTexturingQuality bestFittingTexturingQuality = BestFittingTexturingQuality(triangles, tms);
+    pcl::TextureMesh tm_best_fitting = bestFittingTexturingQuality.fit();
+
     ColorTransferMeanSamePolygons color_transfer_same_polygons
-        = ColorTransferMeanSamePolygons(triangles, tm, tms, "../example_mini5/");
+        = ColorTransferMeanSamePolygons(triangles, tm_best_fitting, cams, tms, "../example_mini5/");
     color_transfer_same_polygons.transfer();
+
+    MtlUtils mtlutils = MtlUtils("../example_mini5/textured.mtl");
+    mtlutils.addToMapKd("_Tpatch");
 
 ////    urban_rec::Lidar2depth l2dimg = urban_rec::Lidar2depth(config_path, input_ply_file_path);
 ////    l2dimg.createDepthImages();

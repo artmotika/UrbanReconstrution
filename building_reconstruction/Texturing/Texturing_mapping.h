@@ -13,6 +13,8 @@
 #include <pcl/surface/texture_mapping.h>
 #include <pcl/common/io.h>
 #include <pcl/visualization/pcl_visualizer.h>
+#include <cmath>
+#include <math.h> /* modf */
 
 #include <pcl/point_types.h>
 #include <pcl/impl/instantiate.hpp>  // defines the PCL_INSTANTIATE_PRODUCT macro
@@ -22,6 +24,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "../StringUtils/PathUtils.h"
+#include "../Geometry/Geometry_pcl.h"
 
 using namespace std;
 using namespace pcl;
@@ -34,6 +37,12 @@ namespace urban_rec {
     public:
         using Camera = pcl::texture_mapping::Camera;
         using UvIndex = pcl::texture_mapping::UvIndex;
+
+        Texturing_mapping(int width, int height) {
+            setTextureWidthAndHeight(width, height);
+        }
+
+        void setTextureWidthAndHeight(int width, int height);
 
         void setInputPolygonMesh(PolygonMesh &polygon_mesh);
 
@@ -49,12 +58,27 @@ namespace urban_rec {
         static bool getPointUVCoords(const PointXYZ &pt, const pcl::TextureMapping<pcl::PointXYZ>::Camera &cam,
                                      PointXY &UV_coordinates);
 
+        bool isFaceOnMask (pcl::PointXY &proj1, pcl::PointXY &proj2, pcl::PointXY &proj3, const cv::Mat &mask);
+
+        static bool isFaceProjectedAngleMore (const pcl::PointXYZ &p1,
+                                           const pcl::PointXYZ &p2,
+                                           const pcl::PointXYZ &p3,
+                                           const pcl::PointXYZ &camPose,
+                                           double angle,
+                                           double max_dist);
+
+        static int saveOBJFile(const std::string &file_name,
+                              const pcl::TextureMesh &tex_mesh, unsigned precision);
+
     private:
         PolygonMesh::Ptr input_polygon_mesh{nullptr};
+        int texture_width = 0;
+        int texture_height = 0;
 
         void
         textureMeshwithMultipleCameras (pcl::TextureMesh &mesh,
-                                        const pcl::texture_mapping::CameraVector &cameras);
+                                        const pcl::texture_mapping::CameraVector &cameras,
+                                        const vector <cv::Mat> &masks);
 
         inline void
         getTriangleCircumcenterAndSize(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3,

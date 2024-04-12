@@ -109,14 +109,18 @@ add_library(geometry STATIC Geometry/Geometry_pcl.h Geometry/Geometry_pcl.cpp)
 add_library(algo_reconstruction STATIC Algo_reconstruction.h Algo_reconstruction.cpp)
 add_library(shift STATIC PointClouds/Shift.h PointClouds/Shift.cpp)
 add_library(string_utils STATIC StringUtils/PathUtils.h StringUtils/PathUtils.cpp)
+add_library(file_utils STATIC FileUtils/FileUtils.h FileUtils/FileUtils.cpp)
 add_library(texturing_mapping STATIC Texturing/Texturing_mapping.h Texturing/Texturing_mapping.cpp
         Texturing/IO/Image_txt_reading.h Texturing/IO/Image_txt_reading.cpp
         Texturing/Image/Panorama2cubemap.h Texturing/Image/Panorama2cubemap.cpp
-        Texturing/Image/Lidar2depth.h Texturing/Image/Lidar2depth.cpp)
+        Texturing/Image/Lidar2depth.h Texturing/Image/Lidar2depth.cpp
+        Texturing/MtlUtils.h Texturing/MtlUtils.cpp
+        Texturing/FaceIndexMaps.h Texturing/FaceIndexMaps.cpp)
 add_library(metrics STATIC Metrics/Metrics.h Metrics/Metrics.cpp
             Metrics/BlurEstimation.h Metrics/BlurEstimation.cpp)
 add_library(color_transfer STATIC ColorTransfer/ColorTransferMeanLocal.h ColorTransfer/ColorTransferMeanLocal.cpp
             ColorTransfer/ColorTransferMeanSamePolygons.h ColorTransfer/ColorTransferMeanSamePolygons.cpp)
+add_library(best_fitting_texturing STATIC BestFittingTexturing/BestFittingTexturingQuality.h BestFittingTexturing/BestFittingTexturingQuality.cpp)
 create_single_source_cgal_program("texturing_map_example.cpp")
 create_single_source_cgal_program("metric_image_compare_example.cpp")
 #add_library(surface_reconstruction STATIC surface_reconstruction.cpp)
@@ -146,6 +150,7 @@ foreach (
         #        surface_reconstruction
         building_reconstruction
         color_transfer
+        best_fitting_texturing
 )
     target_link_libraries(${target} PUBLIC CGAL::Eigen3_support ${PCL_LIBRARIES})
     if (TARGET CGAL::SCIP_support)
@@ -168,10 +173,12 @@ foreach (
     target_link_libraries(${target} PUBLIC algo_reconstruction)
     target_link_libraries(${target} PUBLIC shift)
     target_link_libraries(${target} PUBLIC string_utils)
+    target_link_libraries(${target} PUBLIC file_utils)
     #  target_link_libraries(${target} PUBLIC surface_reconstruction)
     target_link_libraries(${target} PUBLIC building_reconstruction)
     target_link_libraries(${target} PUBLIC texturing_mapping)
     target_link_libraries(${target} PUBLIC color_transfer)
+    target_link_libraries(${target} PUBLIC best_fitting_texturing)
     target_link_libraries(${target} PUBLIC CGAL::Eigen3_support ${PCL_LIBRARIES})
     if (TARGET CGAL::SCIP_support)
         target_link_libraries(${target} PUBLIC CGAL::SCIP_support)

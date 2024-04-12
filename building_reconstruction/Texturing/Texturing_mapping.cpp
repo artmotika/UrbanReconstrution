@@ -2,8 +2,9 @@
 #include "IO/Image_txt_reading.h"
 
 using namespace urban_rec;
+using namespace std;
 
-int saveOBJFile(const std::string &file_name,
+int urban_rec::Texturing_mapping::saveOBJFile(const std::string &file_name,
                 const pcl::TextureMesh &tex_mesh, unsigned precision) {
     if (tex_mesh.cloud.data.empty()) {
         PCL_ERROR("[pcl::io::saveOBJFile] Input point cloud has no data!\n");
@@ -206,6 +207,11 @@ int saveOBJFile(const std::string &file_name,
     return (0);
 }
 
+void urban_rec::Texturing_mapping::setTextureWidthAndHeight(int width, int height) {
+    texture_width = width;
+    texture_height = height;
+}
+
 void urban_rec::Texturing_mapping::setInputPolygonMesh(pcl::PolygonMesh &polygon_mesh) {
     input_polygon_mesh = std::make_shared<pcl::PolygonMesh>(polygon_mesh);
 }
@@ -323,7 +329,9 @@ bool urban_rec::Texturing_mapping::readCamPoseFile(std::string filename,
 }
 
 void
-urban_rec::Texturing_mapping::textureMeshwithMultipleCameras (pcl::TextureMesh &mesh, const pcl::texture_mapping::CameraVector &cameras)
+urban_rec::Texturing_mapping::textureMeshwithMultipleCameras (pcl::TextureMesh &mesh,
+                                                              const pcl::texture_mapping::CameraVector &cameras,
+                                                              const vector <cv::Mat> &masks)
 {
 
     if (mesh.tex_polygons.size () != 1)
@@ -338,6 +346,8 @@ urban_rec::Texturing_mapping::textureMeshwithMultipleCameras (pcl::TextureMesh &
     for (int current_cam = 0; current_cam < static_cast<int> (cameras.size ()); ++current_cam)
     {
         PCL_INFO ("Processing camera %d of %d.\n", current_cam+1, cameras.size ());
+
+        int mask_idx = current_cam % 6;
 
         // transform mesh into camera's frame
         typename pcl::PointCloud<pcl::PointXYZ>::Ptr camera_cloud (new pcl::PointCloud<pcl::PointXYZ>);
@@ -376,23 +386,47 @@ urban_rec::Texturing_mapping::textureMeshwithMultipleCameras (pcl::TextureMesh &
             {
                 // face is in the camera's FOV
 
-                // add UV coordinates
-                projections->points.push_back (uv_coord1);
-                projections->points.push_back (uv_coord2);
-                projections->points.push_back (uv_coord3);
 
-                // remember corresponding face
-                UvIndex u1, u2, u3;
-                u1.idx_cloud = mesh.tex_polygons[current_cam][idx_face].vertices[0];
-                u2.idx_cloud = mesh.tex_polygons[current_cam][idx_face].vertices[1];
-                u3.idx_cloud = mesh.tex_polygons[current_cam][idx_face].vertices[2];
-                u1.idx_face = idx_face; u2.idx_face = idx_face; u3.idx_face = idx_face;
-                indexes_uv_to_points.push_back (u1);
-                indexes_uv_to_points.push_back (u2);
-                indexes_uv_to_points.push_back (u3);
 
-                //keep track of visibility
-                visibility[idx_face] = true;
+                // face is not in the mask Проверка, что пиксель не находится на маске
+                // uv_coord1, uv_coord2, uv_coord3
+                pcl::PointXYZ camPose(cameras[current_cam].pose(0, 3), cameras[current_cam].pose(1, 3), cameras[current_cam].pose(2, 3));
+                if (mask_idx == 5
+                || !isFaceOnMask (uv_coord1,
+                                   uv_coord2,
+                                   uv_coord3,
+                                   masks[mask_idx])) {
+
+                    // add UV coordinates
+                    projections->points.push_back (uv_coord1);
+                    projections->points.push_back (uv_coord2);
+                    projections->points.push_back (uv_coord3);
+
+                    // remember corresponding face
+                    UvIndex u1, u2, u3;
+                    u1.idx_cloud = mesh.tex_polygons[current_cam][idx_face].vertices[0];
+                    u2.idx_cloud = mesh.tex_polygons[current_cam][idx_face].vertices[1];
+                    u3.idx_cloud = mesh.tex_polygons[current_cam][idx_face].vertices[2];
+                    u1.idx_face = idx_face; u2.idx_face = idx_face; u3.idx_face = idx_face;
+                    indexes_uv_to_points.push_back (u1);
+                    indexes_uv_to_points.push_back (u2);
+                    indexes_uv_to_points.push_back (u3);
+
+                    //keep track of visibility
+                    visibility[idx_face] = true;
+                }
+                else
+                {
+                    projections->points.push_back (nan_point);
+                    projections->points.push_back (nan_point);
+                    projections->points.push_back (nan_point);
+                    indexes_uv_to_points.push_back (u_null);
+                    indexes_uv_to_points.push_back (u_null);
+                    indexes_uv_to_points.push_back (u_null);
+                    //keep track of visibility
+                    visibility[idx_face] = false;
+                    cpt_invisible++;
+                }
             }
             else
             {
@@ -693,6 +727,44 @@ urban_rec::Texturing_mapping::isFaceProjected (const Camera &camera, const pcl::
     );
 }
 
+bool urban_rec::Texturing_mapping::isFaceOnMask (pcl::PointXY &proj1, pcl::PointXY &proj2, pcl::PointXY &proj3, const cv::Mat &mask) {
+    int x0 = proj1.x * float(texture_width);
+    int y0 = float(texture_height) - proj1.y * float(texture_height);
+    int x1 = proj2.x * float(texture_width);
+    int y1 = float(texture_height) - proj2.y * float(texture_height);
+    int x2 = proj3.x * float(texture_width);
+    int y2 = float(texture_height) - proj3.y * float(texture_height);
+    cv::Vec3b black_pixel = cv::Vec3b(0, 0, 0);
+    if (mask.at<cv::Vec3b>(y0, x0) == black_pixel
+    || mask.at<cv::Vec3b>(y1, x1) == black_pixel
+    || mask.at<cv::Vec3b>(y2, x2) == black_pixel) {
+        return true;
+    }
+    return false;
+}
+
+bool urban_rec::Texturing_mapping::isFaceProjectedAngleMore (const pcl::PointXYZ &p1,
+                                                             const pcl::PointXYZ &p2,
+                                                             const pcl::PointXYZ &p3,
+                                                             const pcl::PointXYZ &camPose,
+                                                             double angle,
+                                                             double max_dist) {
+    pcl::PointXYZ center = Geometry_pcl::getTriangleCenterOfMass(p1, p2, p3);
+    if (Geometry_pcl::euclidean_dist_between_two_points(center, camPose) < max_dist) return true;
+    Eigen::Vector3d vectorAB(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
+    Eigen::Vector3d vectorAC(p3.x - p1.x, p3.y - p1.y, p3.z - p1.z);
+    Eigen::Vector3d vectorNormal = vectorAB.cross(vectorAC);
+    Eigen::Vector3d vectorCamPoseToCenter(center.x - camPose.x, center.y - camPose.y, center.z - camPose.z);
+    double scalar_product = vectorNormal.dot(vectorCamPoseToCenter);
+    double calculated_angle = std::acos(scalar_product / (vectorNormal.norm() * vectorCamPoseToCenter.norm())) * (180 / M_PI);
+    if (calculated_angle > 90.0) calculated_angle = 180.0 - calculated_angle;
+//    cout << "calculated_angle: " << calculated_angle << endl;
+    if (calculated_angle > angle) {
+        return true;
+    }
+    return false;
+}
+
 
 tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> urban_rec::Texturing_mapping::textureMesh(vector <string> argv) {
     pcl::PolygonMesh triangles;
@@ -776,9 +848,43 @@ tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> urban_rec::Texturing
         mesh.tex_materials[i] = mesh_material;
     }
 
+    // Create image masks
+    vector <cv::Mat> masks;
+    // Сохраняем текстуры маски в матрицы из opencv
+    std::ostringstream oss_masks;
+    oss_masks << argv[2] << "masks/mask_Xminus.jpg";
+    string masks_path = oss_masks.str();
+    cout << masks_path << endl;
+    cv::Mat imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
+    masks.push_back(imageMask);
+    oss_masks.str("");
+    oss_masks << argv[2] << "masks/mask_Xplus.jpg";
+    masks_path = oss_masks.str();
+    cout << masks_path << endl;
+    imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
+    masks.push_back(imageMask);
+    oss_masks.str("");
+    oss_masks << argv[2] << "masks/mask_Yminus.jpg";
+    masks_path = oss_masks.str();
+    cout << masks_path << endl;
+    imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
+    masks.push_back(imageMask);
+    oss_masks.str("");
+    oss_masks << argv[2] << "masks/mask_Yplus.jpg";
+    masks_path = oss_masks.str();
+    cout << masks_path << endl;
+    imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
+    masks.push_back(imageMask);
+    oss_masks.str("");
+    oss_masks << argv[2] << "masks/mask_Zminus.jpg";
+    masks_path = oss_masks.str();
+    cout << masks_path << endl;
+    imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
+    masks.push_back(imageMask);
+
     // Sort faces
 //    pcl::TextureMapping <pcl::PointXYZ> tm;  // TextureMapping object that will perform the sort
-    textureMeshwithMultipleCameras(mesh, my_cams);
+    textureMeshwithMultipleCameras(mesh, my_cams, masks);
 
     // Compute normals for the mesh
     pcl::NormalEstimation <pcl::PointXYZ, pcl::Normal> n;
@@ -894,8 +1000,8 @@ vector<pcl::TextureMesh> urban_rec::Texturing_mapping::textureMeshes(vector <str
 
     // Sort faces
     for (int i = 0; i < filenames.size(); ++i) {
-        //    pcl::TextureMapping <pcl::PointXYZ> tm;  // TextureMapping object that will perform the sort
-        textureMeshwithMultipleCameras(mesh[i], my_cams[i]);
+        pcl::TextureMapping <pcl::PointXYZ> tm;  // TextureMapping object that will perform the sort
+        tm.textureMeshwithMultipleCameras(mesh[i], my_cams[i]);
         cout << "Ended..." << endl;
     }
 
@@ -918,12 +1024,16 @@ vector<pcl::TextureMesh> urban_rec::Texturing_mapping::textureMeshes(vector <str
     string obj_subpath1 = argv[1].substr(0, dot_index);
     string obj_subpath2 = argv[1].substr(dot_index, argv[1].size());
 
-    for (int i = 0; i < filenames.size(); ++i) {
-        pcl::toPCLPointCloud2(*cloud_with_normals, mesh[i].cloud);
-        std::ostringstream oss_dest;
-        oss_dest << obj_subpath1 << "_" << i << obj_subpath2;
-        saveOBJFile(oss_dest.str(), mesh[i], 5);
-    }
+//    for (int i = 0; i < filenames.size(); ++i) {
+//        // LOG ONLY
+////        if (i != filenames.size()-1 && i != filenames.size()-2) continue;
+//        if (i % 6 != 5 && i % 6 != 4) continue;
+//        // LOG ONLY
+//        pcl::toPCLPointCloud2(*cloud_with_normals, mesh[i].cloud);
+//        std::ostringstream oss_dest;
+//        oss_dest << obj_subpath1 << "_" << i << obj_subpath2;
+//        saveOBJFile(oss_dest.str(), mesh[i], 5);
+//    }
 
     return mesh;
 }
