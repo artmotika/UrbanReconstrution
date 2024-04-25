@@ -69,8 +69,7 @@ private:
                                          cv::Mat &dest_target, std::ofstream & output_file,
                                          vector <cv::Mat> &destinations);
 
-    void transferColorBetweenTpBorder(vector< vector <bool>> &border_cams_to_face_idx,
-                                      vector <vector <int>> &meshFaceIndexMapMainMeshFullToPart,
+    void transferColorBetweenTpBorder(vector <vector <int>> &meshFaceIndexMapMainMeshFullToPart,
                                       vector <vector <int>> &meshFaceIndexMapMainMeshPartToFull,
                                       vector <vector <int>> &meshFaceIndexMapInputMeshesFullToPart,
                                       vector <vector <int>> &meshFaceIndexMapInputMeshesPartToFull,

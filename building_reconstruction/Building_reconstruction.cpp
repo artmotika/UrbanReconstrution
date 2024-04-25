@@ -340,6 +340,9 @@ PolygonMesh urban_rec::Building_reconstruction::filterMeshPoissonByPoints(Polygo
     PointCloud<PointXYZ>::Ptr points_filter_xyz(new PointCloud<PointXYZ>());
     fromPCLPointCloud2(*points_filter, *points_filter_xyz);
 
+    pcl::KdTreeFLANN <pcl::PointXYZ> kdtree;
+    kdtree.setInputCloud(points_filter_xyz);
+
     std::vector <Vertices> new_polygons_filtering;
 
     PointCloud<PointXYZ>::Ptr all_vertices(new PointCloud <PointXYZ>);
@@ -349,8 +352,8 @@ PolygonMesh urban_rec::Building_reconstruction::filterMeshPoissonByPoints(Polygo
     std::cout << "number polygons: " << polygons_left << std::endl;
 
     size_t array_size = all_vertices->points.size();
-    unsigned short *vertex_indices = (unsigned short *) malloc(array_size * sizeof(unsigned short));
-    memset(vertex_indices, 0, array_size * sizeof(unsigned short));
+//    unsigned short *vertex_indices = (unsigned short *) malloc(array_size * sizeof(unsigned short));
+//    memset(vertex_indices, 0, array_size * sizeof(unsigned short));
 
     for (std::vector<Vertices>::iterator it1 = mesh_input.polygons.begin(); it1 != mesh_input.polygons.end(); it1++) {
         Indices vertecies = it1->vertices;
@@ -366,22 +369,25 @@ PolygonMesh urban_rec::Building_reconstruction::filterMeshPoissonByPoints(Polygo
         polygons_left--;
         if (polygons_left % 10000 == 0) std::cout << "number polygons left: " << polygons_left << std::endl;
 
-        PointXYZ pcenter;
-        pcenter.x = (p1.x + p2.x + p3.x) / 3.0;
-        pcenter.y = (p1.y + p2.y + p3.y) / 3.0;
-        pcenter.z = (p1.z + p2.z + p3.z) / 3.0;
-        for (PointXYZ p: *points_filter_xyz) {
-            if (Geometry_pcl::point_in_radius(pcenter, p, filter_radius)) {
-                vertex_indices[vertecies[0]] = vertex_indices[vertecies[0]] + 1;
-                vertex_indices[vertecies[1]] = vertex_indices[vertecies[1]] + 1;
-                vertex_indices[vertecies[2]] = vertex_indices[vertecies[2]] + 1;
-                new_polygons_filtering.push_back(*it1);
-                break;
-            }
+        PointXYZ pcenter = getTriangleCenterOfMass(p1, p2, p3);
+        pcl::Indices idxNeighbors;
+        std::vector<float> neighborsSquaredDistance;
+        // Get points inside circ.circle
+        if (kdtree.radiusSearch (pcenter, filter_radius, idxNeighbors, neighborsSquaredDistance) > 0 ) {
+            new_polygons_filtering.push_back(*it1);
         }
+//        for (PointXYZ p: *points_filter_xyz) {
+//            if (Geometry_pcl::point_in_radius(pcenter, p, filter_radius)) {
+//                vertex_indices[vertecies[0]] = vertex_indices[vertecies[0]] + 1;
+//                vertex_indices[vertecies[1]] = vertex_indices[vertecies[1]] + 1;
+//                vertex_indices[vertecies[2]] = vertex_indices[vertecies[2]] + 1;
+//                new_polygons_filtering.push_back(*it1);
+//                break;
+//            }
+//        }
     }
 
-    free(vertex_indices);
+//    free(vertex_indices);
     mesh_input.polygons = new_polygons_filtering;
     print_info("[done, ");
     print_value("%g", tt.toc());

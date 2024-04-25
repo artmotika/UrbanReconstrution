@@ -19,9 +19,9 @@ set(OpenMP_C_FLAGS "-fopenmp=lomp")
 set(OpenMP_CXX_FLAGS "-fopenmp=lomp")
 set(OpenMP_C_LIB_NAMES "libomp")
 set(OpenMP_CXX_LIB_NAMES "libomp")
-set(OpenMP_libomp_LIBRARY "/usr/local/Cellar/libomp/17.0.6/lib/libomp.dylib")
-set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp /usr/local/Cellar/libomp/17.0.6/lib/libomp.dylib -I/usr/local/Cellar/libomp/17.0.6/include")
-set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp /usr/local/Cellar/libomp/17.0.6/lib/libomp.dylib -I/usr/local/Cellar/libomp/17.0.6/include")
+set(OpenMP_libomp_LIBRARY "/usr/local/Cellar/libomp/18.1.3/lib/libomp.dylib")
+set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp /usr/local/Cellar/libomp/18.1.3/lib/libomp.dylib -I/usr/local/Cellar/libomp/18.1.3/include")
+set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp /usr/local/Cellar/libomp/18.1.3/lib/libomp.dylib -I/usr/local/Cellar/libomp/18.1.3/include")
 
 #add_compile_options(-std=c++11)
 
@@ -123,6 +123,7 @@ add_library(color_transfer STATIC ColorTransfer/ColorTransferMeanLocal.h ColorTr
 add_library(best_fitting_texturing STATIC BestFittingTexturing/BestFittingTexturingQuality.h BestFittingTexturing/BestFittingTexturingQuality.cpp)
 create_single_source_cgal_program("texturing_map_example.cpp")
 create_single_source_cgal_program("metric_image_compare_example.cpp")
+create_single_source_cgal_program("metrics_examples.cpp")
 #add_library(surface_reconstruction STATIC surface_reconstruction.cpp)
 add_library(building_reconstruction STATIC building_reconstruction.cpp)
 #create_single_source_cgal_program("surface_reconstruction_example.cpp")
@@ -161,6 +162,7 @@ foreach (
 endforeach ()
 
 target_link_libraries(metric_image_compare_example PUBLIC metrics)
+target_link_libraries(metrics_examples PUBLIC metrics)
 target_link_libraries(texturing_mapping PUBLIC color_transfer)
 
 foreach (

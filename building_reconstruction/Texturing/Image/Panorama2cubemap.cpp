@@ -213,8 +213,8 @@ void Panorama2cubemap::createDescriptionFile(DestinationType type, std::string o
 //            pitchAngle = Eigen::AngleAxisd(2*right_angle - degree_to_radian(pitch), Eigen::Vector3d::UnitY());
 //            rollAngle = Eigen::AngleAxisd(degree_to_radian(roll) + right_angle, Eigen::Vector3d::UnitX());
             headingAngle = Eigen::AngleAxisd(2*right_angle - degree_to_radian(heading) + param, Eigen::Vector3d::UnitZ());
-            pitchAngle = Eigen::AngleAxisd(degree_to_radian(pitch), Eigen::Vector3d::UnitY());
-            rollAngle = Eigen::AngleAxisd(degree_to_radian(roll) + 3*right_angle, Eigen::Vector3d::UnitX());
+            pitchAngle = Eigen::AngleAxisd(-degree_to_radian(pitch), Eigen::Vector3d::UnitY());
+            rollAngle = Eigen::AngleAxisd(-degree_to_radian(roll) + 3*right_angle, Eigen::Vector3d::UnitX());
             cout << "Xminus; heading: " << heading << " roll: " << roll << " pitch: " << pitch << endl;
             break;
         case DestinationType::Zminus:
@@ -243,7 +243,7 @@ void Panorama2cubemap::createDescriptionFile(DestinationType type, std::string o
 //            pitchAngle = Eigen::AngleAxisd(degree_to_radian(pitch), Eigen::Vector3d::UnitY());
 //            rollAngle = Eigen::AngleAxisd(-degree_to_radian(roll), Eigen::Vector3d::UnitX());
             headingAngle = Eigen::AngleAxisd(2*right_angle - degree_to_radian(heading), Eigen::Vector3d::UnitZ());
-            pitchAngle = Eigen::AngleAxisd(-degree_to_radian(pitch), Eigen::Vector3d::UnitY());
+            pitchAngle = Eigen::AngleAxisd(degree_to_radian(pitch), Eigen::Vector3d::UnitY());
             rollAngle = Eigen::AngleAxisd(-degree_to_radian(roll), Eigen::Vector3d::UnitX());
             cout << "Zplus; heading: " << heading << " roll: " << roll << " pitch: " << pitch << endl;
             break;

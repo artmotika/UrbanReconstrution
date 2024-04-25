@@ -21,7 +21,7 @@ public:
 
     void setInputTextureMeshes(vector<pcl::TextureMesh> &meshes);
 
-    pcl::TextureMesh fit();
+    pcl::TextureMesh fit(vector <string> argv);
 
 private:
     pcl::PolygonMesh &triangles;

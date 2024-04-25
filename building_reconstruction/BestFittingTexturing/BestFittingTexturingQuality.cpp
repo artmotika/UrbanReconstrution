@@ -16,9 +16,8 @@ void BestFittingTexturingQuality::setInputTextureMeshes(vector<pcl::TextureMesh>
     input_meshes = meshes;
 }
 
-pcl::TextureMesh BestFittingTexturingQuality::fit() {
+pcl::TextureMesh BestFittingTexturingQuality::fit(vector <string> argv) {
     cout << number_cams << endl;
-    std::string path = "../example_mini5/";
     urban_rec::Texturing_mapping texturing_mapping = urban_rec::Texturing_mapping(2000, 2000);
     // Create the texturemesh object that will contain our UV-mapped mesh
     pcl::TextureMesh mesh;
@@ -30,7 +29,7 @@ pcl::TextureMesh BestFittingTexturingQuality::fit() {
     // Load textures and cameras poses and intrinsics
     pcl::texture_mapping::CameraVector my_cams;
 
-    const boost::filesystem::path base_dir(path);
+    const boost::filesystem::path base_dir(argv[2]);
     std::string extension(".txt");
     std::vector <boost::filesystem::path> filenames;
     try {
@@ -90,31 +89,31 @@ pcl::TextureMesh BestFittingTexturingQuality::fit() {
     vector <cv::Mat> masks;
     // Сохраняем текстуры маски в матрицы из opencv
     std::ostringstream oss_masks;
-    oss_masks << path << "masks/mask_Xminus.jpg";
+    oss_masks << argv[2] << "masks/mask_Xminus.jpg";
     string masks_path = oss_masks.str();
     cout << masks_path << endl;
     cv::Mat imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
     masks.push_back(imageMask);
     oss_masks.str("");
-    oss_masks << path << "masks/mask_Xplus.jpg";
+    oss_masks << argv[2] << "masks/mask_Xplus.jpg";
     masks_path = oss_masks.str();
     cout << masks_path << endl;
     imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
     masks.push_back(imageMask);
     oss_masks.str("");
-    oss_masks << path << "masks/mask_Yminus.jpg";
+    oss_masks << argv[2] << "masks/mask_Yminus.jpg";
     masks_path = oss_masks.str();
     cout << masks_path << endl;
     imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
     masks.push_back(imageMask);
     oss_masks.str("");
-    oss_masks << path << "masks/mask_Yplus.jpg";
+    oss_masks << argv[2] << "masks/mask_Yplus.jpg";
     masks_path = oss_masks.str();
     cout << masks_path << endl;
     imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
     masks.push_back(imageMask);
     oss_masks.str("");
-    oss_masks << path << "masks/mask_Zminus.jpg";
+    oss_masks << argv[2] << "masks/mask_Zminus.jpg";
     masks_path = oss_masks.str();
     cout << masks_path << endl;
     imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
@@ -158,13 +157,15 @@ pcl::TextureMesh BestFittingTexturingQuality::fit() {
             pcl::PointXY p2 = PointXY(input_meshes[current_cam].tex_coordinates[0][local_face_idx * 3 + 2](0),
                                     input_meshes[current_cam].tex_coordinates[0][local_face_idx * 3 + 2](1));
             int mask_idx = current_cam % 6;
-            if (mask_idx != 5) {
-                if (texturing_mapping.isFaceOnMask(p0, p1, p2, masks[mask_idx])) {
-                    continue;
-                }
+            if (mask_idx != 5 && texturing_mapping.isFaceOnMask(p0, p1, p2, masks[mask_idx])) {
+                continue;
             }
 
             double area = Geometry_pcl::triangle_area(p0, p1, p2);
+            // Чтобы не брать плохие текстуры с верху - 5, 0 и 1 из-за расскачки автомобиля спереди и сзади
+//            if (mask_idx == 5) area /= 2.0;
+//            if (mask_idx == 0) area /= 8.0;
+            // ––––––––––––––––––
             if (area > max_area) {
                 max_area = area;
                 face_idx = local_face_idx;
@@ -212,7 +213,7 @@ pcl::TextureMesh BestFittingTexturingQuality::fit() {
     pcl::concatenateFields(*cloud, *normals, *cloud_with_normals);
 
     pcl::toPCLPointCloud2(*cloud_with_normals, mesh.cloud);
-    texturing_mapping.saveOBJFile("../example_mini5/textured.obj", mesh, 5);
+    texturing_mapping.saveOBJFile(argv[1], mesh, 5); // example_mini5
 
     return mesh;
 }
