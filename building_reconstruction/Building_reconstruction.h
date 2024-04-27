@@ -2,6 +2,7 @@
 #define URBANRECONSTRUCTION_BUILDING_RECONSTRUCTION_H
 
 #include <pcl/PCLPointCloud2.h>
+#include <pcl/kdtree/kdtree_flann.h>
 
 #include <iostream>
 #include <fstream>
@@ -19,6 +20,7 @@
 
 using namespace pcl;
 using namespace pcl::io;
+using namespace Geometry_pcl;
 
 struct polygon_struct {
     PointXYZ p1;

@@ -3,7 +3,6 @@
 
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/io/ply_io.h>
-//#include <pcl/common/point_types.hpp>
 #include <opencv2/opencv.hpp>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/surface/texture_mapping.h>
@@ -30,11 +29,10 @@ struct NeighborPolygonTextureCoordsMap {
 class ColorTransferMeanLocal {
 public:
     using Camera = pcl::texture_mapping::Camera;
-    ColorTransferMeanLocal(pcl::TextureMesh &mesh, std::string dir_image_path, pcl::texture_mapping::CameraVector my_cams) {
+    ColorTransferMeanLocal(pcl::TextureMesh &mesh, std::string dir_image_path) {
         setDirPath(dir_image_path);
         setInputTextureMesh(mesh);
         setNumberCams(mesh.tex_materials.size());
-        cams = my_cams;
     }
 
     void setDirPath(std::string image_path);
@@ -51,9 +49,9 @@ public:
 
     void setInputTextureMesh(pcl::TextureMesh &mesh);
 
-    void transfer();
+    vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> getNeighboringTp();
 
-    pcl::texture_mapping::CameraVector cams;
+    void transfer();
 
 private:
     pcl::TextureMesh input_mesh;
@@ -62,12 +60,11 @@ private:
     int number_cams;
     int texture_height;
     int texture_width;
-    vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> getNeighboringTp();
     void transferColorBetweenPolygons(NeighborPolygonTextureCoordsMap neighborPolygonTextureCoordsMap,
                                                               cv::Mat & texture_src,
                                                               cv::Mat & texture_target,
-                                                              cv::Mat & dest_target, int c, std::ofstream & output_file);
-    void transferColorBetweenTp(vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> &neighboring_cams_to_polygons_texture_coords,
+                                                              cv::Mat & dest_target, int c);
+    void transferColorBetweenTpBorder(vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> &neighboring_cams_to_polygons_texture_coords,
     vector <cv::Mat> &textures, vector <cv::Mat> &destinations,
     vector <string> &dest_paths);
     pair<int, int> isNeighboringPolygons(pcl::PointXYZ p01, pcl::PointXYZ p02, pcl::PointXYZ p03,

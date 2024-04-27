@@ -55,7 +55,6 @@ vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> ColorTransfe
         }
     }
 
-    std::ofstream output_file("../example_mini5/log/log.txt");
     // Ищем соседние треугольники для того, чтобы перенести цвет
     kdtree.setInputCloud(input_cloud);
     pcl::Indices idxNeighbors;
@@ -104,12 +103,10 @@ vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> ColorTransfe
             if (kdtree.radiusSearch (center, radius, idxNeighbors, neighborsSquaredDistance) > 0 ) {
                 // for each neighbor
                 for (const auto &idxNeighbor : idxNeighbors) {
-//                    output_file << "idxNeighbor: " << idxNeighbor << " idxNeighbors point: " << input_cloud->points[idxNeighbor] << endl;
                     // Находим точку среди облаков других камер
                     for (int cam_idx = current_cam+1; cam_idx < number_cams; cam_idx++) {
                         for (int face_idx : mesh_points_idx_polygons_idx[cam_idx][idxNeighbor]) {
                             pcl::Vertices polygon = input_mesh.tex_polygons[cam_idx][face_idx];
-//                            output_file << "idxNeighbor: " << idxNeighbor << " polygon: " << polygon << endl;
                             // Получаем соседний треугольник из найденного индекса
                             pcl::PointXYZ neighbor_p1 = input_cloud->points[polygon.vertices[0]];
                             pcl::PointXYZ neighbor_p2 = input_cloud->points[polygon.vertices[1]];
@@ -119,10 +116,6 @@ vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> ColorTransfe
                                                                neighbor_p1, neighbor_p2, neighbor_p3);
                             if (segmentNum.first != -1) {
                                 nn_faces++;
-                                output_file << "segmentNum: " << segmentNum.first << segmentNum.second
-                                << " polygon: " << polygon
-                                << "neighbor_p1: " << neighbor_p1 << " neighbor_p2: " << neighbor_p2
-                                << " neighbor_p3: " << neighbor_p3 << endl;
                                 // copy UV coordinates for current_cam of face with j
                                 pcl::PointXY tc_current_cam_p0 = PointXY(input_mesh.tex_coordinates[current_cam][j * 3](0),
                                                           input_mesh.tex_coordinates[current_cam][j * 3](1));
@@ -137,40 +130,23 @@ vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> ColorTransfe
                                                           input_mesh.tex_coordinates[cam_idx][face_idx * 3 + 1](1));
                                 pcl::PointXY tc_cam_idx_p2 = PointXY(input_mesh.tex_coordinates[cam_idx][face_idx * 3 + 2](0),
                                                           input_mesh.tex_coordinates[cam_idx][face_idx * 3 + 2](1));
-                                output_file << "tc_cam_idx_p0: " << tc_cam_idx_p0
-                                << " tc_cam_idx_p1: " << tc_cam_idx_p1
-                                << " tc_cam_idx_p2: " << tc_cam_idx_p2 << endl;
                                 // Сохраняем камеру 1, камеру 2 и текстурные координаты 1 и 2 для переноса цвета.
                                 PolygonTextureCoords textureCoords1 = {tc_current_cam_p0, tc_current_cam_p1, tc_current_cam_p2};
                                 PolygonTextureCoords textureCoords2 = {tc_cam_idx_p0, tc_cam_idx_p1, tc_cam_idx_p2};
                                 NeighborPolygonTextureCoordsMap neighborPolygonTextureCoordsMap = {textureCoords1, textureCoords2, segmentNum, j, face_idx};
                                 neighboring_cams_to_polygons_texture_coords[current_cam][cam_idx][face_idx].push_back(neighborPolygonTextureCoordsMap);
-                            } else {
-                                output_file << "Not Parallel!\n"
-                                << " polygon: " << polygon
-                                << "neighbor_p1: " << neighbor_p1 << " neighbor_p2: " << neighbor_p2
-                                << " neighbor_p3: " << neighbor_p3 << endl;
                             }
                         }
                     }
                 }
             }
 
-            output_file << "number neighbor faces: " << nn_faces << endl
-                        << "src_p1: " << src_p1 << " src_p2: " << src_p2
-                        << " src_p3: " << src_p3 << " center: " << center
-                        << " radius1: " << radius1 << " radius2: " << radius2
-                        << " radius3: " << radius3 << " radius: " << radius << endl
-                        << " src_p1_idx: " << src_p1_idx
-                        << " src_p2_idx: " << src_p2_idx
-                        << " src_p3_idx: " << src_p3_idx << endl << endl << endl;
             if (nn_faces == 1) nn_faces_1++;
             if (nn_faces == 2) nn_faces_2++;
             if (nn_faces == 3) nn_faces_3++;
         }
     }
     cout << "nn_faces_1: " << nn_faces_1 << " nn_faces_2: " << nn_faces_2 << " nn_faces_3: " << nn_faces_3 << endl;
-    output_file.close();
     return neighboring_cams_to_polygons_texture_coords;
 }
 
@@ -208,7 +184,7 @@ pair<int, int> ColorTransferMeanLocal::isNeighboringPolygons(pcl::PointXYZ p01, 
 void ColorTransferMeanLocal::transferColorBetweenPolygons(NeighborPolygonTextureCoordsMap neighborPolygonTextureCoordsMap,
                                                           cv::Mat & texture_src,
                                                           cv::Mat & texture_target,
-                                                          cv::Mat & dest_target, int c, std::ofstream & output_file) {
+                                                          cv::Mat & dest_target, int c) {
     if (c > 0) return;
     c++;
     PolygonTextureCoords texture_coords1 = neighborPolygonTextureCoordsMap.textureCoords1;
@@ -216,9 +192,6 @@ void ColorTransferMeanLocal::transferColorBetweenPolygons(NeighborPolygonTexture
     pair<int, int> segmentNum = neighborPolygonTextureCoordsMap.segmentNum;
     int face_idx1 = neighborPolygonTextureCoordsMap.face_idx1;
     int face_idx2 = neighborPolygonTextureCoordsMap.face_idx2;
-//                    output_file << "segmentNum: " << segmentNum.first << segmentNum.second
-//                                << " face_idx1: " << face_idx1
-//                                << " face_idx2: " << face_idx2 << endl;
 
     int t1_x0 = int(texture_coords1.a.x * texture_width);
     int t1_y0 = int(texture_height - texture_coords1.a.y * texture_height);
@@ -252,14 +225,16 @@ void ColorTransferMeanLocal::transferColorBetweenPolygons(NeighborPolygonTexture
 
     for (int x = t1_minX; x <= t1_maxX; x++) {
         for (int y = t1_minY; y <= t1_maxY; y++) {
-            pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
-            if (checkPointInsideTriangle(texture_coords1.a, texture_coords1.b, texture_coords1.c, pt)) {
+            // Берем MeanColor не из треугольника, а из прямоугольника, который содержит этот треугольник
+            // (чтобы учесть случай неправильной позиции камеры при дальнем расстоянии)
+//            pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
+//            if (checkPointInsideTriangle(texture_coords1.a, texture_coords1.b, texture_coords1.c, pt)) {
                 cv::Vec3b pixel = texture_src.at<cv::Vec3b>(y, x);
                 blueSumSrc += int(pixel[0]); // синий
                 greenSumSrc += int(pixel[1]); // зеленый
                 redSumSrc += int(pixel[2]); // красный
                 countSrc++;
-            }
+//            }
         }
     }
 
@@ -270,14 +245,14 @@ void ColorTransferMeanLocal::transferColorBetweenPolygons(NeighborPolygonTexture
 
     for (int x = t2_minX; x <= t2_maxX; x++) {
         for (int y = t2_minY; y <= t2_maxY; y++) {
-            pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
-            if (checkPointInsideTriangle(texture_coords2.a, texture_coords2.b, texture_coords2.c, pt)) {
+//            pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
+//            if (checkPointInsideTriangle(texture_coords2.a, texture_coords2.b, texture_coords2.c, pt)) {
                 cv::Vec3b pixel = texture_target.at<cv::Vec3b>(y, x);
                 blueSumTarget += int(pixel[0]); // синий
                 greenSumTarget += int(pixel[1]); // зеленый
                 redSumTarget += int(pixel[2]); // красный
                 countTarget++;
-            }
+//            }
         }
     }
 
@@ -317,27 +292,18 @@ void ColorTransferMeanLocal::transferColorBetweenPolygons(NeighborPolygonTexture
             pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
             if (checkPointInsideTriangle(texture_coords2.a, texture_coords2.b, texture_coords2.c, pt)) {
                 cv::Vec3b pixel = texture_target.at<cv::Vec3b>(y, x);
-                output_file << "pixel[0]: " << double(pixel[0]) << " pixel[1]: " << double(pixel[1])
-                            << " pixel[2]: " << double(pixel[2]) << endl
-                            << " alpha: " << alpha
-                            << " beta: " << beta
-                            << " gamma: " << gamma << endl;
-
                 pixel[0] = saturate_cast<uchar>(double(pixel[0]) * alpha);
                 pixel[1] = saturate_cast<uchar>(double(pixel[1]) * beta);
                 pixel[2] = saturate_cast<uchar>(double(pixel[2]) * gamma);
-                output_file << "pixel[0]: " << double(pixel[0]) << " pixel[1]: " << double(pixel[1])
-                            << " pixel[2]: " << double(pixel[2]) << endl << endl << endl;
                 dest_target.at<cv::Vec3b>(y, x) = pixel;
             }
         }
     }
 }
 
-void ColorTransferMeanLocal::transferColorBetweenTp(vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> &neighboring_cams_to_polygons_texture_coords,
+void ColorTransferMeanLocal::transferColorBetweenTpBorder(vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> &neighboring_cams_to_polygons_texture_coords,
                                                     vector <cv::Mat> &textures, vector <cv::Mat> &destinations,
                                                     vector <string> &dest_paths) {
-    std::ofstream output_file("../example_mini5/log/log1.txt");
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
         for (int cam_idx = current_cam + 1; cam_idx < number_cams; cam_idx++) {
             cv::Mat texture_src = textures[current_cam];
@@ -349,12 +315,11 @@ void ColorTransferMeanLocal::transferColorBetweenTp(vector< vector <vector <vect
                 int c = 0;
                 for (NeighborPolygonTextureCoordsMap neighborPolygonTextureCoordsMap
                         : neighboring_polygons_texture_coords) {
-                    transferColorBetweenPolygons(neighborPolygonTextureCoordsMap, texture_src, texture_target, dest_target, c, output_file);
+                    transferColorBetweenPolygons(neighborPolygonTextureCoordsMap, texture_src, texture_target, dest_target, c);
                 }
             }
         }
     }
-    output_file.close();
 }
 
 void ColorTransferMeanLocal::transfer() {
@@ -391,7 +356,7 @@ void ColorTransferMeanLocal::transfer() {
         destinations.push_back(destPatch);
     }
 
-    transferColorBetweenTp(neighboring_cams_to_polygons_texture_coords, textures, destinations, dest_paths);
+    transferColorBetweenTpBorder(neighboring_cams_to_polygons_texture_coords, textures, destinations, dest_paths);
 
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
         cv::imwrite(dest_paths[current_cam], destinations[current_cam]);

@@ -1,0 +1,90 @@
+Значения метрик для lidar6: 
+ssim метрика для одного и того же изображения: 1
+ssim метрика main_part и BF_ct_part: 0.849456
+ssim метрика main_part и BF_part: 0.430327
+ssim метрика main_part и PCL_ct_part: 0.846211
+ssim метрика main_part и PCL_part: 0.830248
+psnr метрика для одного и того же изображения: inf
+psnr метрика main_part и BF_ct_part: 29.1298
+psnr метрика main_part и BF_part: 25.1551
+psnr метрика main_part и PCL_ct_part: 27.9825
+psnr метрика main_part и PCL_part: 25.2919
+Значения метрик для lidar10: 
+ssim метрика для одного и того же изображения: 1
+ssim метрика main_part и BF_ct_part: 0.949428
+ssim метрика main_part и BF_part: 0.886232
+ssim метрика main_part и PCL_ct_part: 0.775601
+ssim метрика main_part и PCL_part: 0.727418
+psnr метрика для одного и того же изображения: inf
+psnr метрика main_part и BF_ct_part: 35.3135
+psnr метрика main_part и BF_part: 33.2229
+psnr метрика main_part и PCL_ct_part: 30.7374
+psnr метрика main_part и PCL_part: 27.6808
+Значения метрик для lidar15: 
+ssim метрика для одного и того же изображения: 1
+ssim метрика main_part и BF_ct_part: 0.652598
+ssim метрика main_part и BF_part: 0.575082
+ssim метрика main_part и PCL_ct_part: 0.587431
+ssim метрика main_part и PCL_part: 0.565744
+psnr метрика для одного и того же изображения: inf
+psnr метрика main_part и BF_ct_part: 17.717
+psnr метрика main_part и BF_part: 17.3669
+psnr метрика main_part и PCL_ct_part: 17.1636
+psnr метрика main_part и PCL_part: 17.1577
+Значения метрик для lidar6: 
+ssim метрика для одного и того же изображения: 1
+ssim метрика main_part и BF_ct: 0.568294
+ssim метрика main_part и BF: 0.482182
+ssim метрика main_part и PCL_ct: 0.45796
+ssim метрика main_part и PCL: 0.476389
+psnr метрика для одного и того же изображения: inf
+psnr метрика main_part и BF_ct: 11.4506
+psnr метрика main_part и BF: 11.3166
+psnr метрика main_part и PCL_ct: 11.6329
+psnr метрика main_part и PCL: 11.5064
+Значения метрик для lidar10: 
+ssim метрика для одного и того же изображения: 1
+ssim метрика main_part и BF_ct: 0.555669
+ssim метрика main_part и BF: 0.493631
+ssim метрика main_part и PCL_ct: 0.281027
+ssim метрика main_part и PCL: 0.375668
+psnr метрика для одного и того же изображения: inf
+psnr метрика main_part и BF_ct: 13.9551
+psnr метрика main_part и BF: 12.531
+psnr метрика main_part и PCL_ct: 12.8344
+psnr метрика main_part и PCL: 13.2079
+Значения метрик для lidar15: 
+ssim метрика для одного и того же изображения: 1
+ssim метрика main_part и BF_ct: 0.514731
+ssim метрика main_part и BF: 0.52015
+ssim метрика main_part и PCL_ct: 0.256442
+ssim метрика main_part и PCL: 0.32825
+psnr метрика для одного и того же изображения: inf
+psnr метрика main_part и BF_ct: 13.3239
+psnr метрика main_part и BF: 13.3592
+psnr метрика main_part и PCL_ct: 12.3903
+psnr метрика main_part и PCL: 12.4687
+Значения метрики Крита для lidar2: 
+метрику Крита для main: 0.383653
+метрику Крита для BF_ct: 0.301817
+метрику Крита для BF: 0.309638
+метрику Крита для PCL_ct: 0.332789
+метрику Крита для PCL: 0.31915
+Значения метрики Крита для lidar6: 
+метрику Крита для main: 0.295105
+метрику Крита для BF_ct: 0.281188
+метрику Крита для BF: 0.28377
+метрику Крита для PCL_ct: 0.284927
+метрику Крита для PCL: 0.305225
+Значения метрики Крита для lidar10: 
+метрику Крита для main: 0.354893
+метрику Крита для BF_ct: 0.378949
+метрику Крита для BF: 0.364399
+метрику Крита для PCL_ct: 0.39224
+метрику Крита для PCL: 0.381302
+Значения метрики Крита для lidar15: 
+метрику Крита для main: 0.333136
+метрику Крита для BF_ct: 0.365149
+метрику Крита для BF: 0.373856
+метрику Крита для PCL_ct: 0.39392
+метрику Крита для PCL: 0.394937

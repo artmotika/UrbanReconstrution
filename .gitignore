@@ -1,14 +1,8 @@
 .idea
 build
-data
-example_data_set
-example_mini
-examples
-example_mini2
-example_mini3
-example_mini4
-example_mini5
+example*
 Testing
 *.ply
+*.pcd
 cmake-build-release
 cmake-build-debug

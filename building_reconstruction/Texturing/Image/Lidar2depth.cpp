@@ -89,18 +89,12 @@ void urban_rec::Lidar2depth::fillPointCoordsSet(Camera cam, PointCoordsSet *poly
             // translating UV coords from pcl to coords onto image frame
             int iX = int (round(p_xy1.x * cam.width));
             int iY = int (round((1-p_xy1.y) * cam.height));
-//            int iY = int (round((1-p_xy1.x) * cam.width));
-//            int iX = int (round((1-p_xy1.y) * cam.height));
             Eigen::Vector2i pixel1 (iX, iY);
             iX = int (round(p_xy2.x * cam.width));
             iY = int (round((1-p_xy2.y) * cam.height));
-//            iY = int (round((1-p_xy2.x) * cam.width));
-//            iX = int (round((1-p_xy2.y) * cam.height));
             Eigen::Vector2i pixel2 (iX, iY);
             iX = int (round(p_xy3.x * cam.width));
             iY = int (round((1-p_xy3.y) * cam.height));
-//            iY = int (round((1-p_xy3.x) * cam.width));
-//            iX = int (round((1-p_xy3.y) * cam.height));
             Eigen::Vector2i pixel3 (iX, iY);
             polygons->push_back(
                     make_tuple(
