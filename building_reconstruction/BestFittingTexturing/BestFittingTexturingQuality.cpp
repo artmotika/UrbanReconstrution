@@ -130,18 +130,12 @@ pcl::TextureMesh BestFittingTexturingQuality::fit(vector <string> argv) {
         meshFaceIndexMapInputMeshesPartToFull[current_cam] = faceIndexMaps.faceIndexMapPartToFull;
     }
 
-    cout << "end" << endl;
-
     for (int current_cam = 0; current_cam < number_cams + 1; current_cam++) {
         vector  <Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f> > dummy_container;
         mesh.tex_coordinates.push_back (dummy_container);
         vector <pcl::Vertices> polygon_dummy;
         mesh.tex_polygons.push_back(polygon_dummy);
     }
-
-    cout << "end" << endl;
-    cout << "triangles.polygons.size(): " << triangles.polygons.size() << endl;
-    cout << "cloud.size(): " << cloud->size() << endl;
 
     for (int global_face_idx = 0; global_face_idx < triangles.polygons.size(); global_face_idx++) {
         double max_area = 0.0;
@@ -162,10 +156,6 @@ pcl::TextureMesh BestFittingTexturingQuality::fit(vector <string> argv) {
             }
 
             double area = Geometry_pcl::triangle_area(p0, p1, p2);
-            // Чтобы не брать плохие текстуры с верху - 5, 0 и 1 из-за расскачки автомобиля спереди и сзади
-//            if (mask_idx == 5) area /= 2.0;
-//            if (mask_idx == 0) area /= 8.0;
-            // ––––––––––––––––––
             if (area > max_area) {
                 max_area = area;
                 face_idx = local_face_idx;

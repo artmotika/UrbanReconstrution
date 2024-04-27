@@ -49,9 +49,6 @@ find_package(VTK)
 # OPENCV
 find_package(OpenCV REQUIRED)
 
-# CGAL and its components
-find_package(CGAL REQUIRED)
-
 # Boost and its components
 find_package(Boost REQUIRED)
 
@@ -77,33 +74,9 @@ link_directories(${OpenCV_LIB_DIR})
 
 # Creating entries for all C++ files with "main" routine
 # ##########################################################
-
 find_package(Eigen3 3.1.0) #(requires 3.1.0 or greater)
-include(CGAL_Eigen3_support)
-if (NOT TARGET CGAL::Eigen3_support)
-    message(
-            STATUS
-            "NOTICE: This project requires Eigen 3.1 (or greater) and will not be compiled."
-    )
-    return()
-endif ()
 
-find_package(SCIP QUIET)
-include(CGAL_SCIP_support)
-if (NOT TARGET CGAL::SCIP_support)
-    find_package(GLPK QUIET)
-    include(CGAL_GLPK_support)
-    if (NOT TARGET CGAL::GLPK_support)
-        message(
-                STATUS
-                "NOTICE: This project requires either SCIP or GLPK, and will not be compiled."
-        )
-        return()
-    endif ()
-endif ()
-
-
-add_library(iocgal STATIC IO/Io_cgal.h IO/Io_cgal.cpp)
+#add_library(iocgal STATIC IO/Io_cgal.h IO/Io_cgal.cpp)
 add_library(iopcl STATIC IO/Io_pcl.h IO/Io_pcl.cpp)
 add_library(geometry STATIC Geometry/Geometry_pcl.h Geometry/Geometry_pcl.cpp)
 add_library(algo_reconstruction STATIC Algo_reconstruction.h Algo_reconstruction.cpp)
@@ -121,13 +94,13 @@ add_library(metrics STATIC Metrics/Metrics.h Metrics/Metrics.cpp
 add_library(color_transfer STATIC ColorTransfer/ColorTransferMeanLocal.h ColorTransfer/ColorTransferMeanLocal.cpp
             ColorTransfer/ColorTransferMeanSamePolygons.h ColorTransfer/ColorTransferMeanSamePolygons.cpp)
 add_library(best_fitting_texturing STATIC BestFittingTexturing/BestFittingTexturingQuality.h BestFittingTexturing/BestFittingTexturingQuality.cpp)
-create_single_source_cgal_program("texturing_map_example.cpp")
-create_single_source_cgal_program("metric_image_compare_example.cpp")
-create_single_source_cgal_program("metrics_examples.cpp")
+add_executable(texturing_map_example texturing_map_example.cpp)
+add_executable(metric_image_compare_example metric_image_compare_example.cpp)
+add_executable(metrics_examples metrics_examples.cpp)
 #add_library(surface_reconstruction STATIC surface_reconstruction.cpp)
 add_library(building_reconstruction STATIC building_reconstruction.cpp)
 #create_single_source_cgal_program("surface_reconstruction_example.cpp")
-create_single_source_cgal_program("building_reconstruction_example.cpp")
+add_executable(building_reconstruction_example building_reconstruction_example.cpp)
 
 foreach (
         target
@@ -140,7 +113,7 @@ endforeach ()
 
 foreach (
         target
-        iocgal
+#        iocgal
         iopcl
         geometry
         algo_reconstruction
@@ -148,17 +121,12 @@ foreach (
         string_utils
         texturing_mapping
         metrics
-        #        surface_reconstruction
+#        surface_reconstruction
         building_reconstruction
         color_transfer
         best_fitting_texturing
 )
-    target_link_libraries(${target} PUBLIC CGAL::Eigen3_support ${PCL_LIBRARIES})
-    if (TARGET CGAL::SCIP_support)
-        target_link_libraries(${target} PUBLIC CGAL::SCIP_support)
-    else ()
-        target_link_libraries(${target} PUBLIC CGAL::GLPK_support)
-    endif ()
+    target_link_libraries(${target} PUBLIC Eigen3::Eigen ${PCL_LIBRARIES})
 endforeach ()
 
 target_link_libraries(metric_image_compare_example PUBLIC metrics)
@@ -169,7 +137,7 @@ foreach (
         target
         texturing_map_example
 )
-    target_link_libraries(${target} PUBLIC iocgal)
+#    target_link_libraries(${target} PUBLIC iocgal)
     target_link_libraries(${target} PUBLIC iopcl)
     target_link_libraries(${target} PUBLIC geometry)
     target_link_libraries(${target} PUBLIC algo_reconstruction)
@@ -181,33 +149,23 @@ foreach (
     target_link_libraries(${target} PUBLIC texturing_mapping)
     target_link_libraries(${target} PUBLIC color_transfer)
     target_link_libraries(${target} PUBLIC best_fitting_texturing)
-    target_link_libraries(${target} PUBLIC CGAL::Eigen3_support ${PCL_LIBRARIES})
-    if (TARGET CGAL::SCIP_support)
-        target_link_libraries(${target} PUBLIC CGAL::SCIP_support)
-    else ()
-        target_link_libraries(${target} PUBLIC CGAL::GLPK_support)
-    endif ()
+    target_link_libraries(${target} PUBLIC Eigen3::Eigen ${PCL_LIBRARIES})
 endforeach ()
 
 foreach (
         target
         building_reconstruction_example
-        #        surface_reconstruction_example
+#        surface_reconstruction_example
 )
-    target_link_libraries(${target} PUBLIC iocgal)
+#    target_link_libraries(${target} PUBLIC iocgal)
     target_link_libraries(${target} PUBLIC iopcl)
     target_link_libraries(${target} PUBLIC geometry)
     target_link_libraries(${target} PUBLIC algo_reconstruction)
     target_link_libraries(${target} PUBLIC shift)
     target_link_libraries(${target} PUBLIC string_utils)
-    #  target_link_libraries(${target} PUBLIC surface_reconstruction)
+#    target_link_libraries(${target} PUBLIC surface_reconstruction)
     target_link_libraries(${target} PUBLIC building_reconstruction)
     target_link_libraries(${target} PUBLIC texturing_mapping)
-    target_link_libraries(${target} PUBLIC CGAL::Eigen3_support ${PCL_LIBRARIES})
-    if (TARGET CGAL::SCIP_support)
-        target_link_libraries(${target} PUBLIC CGAL::SCIP_support)
-    else ()
-        target_link_libraries(${target} PUBLIC CGAL::GLPK_support)
-    endif ()
+    target_link_libraries(${target} PUBLIC Eigen3::Eigen ${PCL_LIBRARIES})
 endforeach ()
 

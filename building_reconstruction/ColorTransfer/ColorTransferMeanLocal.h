@@ -63,7 +63,7 @@ private:
     void transferColorBetweenPolygons(NeighborPolygonTextureCoordsMap neighborPolygonTextureCoordsMap,
                                                               cv::Mat & texture_src,
                                                               cv::Mat & texture_target,
-                                                              cv::Mat & dest_target, int c, std::ofstream & output_file);
+                                                              cv::Mat & dest_target, int c);
     void transferColorBetweenTpBorder(vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> &neighboring_cams_to_polygons_texture_coords,
     vector <cv::Mat> &textures, vector <cv::Mat> &destinations,
     vector <string> &dest_paths);

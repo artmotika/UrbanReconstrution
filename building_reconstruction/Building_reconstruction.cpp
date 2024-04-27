@@ -352,8 +352,6 @@ PolygonMesh urban_rec::Building_reconstruction::filterMeshPoissonByPoints(Polygo
     std::cout << "number polygons: " << polygons_left << std::endl;
 
     size_t array_size = all_vertices->points.size();
-//    unsigned short *vertex_indices = (unsigned short *) malloc(array_size * sizeof(unsigned short));
-//    memset(vertex_indices, 0, array_size * sizeof(unsigned short));
 
     for (std::vector<Vertices>::iterator it1 = mesh_input.polygons.begin(); it1 != mesh_input.polygons.end(); it1++) {
         Indices vertecies = it1->vertices;
@@ -376,18 +374,8 @@ PolygonMesh urban_rec::Building_reconstruction::filterMeshPoissonByPoints(Polygo
         if (kdtree.radiusSearch (pcenter, filter_radius, idxNeighbors, neighborsSquaredDistance) > 0 ) {
             new_polygons_filtering.push_back(*it1);
         }
-//        for (PointXYZ p: *points_filter_xyz) {
-//            if (Geometry_pcl::point_in_radius(pcenter, p, filter_radius)) {
-//                vertex_indices[vertecies[0]] = vertex_indices[vertecies[0]] + 1;
-//                vertex_indices[vertecies[1]] = vertex_indices[vertecies[1]] + 1;
-//                vertex_indices[vertecies[2]] = vertex_indices[vertecies[2]] + 1;
-//                new_polygons_filtering.push_back(*it1);
-//                break;
-//            }
-//        }
     }
 
-//    free(vertex_indices);
     mesh_input.polygons = new_polygons_filtering;
     print_info("[done, ");
     print_value("%g", tt.toc());

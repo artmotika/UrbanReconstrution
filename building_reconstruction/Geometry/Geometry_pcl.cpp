@@ -92,26 +92,6 @@ double Geometry_pcl::dist_between_two_points(Eigen::Vector2i p1, Eigen::Vector2i
     return sqrt(pow(p1(0) - p2(0), 2) + pow(p1(1) - p2(1), 2));
 }
 
-//bool Geometry_pcl::arePointsCollinear(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c) {
-////    float epsilon = std::numeric_limits<float>::epsilon() * 2.0;
-//    float epsilon = 1.0;
-//    double vectorAB_x = b.x - a.x;
-//    double vectorAB_y = b.y - a.y;
-//    double vectorAB_z = b.z - a.z;
-//
-//    double vectorAC_x = c.x - a.x;
-//    double vectorAC_y = c.y - a.y;
-//    double vectorAC_z = c.z - a.z;
-//
-//    double crossProduct_x = (vectorAB_y * vectorAC_z) - (vectorAB_z * vectorAC_y);
-//    double crossProduct_y = (vectorAB_z * vectorAC_x) - (vectorAB_x * vectorAC_z);
-//    double crossProduct_z = (vectorAB_x * vectorAC_y) - (vectorAB_y * vectorAC_x);
-//
-//    return (crossProduct_x < epsilon && crossProduct_x > -epsilon
-//            && crossProduct_y < epsilon && crossProduct_y > -epsilon
-//            && crossProduct_z < epsilon && crossProduct_z > -epsilon);
-//}
-
 bool Geometry_pcl::arePointsCollinear(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c) {
     float epsilon = std::numeric_limits<float>::epsilon();
     return triangle_area_geron(a, b, c) < epsilon;

@@ -66,16 +66,16 @@ private:
                                          vector <vector <int>> &meshFaceIndexMapInputMeshesFullToPart,
                                          vector <vector <int>> &meshFaceIndexMapInputMeshesPartToFull,
                                          vector <cv::Mat> &textures,
-                                         cv::Mat &dest_target, std::ofstream & output_file,
+                                         cv::Mat &dest_target,
                                          vector <cv::Mat> &destinations);
 
-    void transferColorBetweenTpBorder(vector <vector <int>> &meshFaceIndexMapMainMeshFullToPart,
-                                      vector <vector <int>> &meshFaceIndexMapMainMeshPartToFull,
-                                      vector <vector <int>> &meshFaceIndexMapInputMeshesFullToPart,
-                                      vector <vector <int>> &meshFaceIndexMapInputMeshesPartToFull,
-                                      vector <cv::Mat> &masks,
-                                      vector <cv::Mat> &textures,
-                                      vector <cv::Mat> &destinations);
+    void transferColorBetweenTp(vector <vector <int>> &meshFaceIndexMapMainMeshFullToPart,
+                              vector <vector <int>> &meshFaceIndexMapMainMeshPartToFull,
+                              vector <vector <int>> &meshFaceIndexMapInputMeshesFullToPart,
+                              vector <vector <int>> &meshFaceIndexMapInputMeshesPartToFull,
+                              vector <cv::Mat> &masks,
+                              vector <cv::Mat> &textures,
+                              vector <cv::Mat> &destinations);
 };
 
 

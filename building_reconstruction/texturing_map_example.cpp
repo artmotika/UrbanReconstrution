@@ -21,7 +21,6 @@ using Camera = TextureMapping<pcl::PointXYZ>::Camera;
 
 int main() {
     urban_rec::shift_coord shift_lidar2 = std::make_tuple(-369780, -2681780, -240);
-//    urban_rec::shift_coord shift_lidar5 = std::make_tuple(-369600, -2681830, -240);
     urban_rec::shift_coord shift_lidar6 = std::make_tuple(-369630, -2682080, -240);
     urban_rec::shift_coord shift_lidar10 = std::make_tuple(-369780, -2682240, -240);
     urban_rec::shift_coord shift_lidar15 = std::make_tuple(-369500, -2682050, -240);
@@ -81,22 +80,15 @@ int main() {
 
     vector<pcl::TextureMesh> tms = texturing_mapping.textureMeshes(argv);
 
+    BestFittingTexturingQuality bestFittingTexturingQuality = BestFittingTexturingQuality(triangles, tms);
+    pcl::TextureMesh tm_best_fitting = bestFittingTexturingQuality.fit(argv);
+
     ColorTransferMeanSamePolygons color_transfer_same_polygons
-            = ColorTransferMeanSamePolygons(triangles, tm, cams, tms, "../example_2/"); // "../example_mini5/"
+        = ColorTransferMeanSamePolygons(triangles, tm_best_fitting, cams, tms, "../example_2/"); // "../example_mini5/"
     color_transfer_same_polygons.transfer();
 
     MtlUtils mtlutils = MtlUtils("../example_2/textured.mtl"); // "../example_mini5/textured.mtl"
     mtlutils.addToMapKd("_Tpatch");
-
-//    BestFittingTexturingQuality bestFittingTexturingQuality = BestFittingTexturingQuality(triangles, tms);
-//    pcl::TextureMesh tm_best_fitting = bestFittingTexturingQuality.fit(argv);
-//
-//    ColorTransferMeanSamePolygons color_transfer_same_polygons
-//        = ColorTransferMeanSamePolygons(triangles, tm_best_fitting, cams, tms, "../example_2/"); // "../example_mini5/"
-//    color_transfer_same_polygons.transfer();
-//
-//    MtlUtils mtlutils = MtlUtils("../example_2/textured.mtl"); // "../example_mini5/textured.mtl"
-//    mtlutils.addToMapKd("_Tpatch");
 
 ////    urban_rec::Lidar2depth l2dimg = urban_rec::Lidar2depth(config_path, input_ply_file_path);
 ////    l2dimg.createDepthImages();

@@ -74,31 +74,6 @@ namespace urban_rec {
         PolygonMesh::Ptr input_polygon_mesh{nullptr};
         int texture_width = 0;
         int texture_height = 0;
-
-        void
-        textureMeshwithMultipleCameras (pcl::TextureMesh &mesh,
-                                        const pcl::texture_mapping::CameraVector &cameras,
-                                        const vector <cv::Mat> &masks);
-
-        inline void
-        getTriangleCircumcenterAndSize(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3,
-                                       pcl::PointXY &circomcenter, double &radius);
-
-        inline void
-        getTriangleCircumcscribedCircleCentroid(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3,
-                                                pcl::PointXY &circumcenter, double &radius);
-
-        inline bool
-        getPointUVCoordinates(const pcl::PointXYZ &pt, const Camera &cam, pcl::PointXY &UV_coordinates);
-
-        inline bool
-        checkPointInsideTriangle(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3,
-                                 const pcl::PointXY &pt);
-
-        inline bool
-        isFaceProjected (const Camera &camera, const pcl::PointXYZ &p1, const pcl::PointXYZ &p2, const pcl::PointXYZ &p3,
-                         pcl::PointXY &proj1, pcl::PointXY &proj2, pcl::PointXY &proj3);
-
     };
 }
 
