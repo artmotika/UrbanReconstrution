@@ -17,7 +17,7 @@ jobs:
     - name: Install VTK
       run: |
         sudo apt-get update
-        sudo apt-get install -y libvtk7-dev
+        sudo apt-get install -y libvtk9-dev
 
     - name: Set up OpenCV
       run: |
