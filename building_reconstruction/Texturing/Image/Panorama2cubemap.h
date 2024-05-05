@@ -9,6 +9,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <string>
 #include <boost/filesystem.hpp>
 #include <boost/thread/thread.hpp>
 #include "../../../include/rapidscv/rapidcsv.h"

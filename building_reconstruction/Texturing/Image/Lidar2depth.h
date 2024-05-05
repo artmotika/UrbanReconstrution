@@ -8,6 +8,7 @@
 #include <limits.h>
 #include <vector>
 #include <opencv2/opencv.hpp>
+#include <string>
 
 #include "../TexturingMapping.h"
 #include "../../StringUtils/PathUtils.h"

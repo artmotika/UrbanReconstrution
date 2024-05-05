@@ -13,6 +13,8 @@
 #include <typeinfo>
 #include <stack>
 #include <deque>
+#include <vector>
+#include <string>
 
 #include "IO/Io_pcl.h"
 #include "Geometry/Geometry_pcl.h"

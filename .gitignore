@@ -4,5 +4,6 @@ example*
 Testing
 *.ply
 *.pcd
+*.psd
 cmake-build-release
 cmake-build-debug
