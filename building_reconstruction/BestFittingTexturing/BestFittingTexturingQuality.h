@@ -3,12 +3,13 @@
 
 #include "../Texturing/FaceIndexMaps.h"
 #include "../Geometry/Geometry_pcl.h"
-#include "../Texturing/Texturing_mapping.h"
+#include "../Texturing/TexturingMapping.h"
+#include "../consts/PCLTexMaterialConsts.h"
 
 class BestFittingTexturingQuality {
 public:
     BestFittingTexturingQuality(pcl::PolygonMesh &in_triangles,
-                                vector<pcl::TextureMesh> &meshes)
+                                std::vector<pcl::TextureMesh> &meshes)
                                 : triangles(in_triangles), input_meshes(meshes) {
         setNumberCams(input_meshes.size());
     }
@@ -19,13 +20,13 @@ public:
 
     void setInputPolygonMesh(pcl::PolygonMesh &mesh);
 
-    void setInputTextureMeshes(vector<pcl::TextureMesh> &meshes);
+    void setInputTextureMeshes(std::vector<pcl::TextureMesh> &meshes);
 
-    pcl::TextureMesh fit(vector <string> argv);
+    pcl::TextureMesh fit(std::vector <std::string> argv);
 
 private:
     pcl::PolygonMesh &triangles;
-    vector<pcl::TextureMesh> &input_meshes;
+    std::vector<pcl::TextureMesh> &input_meshes;
     int number_cams;
 };
 

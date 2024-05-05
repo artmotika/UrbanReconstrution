@@ -1,10 +1,11 @@
-#include "Texturing_mapping.h"
+#include "TexturingMapping.h"
 #include "IO/Image_txt_reading.h"
 
 using namespace urban_rec;
 using namespace std;
+using namespace pcl;
 
-int urban_rec::Texturing_mapping::saveOBJFile(const std::string &file_name,
+int urban_rec::TexturingMapping::saveOBJFile(const std::string &file_name,
                 const pcl::TextureMesh &tex_mesh, unsigned precision) {
     if (tex_mesh.cloud.data.empty()) {
         PCL_ERROR("[pcl::io::saveOBJFile] Input point cloud has no data!\n");
@@ -207,20 +208,20 @@ int urban_rec::Texturing_mapping::saveOBJFile(const std::string &file_name,
     return (0);
 }
 
-void urban_rec::Texturing_mapping::setTextureWidthAndHeight(int width, int height) {
+void urban_rec::TexturingMapping::setTextureWidthAndHeight(int width, int height) {
     texture_width = width;
     texture_height = height;
 }
 
-void urban_rec::Texturing_mapping::setInputPolygonMesh(pcl::PolygonMesh &polygon_mesh) {
+void urban_rec::TexturingMapping::setInputPolygonMesh(pcl::PolygonMesh &polygon_mesh) {
     input_polygon_mesh = std::make_shared<pcl::PolygonMesh>(polygon_mesh);
 }
 
-pcl::PolygonMesh urban_rec::Texturing_mapping::getInputPolygonMesh() {
+pcl::PolygonMesh urban_rec::TexturingMapping::getInputPolygonMesh() {
     return *input_polygon_mesh;
 }
 
-bool urban_rec::Texturing_mapping::getPointUVCoords(const PointXYZ &pt, const pcl::TextureMapping<pcl::PointXYZ>::Camera &cam, PointXY &UV_coordinates) {
+bool urban_rec::TexturingMapping::getPointUVCoords(const PointXYZ &pt, const pcl::TextureMapping<pcl::PointXYZ>::Camera &cam, PointXY &UV_coordinates) {
     // if the point is in front of the camera
     if (pt.z > 0)
     {
@@ -261,7 +262,7 @@ bool urban_rec::Texturing_mapping::getPointUVCoords(const PointXYZ &pt, const pc
     return (false); // point was not visible by the camera
 }
 
-bool urban_rec::Texturing_mapping::readCamPoseFile(std::string filename,
+bool urban_rec::TexturingMapping::readCamPoseFile(std::string filename,
                                                       pcl::TextureMapping<pcl::PointXYZ>::Camera &cam) {
     std::ifstream myReadFile;
     myReadFile.open(filename.c_str(), ios::in);
@@ -328,7 +329,7 @@ bool urban_rec::Texturing_mapping::readCamPoseFile(std::string filename,
     return true;
 }
 
-bool urban_rec::Texturing_mapping::isFaceOnMask (pcl::PointXY &proj1, pcl::PointXY &proj2, pcl::PointXY &proj3, const cv::Mat &mask) {
+bool urban_rec::TexturingMapping::isFaceOnMask (pcl::PointXY &proj1, pcl::PointXY &proj2, pcl::PointXY &proj3, const cv::Mat &mask) {
     int x0 = proj1.x * float(texture_width);
     int y0 = float(texture_height) - proj1.y * float(texture_height);
     int x1 = proj2.x * float(texture_width);
@@ -344,7 +345,7 @@ bool urban_rec::Texturing_mapping::isFaceOnMask (pcl::PointXY &proj1, pcl::Point
     return false;
 }
 
-bool urban_rec::Texturing_mapping::isFaceProjectedAngleMore (const pcl::PointXYZ &p1,
+bool urban_rec::TexturingMapping::isFaceProjectedAngleMore (const pcl::PointXYZ &p1,
                                                              const pcl::PointXYZ &p2,
                                                              const pcl::PointXYZ &p3,
                                                              const pcl::PointXYZ &camPose,
@@ -366,7 +367,7 @@ bool urban_rec::Texturing_mapping::isFaceProjectedAngleMore (const pcl::PointXYZ
 }
 
 
-tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> urban_rec::Texturing_mapping::textureMesh(vector <string> argv) {
+tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> urban_rec::TexturingMapping::textureMesh(vector <string> argv) {
     pcl::PolygonMesh triangles;
     if (input_polygon_mesh != nullptr) {
         triangles = *input_polygon_mesh;
@@ -420,21 +421,21 @@ tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> urban_rec::Texturing
     mesh.tex_materials.resize(my_cams.size() + 1);
     for (int i = 0; i <= my_cams.size(); ++i) {
         pcl::TexMaterial mesh_material;
-        mesh_material.tex_Ka.r = 0.2f;
-        mesh_material.tex_Ka.g = 0.2f;
-        mesh_material.tex_Ka.b = 0.2f;
+        mesh_material.tex_Ka.r = KA_R;
+        mesh_material.tex_Ka.g = KA_G;
+        mesh_material.tex_Ka.b = KA_B;
 
-        mesh_material.tex_Kd.r = 0.8f;
-        mesh_material.tex_Kd.g = 0.8f;
-        mesh_material.tex_Kd.b = 0.8f;
+        mesh_material.tex_Kd.r = KD_R;
+        mesh_material.tex_Kd.g = KD_G;
+        mesh_material.tex_Kd.b = KD_B;
 
-        mesh_material.tex_Ks.r = 1.0f;
-        mesh_material.tex_Ks.g = 1.0f;
-        mesh_material.tex_Ks.b = 1.0f;
+        mesh_material.tex_Ks.r = KS_R;
+        mesh_material.tex_Ks.g = KS_G;
+        mesh_material.tex_Ks.b = KS_B;
 
-        mesh_material.tex_d = 1.0f;
-        mesh_material.tex_Ns = 75.0f;
-        mesh_material.tex_illum = 2;
+        mesh_material.tex_d = D;
+        mesh_material.tex_Ns = NS;
+        mesh_material.tex_illum = ILLUM;
 
         std::stringstream tex_name;
         tex_name << "material_" << i;
@@ -473,7 +474,7 @@ tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> urban_rec::Texturing
     return make_tuple(mesh, my_cams);
 }
 
-vector<pcl::TextureMesh> urban_rec::Texturing_mapping::textureMeshes(vector <string> argv) {
+vector<pcl::TextureMesh> urban_rec::TexturingMapping::textureMeshes(vector <string> argv) {
     pcl::PolygonMesh triangles;
     if (input_polygon_mesh != nullptr) {
         triangles = *input_polygon_mesh;
@@ -533,21 +534,21 @@ vector<pcl::TextureMesh> urban_rec::Texturing_mapping::textureMeshes(vector <str
     }
     for (int i = 0; i <= my_cams.size(); ++i) {
         pcl::TexMaterial mesh_material;
-        mesh_material.tex_Ka.r = 0.2f;
-        mesh_material.tex_Ka.g = 0.2f;
-        mesh_material.tex_Ka.b = 0.2f;
+        mesh_material.tex_Ka.r = KA_R;
+        mesh_material.tex_Ka.g = KA_G;
+        mesh_material.tex_Ka.b = KA_B;
 
-        mesh_material.tex_Kd.r = 0.8f;
-        mesh_material.tex_Kd.g = 0.8f;
-        mesh_material.tex_Kd.b = 0.8f;
+        mesh_material.tex_Kd.r = KD_R;
+        mesh_material.tex_Kd.g = KD_G;
+        mesh_material.tex_Kd.b = KD_B;
 
-        mesh_material.tex_Ks.r = 1.0f;
-        mesh_material.tex_Ks.g = 1.0f;
-        mesh_material.tex_Ks.b = 1.0f;
+        mesh_material.tex_Ks.r = KS_R;
+        mesh_material.tex_Ks.g = KS_G;
+        mesh_material.tex_Ks.b = KS_B;
 
-        mesh_material.tex_d = 1.0f;
-        mesh_material.tex_Ns = 75.0f;
-        mesh_material.tex_illum = 2;
+        mesh_material.tex_d = D;
+        mesh_material.tex_Ns = NS;
+        mesh_material.tex_illum = ILLUM;
 
         std::stringstream tex_name;
         tex_name << "material_" << i;

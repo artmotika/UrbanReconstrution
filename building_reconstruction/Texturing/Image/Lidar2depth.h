@@ -9,22 +9,20 @@
 #include <vector>
 #include <opencv2/opencv.hpp>
 
-#include "../Texturing_mapping.h"
+#include "../TexturingMapping.h"
 #include "../../StringUtils/PathUtils.h"
 #include "../../IO/Io_pcl.h"
 #include "../../Geometry/Geometry_pcl.h"
 
-using namespace std;
-
 namespace urban_rec {
     using Camera = pcl::TextureMapping<pcl::PointXYZ>::Camera;
-    using PointCoordsSet = vector<tuple<
-            tuple<PointXYZ, PointXYZ, PointXYZ>,
-    tuple<Eigen::Vector2i, Eigen::Vector2i, Eigen::Vector2i>,
-    tuple<bool, bool, bool>>>;
+    using PointCoordsSet = std::vector<std::tuple<
+            std::tuple<pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ>,
+    std::tuple<Eigen::Vector2i, Eigen::Vector2i, Eigen::Vector2i>,
+    std::tuple<bool, bool, bool>>>;
     class Lidar2depth {
     public:
-        Lidar2depth(string base_dir_path, string input_mesh_file_path = "") {
+        Lidar2depth(std::string base_dir_path, std::string input_mesh_file_path = "") {
             setBaseDirPath(base_dir_path);
             if (input_mesh_file_path != "") {
                 setInputMeshFilePath(input_mesh_file_path);
@@ -35,22 +33,22 @@ namespace urban_rec {
 
         pcl::PolygonMesh getInputPolygonMesh();
 
-        void setInputMeshFilePath(string input_mesh_file_path);
+        void setInputMeshFilePath(std::string input_mesh_file_path);
 
-        string getInputMeshFilePath();
+        std::string getInputMeshFilePath();
 
-        void setBaseDirPath(string base_dir_path);
+        void setBaseDirPath(std::string base_dir_path);
 
-        string getBaseDirPath();
+        std::string getBaseDirPath();
 
         void createDepthImages();
 
     private:
-        string input_mesh_file_path;
-        string base_dir_path;
+        std::string input_mesh_file_path;
+        std::string base_dir_path;
         pcl::PolygonMesh::Ptr input_polygon_mesh{nullptr};
 
-        void readCamPoses(vector<Camera> *cams, vector<boost::filesystem::path> *filenames);
+        void readCamPoses(std::vector<Camera> *cams, std::vector<boost::filesystem::path> *filenames);
 
         void fillPointCoordsSet(Camera cam, PointCoordsSet *polygons);
     };

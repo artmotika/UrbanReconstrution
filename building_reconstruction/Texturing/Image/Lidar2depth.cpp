@@ -1,5 +1,8 @@
 #include "Lidar2depth.h"
 
+using namespace std;
+using namespace pcl;
+
 void urban_rec::Lidar2depth::setInputPolygonMesh(pcl::PolygonMesh polygon_mesh) {
     input_polygon_mesh = std::make_shared<pcl::PolygonMesh>(polygon_mesh);
 }
@@ -45,7 +48,7 @@ void urban_rec::Lidar2depth::readCamPoses(vector<Camera> *cams, vector<boost::fi
 
     for (int i = 0; i < filenames->size(); i++) {
         Camera cam;
-        urban_rec::Texturing_mapping::readCamPoseFile((*filenames)[i].string(), cam);
+        urban_rec::TexturingMapping::readCamPoseFile((*filenames)[i].string(), cam);
         cams->push_back(cam);
     }
 }
@@ -82,9 +85,9 @@ void urban_rec::Lidar2depth::fillPointCoordsSet(Camera cam, PointCoordsSet *poly
          * inforamtion is the point projected onto the image frame
          */
         pcl::PointXY p_xy1, p_xy2, p_xy3;
-        bool is_projected1 = urban_rec::Texturing_mapping::getPointUVCoords(p1, cam, p_xy1);
-        bool is_projected2 = urban_rec::Texturing_mapping::getPointUVCoords(p2, cam, p_xy2);
-        bool is_projected3 = urban_rec::Texturing_mapping::getPointUVCoords(p3, cam, p_xy3);
+        bool is_projected1 = urban_rec::TexturingMapping::getPointUVCoords(p1, cam, p_xy1);
+        bool is_projected2 = urban_rec::TexturingMapping::getPointUVCoords(p2, cam, p_xy2);
+        bool is_projected3 = urban_rec::TexturingMapping::getPointUVCoords(p3, cam, p_xy3);
         if (is_projected1 || is_projected2 || is_projected3) {
             // translating UV coords from pcl to coords onto image frame
             int iX = int (round(p_xy1.x * cam.width));

@@ -1,7 +1,3 @@
-//
-// Created by Артем Мотыка on 16.03.2024.
-//
-
 #include "ColorTransferMeanLocal.h"
 
 using namespace cv;

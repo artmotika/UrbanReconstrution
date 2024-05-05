@@ -83,7 +83,7 @@ add_library(algo_reconstruction STATIC Algo_reconstruction.h Algo_reconstruction
 add_library(shift STATIC PointClouds/Shift.h PointClouds/Shift.cpp)
 add_library(string_utils STATIC StringUtils/PathUtils.h StringUtils/PathUtils.cpp)
 add_library(file_utils STATIC FileUtils/FileUtils.h FileUtils/FileUtils.cpp)
-add_library(texturing_mapping STATIC Texturing/Texturing_mapping.h Texturing/Texturing_mapping.cpp
+add_library(texturing_mapping STATIC Texturing/TexturingMapping.h Texturing/TexturingMapping.cpp
         Texturing/IO/Image_txt_reading.h Texturing/IO/Image_txt_reading.cpp
         Texturing/Image/Panorama2cubemap.h Texturing/Image/Panorama2cubemap.cpp
         Texturing/Image/Lidar2depth.h Texturing/Image/Lidar2depth.cpp
