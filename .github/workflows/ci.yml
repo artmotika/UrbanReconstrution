@@ -16,6 +16,7 @@ jobs:
 
     - name: Build
       run: |
+        cd building_reconstruction
         mkdir build
         cd build
         cmake ..
