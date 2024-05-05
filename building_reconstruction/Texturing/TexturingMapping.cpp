@@ -399,7 +399,7 @@ tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> urban_rec::Texturing
         for (boost::filesystem::directory_iterator it(base_dir);
              it != boost::filesystem::directory_iterator(); ++it) {
             if (boost::filesystem::is_regular_file(it->status()) &&
-                boost::filesystem::extension(it->path()) == extension) {
+                (it->path().extension().string() == extension)) {
                 filenames.push_back(it->path());
             }
         }
@@ -492,7 +492,7 @@ vector<pcl::TextureMesh> urban_rec::TexturingMapping::textureMeshes(vector <stri
         for (boost::filesystem::directory_iterator it(base_dir);
              it != boost::filesystem::directory_iterator(); ++it) {
             if (boost::filesystem::is_regular_file(it->status()) &&
-                boost::filesystem::extension(it->path()) == extension) {
+                    (it->path().extension().string() == extension)) {
                 filenames.push_back(it->path());
             }
         }

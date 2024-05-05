@@ -15,6 +15,8 @@
 #include <pcl/visualization/pcl_visualizer.h>
 #include <cmath>
 #include <math.h> /* modf */
+#include <vector>
+#include <string>
 
 #include <pcl/point_types.h>
 #include <pcl/impl/instantiate.hpp>  // defines the PCL_INSTANTIATE_PRODUCT macro

@@ -1,6 +1,8 @@
 #ifndef URBAN_RECONSTRUCTION_BESTFITTINGTEXTURINGQUALITY_H
 #define URBAN_RECONSTRUCTION_BESTFITTINGTEXTURINGQUALITY_H
 
+#include <opencv2/opencv.hpp>
+#include <string>
 #include "../Texturing/FaceIndexMaps.h"
 #include "../Geometry/Geometry_pcl.h"
 #include "../Texturing/TexturingMapping.h"

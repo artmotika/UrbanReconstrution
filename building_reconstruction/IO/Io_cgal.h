@@ -10,6 +10,7 @@
 #include <CGAL/Point_set_3/IO.h>
 #include <fstream>
 #include <vector>
+#include <string>
 
 namespace Io_cgal {
     void readFileToPointSet(std::string filename, CGAL::Point_set_3<Kernel::Point_3, Kernel::Vector_3> *points_start);

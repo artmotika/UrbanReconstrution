@@ -1,7 +1,7 @@
 #ifndef URBANRECONSTRUCTION_PATHUTILS_H
 #define URBANRECONSTRUCTION_PATHUTILS_H
 
-#include<string>
+#include <string>
 #include <sstream>
 #include <fstream>
 

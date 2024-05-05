@@ -8,6 +8,7 @@
 #include <pcl/surface/gp3.h>
 #include <vector>
 #include <math.h>
+#include <string>
 
 namespace Metrics {
     /*

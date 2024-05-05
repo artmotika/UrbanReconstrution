@@ -7,6 +7,7 @@
 #include <pcl/console/print.h>
 #include <pcl/console/parse.h>
 #include <pcl/console/time.h>
+#include <string>
 
 namespace Io_pcl {
 

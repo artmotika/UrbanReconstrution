@@ -37,7 +37,7 @@ void urban_rec::Lidar2depth::readCamPoses(vector<Camera> *cams, vector<boost::fi
         for (boost::filesystem::directory_iterator it(base_dir);
              it != boost::filesystem::directory_iterator(); ++it) {
             if (boost::filesystem::is_regular_file(it->status()) &&
-                boost::filesystem::extension(it->path()) == extension) {
+                    (it->path().extension().string() == extension)) {
                 filenames->push_back(it->path());
             }
         }

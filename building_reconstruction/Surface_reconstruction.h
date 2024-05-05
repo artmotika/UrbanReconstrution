@@ -24,6 +24,7 @@
 #include <CGAL/Polygon_mesh_processing/polygon_soup_to_polygon_mesh.h>
 #include <cstdlib>
 #include <vector>
+#include <string>
 
 #include "IO/Io_cgal.h"
 #include "Index_map.h"

@@ -335,7 +335,7 @@ void Panorama2cubemap::transform_dir(std::string file_extension) {
         for (boost::filesystem::directory_iterator it(base_dir);
              it != boost::filesystem::directory_iterator(); ++it) {
             if (boost::filesystem::is_regular_file(it->status()) &&
-                boost::filesystem::extension(it->path()) == extension) {
+                (it->path().extension().string() == extension)) {
                 filenames.push_back(it->path());
             }
         }

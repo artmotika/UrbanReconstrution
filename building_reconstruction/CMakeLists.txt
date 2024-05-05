@@ -3,10 +3,15 @@
 
 cmake_minimum_required(VERSION 3.1...3.23)
 
+set(CMAKE_C_COMPILER "gcc-13")
+set(CMAKE_CXX_COMPILER "g++-13")
+
 project(Polygonal_surface_reconstruction_Examples)
 
-#set(CMAKE_CXX_COMPILER "g++-13")
 #set(CMAKE_CXX_COMPILER "clang")
+
+#add_compile_options(-std=c++20)
+#add_compile_options(-std=c++14)
 
 set(CMAKE_THREAD_LIBS_INIT "-lpthread")
 set(CMAKE_HAVE_THREADS_LIBRARY 1)
@@ -14,27 +19,21 @@ set(CMAKE_USE_WIN32_THREADS_INIT 0)
 set(CMAKE_USE_PTHREADS_INIT 1)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-# OPENMP variables
-set(OpenMP_C_FLAGS "-fopenmp=lomp")
-set(OpenMP_CXX_FLAGS "-fopenmp=lomp")
-set(OpenMP_C_LIB_NAMES "libomp")
-set(OpenMP_CXX_LIB_NAMES "libomp")
-set(OpenMP_libomp_LIBRARY "/usr/local/Cellar/libomp/18.1.3/lib/libomp.dylib")
-set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp /usr/local/Cellar/libomp/18.1.3/lib/libomp.dylib -I/usr/local/Cellar/libomp/18.1.3/include")
-set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp /usr/local/Cellar/libomp/18.1.3/lib/libomp.dylib -I/usr/local/Cellar/libomp/18.1.3/include")
-
-#add_compile_options(-std=c++11)
+## OPENMP variables
+#set(OpenMP_CXX_FLAGS "-fopenmp=lomp")
+#set(OpenMP_CXX_LIB_NAMES "libomp")
+#set(OpenMP_libomp_LIBRARY "/usr/local/Cellar/libomp/18.1.3/lib/libomp.dylib")
+#set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp /usr/local/Cellar/libomp/18.1.3/lib/libomp.dylib -I/usr/local/Cellar/libomp/18.1.3/include")
 
 find_package(Vulkan)
 
 #find_package(Threads REQUIRED)
 
 find_package(OpenMP)
-if (OPENMP_FOUND)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-endif ()
+#if (OPENMP_FOUND)
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+#    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+#endif ()
 
 # PCL and its components
 find_package(PCL 1.12.1 REQUIRED common io search kdtree octree surface filters)
