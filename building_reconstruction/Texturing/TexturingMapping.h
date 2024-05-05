@@ -1,5 +1,5 @@
-#ifndef URBANRECONSTRUCTION_TEXTURING_MAPPING_H
-#define URBANRECONSTRUCTION_TEXTURING_MAPPING_H
+#ifndef URBANRECONSTRUCTION_TEXTURINGMAPPING_H
+#define URBANRECONSTRUCTION_TEXTURINGMAPPING_H
 
 #include <boost/filesystem.hpp>
 #include <boost/thread/thread.hpp>
@@ -25,38 +25,36 @@
 
 #include "../StringUtils/PathUtils.h"
 #include "../Geometry/Geometry_pcl.h"
-
-using namespace std;
-using namespace pcl;
+#include "../consts/PCLTexMaterialConsts.h"
 
 PCL_INSTANTIATE_PRODUCT(NormalEstimation, ((pcl::PointXYZRGBNormal))((pcl::Normal))
 )
 
 namespace urban_rec {
-    class Texturing_mapping {
+    class TexturingMapping {
     public:
         using Camera = pcl::texture_mapping::Camera;
         using UvIndex = pcl::texture_mapping::UvIndex;
 
-        Texturing_mapping(int width, int height) {
+        TexturingMapping(int width, int height) {
             setTextureWidthAndHeight(width, height);
         }
 
         void setTextureWidthAndHeight(int width, int height);
 
-        void setInputPolygonMesh(PolygonMesh &polygon_mesh);
+        void setInputPolygonMesh(pcl::PolygonMesh &polygon_mesh);
 
-        PolygonMesh getInputPolygonMesh();
+        pcl::PolygonMesh getInputPolygonMesh();
 
-        tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> textureMesh(vector <string> argv);
+        std::tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> textureMesh(std::vector <std::string> argv);
 
-        vector<pcl::TextureMesh> textureMeshes(vector <string> argv);
+        std::vector<pcl::TextureMesh> textureMeshes(std::vector <std::string> argv);
 
-        static bool readCamPoseFile(string filename,
-                                TextureMapping<pcl::PointXYZ>::Camera &cam);
+        static bool readCamPoseFile(std::string filename,
+                                pcl::TextureMapping<pcl::PointXYZ>::Camera &cam);
 
-        static bool getPointUVCoords(const PointXYZ &pt, const pcl::TextureMapping<pcl::PointXYZ>::Camera &cam,
-                                     PointXY &UV_coordinates);
+        static bool getPointUVCoords(const pcl::PointXYZ &pt, const pcl::TextureMapping<pcl::PointXYZ>::Camera &cam,
+                                     pcl::PointXY &UV_coordinates);
 
         bool isFaceOnMask (pcl::PointXY &proj1, pcl::PointXY &proj2, pcl::PointXY &proj3, const cv::Mat &mask);
 
@@ -71,10 +69,10 @@ namespace urban_rec {
                               const pcl::TextureMesh &tex_mesh, unsigned precision);
 
     private:
-        PolygonMesh::Ptr input_polygon_mesh{nullptr};
+        pcl::PolygonMesh::Ptr input_polygon_mesh{nullptr};
         int texture_width = 0;
         int texture_height = 0;
     };
 }
 
-#endif //URBANRECONSTRUCTION_TEXTURING_MAPPING_H
+#endif //URBANRECONSTRUCTION_TEXTURINGMAPPING_H

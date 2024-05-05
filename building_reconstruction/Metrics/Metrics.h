@@ -9,9 +9,6 @@
 #include <vector>
 #include <math.h>
 
-using namespace std;
-using namespace pcl;
-
 namespace Metrics {
     /*
      * Чем ближе значение SSIM к 1, тем больше сходство между изображениями.
@@ -27,11 +24,6 @@ namespace Metrics {
      * вызванного ошибками восстановления. PSNR обычно выражается в децибелах (dB).
      */
     double PSNR(cv::Mat image1, cv::Mat image2);
-    double PhotometricConsistencyRMSEnormalized(PolygonMesh mesh,
-                                  string camera_pose_path_set_color,
-                                  string camera_pose_path_check_color,
-                                  cv::Mat image_real,
-                                  cv::Mat image_rendered); // ml course
 }
 
 

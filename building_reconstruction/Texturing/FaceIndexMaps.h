@@ -7,13 +7,10 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/surface/texture_mapping.h>
 
-using namespace std;
-using namespace pcl;
-
 class FaceIndexMaps {
 public:
-    FaceIndexMaps(vector <pcl::Vertices> &input_polygons,
-                  vector <pcl::Vertices> &input_tex_polygons,
+    FaceIndexMaps(std::vector <pcl::Vertices> &input_polygons,
+                  std::vector <pcl::Vertices> &input_tex_polygons,
                   int input_num_points)
                   : polygons(input_polygons), tex_polygons(input_tex_polygons) {
         faceIndexMapFullToPart.assign(polygons.size(), -1);
@@ -23,18 +20,18 @@ public:
 
     void setInputNumPoints(int input_num_points);
 
-    void setInputPolygons(vector <pcl::Vertices> &input_polygons);
+    void setInputPolygons(std::vector <pcl::Vertices> &input_polygons);
 
-    void setInputTexturePolygons(vector <pcl::Vertices> &input_tex_polygons);
+    void setInputTexturePolygons(std::vector <pcl::Vertices> &input_tex_polygons);
 
     void getFaceIndexMaps();
 
-    vector <int> faceIndexMapFullToPart;
-    vector <int> faceIndexMapPartToFull;
+    std::vector <int> faceIndexMapFullToPart;
+    std::vector <int> faceIndexMapPartToFull;
 
 private:
-    vector <pcl::Vertices> &polygons;
-    vector <pcl::Vertices> &tex_polygons;
+    std::vector <pcl::Vertices> &polygons;
+    std::vector <pcl::Vertices> &tex_polygons;
     int num_points;
 };
 

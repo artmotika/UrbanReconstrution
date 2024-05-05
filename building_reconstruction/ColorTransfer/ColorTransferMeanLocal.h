@@ -11,9 +11,6 @@
 #include "../StringUtils/PathUtils.h"
 #include "../Geometry/Geometry_pcl.h"
 
-using namespace std;
-using namespace pcl;
-
 struct PolygonTextureCoords {
     pcl::PointXY a, b, c;
 };
@@ -21,7 +18,7 @@ struct PolygonTextureCoords {
 struct NeighborPolygonTextureCoordsMap {
     PolygonTextureCoords textureCoords1;
     PolygonTextureCoords textureCoords2;
-    pair<int, int> segmentNum;
+    std::pair<int, int> segmentNum;
     int face_idx1;
     int face_idx2;
 };
@@ -49,7 +46,7 @@ public:
 
     void setInputTextureMesh(pcl::TextureMesh &mesh);
 
-    vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> getNeighboringTp();
+    std::vector< std::vector <std::vector <std::vector <NeighborPolygonTextureCoordsMap>>>> getNeighboringTp();
 
     void transfer();
 
@@ -64,10 +61,10 @@ private:
                                                               cv::Mat & texture_src,
                                                               cv::Mat & texture_target,
                                                               cv::Mat & dest_target, int c);
-    void transferColorBetweenTpBorder(vector< vector <vector <vector <NeighborPolygonTextureCoordsMap>>>> &neighboring_cams_to_polygons_texture_coords,
-    vector <cv::Mat> &textures, vector <cv::Mat> &destinations,
-    vector <string> &dest_paths);
-    pair<int, int> isNeighboringPolygons(pcl::PointXYZ p01, pcl::PointXYZ p02, pcl::PointXYZ p03,
+    void transferColorBetweenTpBorder(std::vector< std::vector <std::vector <std::vector <NeighborPolygonTextureCoordsMap>>>> &neighboring_cams_to_polygons_texture_coords,
+    std::vector <cv::Mat> &textures, std::vector <cv::Mat> &destinations,
+    std::vector <std::string> &dest_paths);
+    std::pair<int, int> isNeighboringPolygons(pcl::PointXYZ p01, pcl::PointXYZ p02, pcl::PointXYZ p03,
                                pcl::PointXYZ p11, pcl::PointXYZ p12, pcl::PointXYZ p13);
 };
 

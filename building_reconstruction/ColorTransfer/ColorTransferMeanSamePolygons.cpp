@@ -37,6 +37,62 @@ void ColorTransferMeanSamePolygons::setInputTextureMeshes(vector<pcl::TextureMes
     input_meshes = meshes;
 }
 
+void ColorTransferMeanSamePolygons::setLowerBoundArea(double lower_bound) {
+    lower_bound_area = lower_bound;
+}
+
+void ColorTransferMeanSamePolygons::setMinQualityMetric(double min_quality_metric) {
+    this->min_quality_metric = min_quality_metric;
+}
+
+void ColorTransferMeanSamePolygons::setAlphaOneSourceUpperBound(double upper_bound) {
+    alpha_one_source_upper_bound = upper_bound;
+}
+
+void ColorTransferMeanSamePolygons::setAlphaOneSourceLowerBound(double lower_bound) {
+    alpha_one_source_lower_bound = lower_bound;
+}
+
+void ColorTransferMeanSamePolygons::setBetaOneSourceUpperBound(double upper_bound) {
+    beta_one_source_upper_bound = upper_bound;
+}
+
+void ColorTransferMeanSamePolygons::setBetaOneSourceLowerBound(double lower_bound) {
+    beta_one_source_lower_bound = lower_bound;
+}
+
+void ColorTransferMeanSamePolygons::setGammaOneSourceUpperBound(double upper_bound) {
+    gamma_one_source_upper_bound = upper_bound;
+}
+
+void ColorTransferMeanSamePolygons::setGammaOneSourceLowerBound(double lower_bound) {
+    gamma_one_source_lower_bound = lower_bound;
+}
+
+void ColorTransferMeanSamePolygons::setAlphaAllSourceUpperBound(double upper_bound) {
+    alpha_all_source_upper_bound = upper_bound;
+}
+
+void ColorTransferMeanSamePolygons::setAlphaAllSourceLowerBound(double lower_bound) {
+    alpha_all_source_lower_bound = lower_bound;
+}
+
+void ColorTransferMeanSamePolygons::setBetaAllSourceUpperBound(double upper_bound) {
+    beta_all_source_upper_bound = upper_bound;
+}
+
+void ColorTransferMeanSamePolygons::setBetaAllSourceLowerBound(double lower_bound) {
+    beta_all_source_lower_bound = lower_bound;
+}
+
+void ColorTransferMeanSamePolygons::setGammaAllSourceUpperBound(double upper_bound) {
+    gamma_all_source_upper_bound = upper_bound;
+}
+
+void ColorTransferMeanSamePolygons::setGammaAllSourceLowerBound(double lower_bound) {
+    gamma_all_source_lower_bound = lower_bound;
+}
+
 vector <vector <bool>> ColorTransferMeanSamePolygons::getBorderTp() {
     pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     fromPCLPointCloud2(main_mesh.cloud, *input_cloud);
@@ -89,9 +145,7 @@ void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam
                                                                  vector <cv::Mat> &textures,
                                                                  cv::Mat &dest_target,
                                                                  vector <cv::Mat> &destinations) {
-    double lower_bound_area = 0.0;
     vector <int> area_cams_idx;
-
     PolygonTextureCoords polygonTextureCoordsTarget = camToPolygonTextureCoords[cur_cam];
     double area_target = Geometry_pcl::triangle_area(polygonTextureCoordsTarget.a, polygonTextureCoordsTarget.b, polygonTextureCoordsTarget.c);
     vector <double> quality_metric(number_cams);
@@ -102,7 +156,7 @@ void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam
         double area_src = Geometry_pcl::triangle_area(polygonTextureCoords.a, polygonTextureCoords.b, polygonTextureCoords.c);
         if (lower_bound_area < area_src) {
             quality_metric[current_cam] = area_src / area_target;
-            if (quality_metric[current_cam] < 0.333333) continue;
+            if (quality_metric[current_cam] < min_quality_metric) continue;
             area_cams_idx.push_back(current_cam);
         }
     }
@@ -194,9 +248,9 @@ void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam
         double gammaImage = (double(redSumSrc) / double(countSrc)) / meanRedTarget;
 
         // Пропускаем изображение, если оно имеет не реалистично большую разницу с исходным target изображением
-        if (alphaImage <= 0.5 || alphaImage > 2.0
-        || betaImage <= 0.5 || betaImage > 2.0
-        || gammaImage <= 0.5 || gammaImage > 2.0) {
+        if (alphaImage <= alpha_one_source_lower_bound || alphaImage > alpha_one_source_upper_bound
+        || betaImage <= beta_one_source_lower_bound || betaImage > beta_one_source_upper_bound
+        || gammaImage <= gamma_one_source_lower_bound || gammaImage > gamma_one_source_upper_bound) {
             continue;
         }
         blueSumSrcAll += quality_metric[cam_idx] * (blueSumSrc / countSrc);
@@ -235,7 +289,12 @@ void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam
     }
 
     // Нереалистично маленькие значения, ошибка в параметрах позы камер
-    if (alpha <= 0.5 || beta <= 0.5 || gamma <= 0.5 || alpha > 2.0 || beta > 2.0 || gamma > 2.0) {
+    if (alpha <= alpha_all_source_lower_bound
+    || beta <= beta_all_source_lower_bound
+    || gamma <= gamma_all_source_lower_bound
+    || alpha > alpha_all_source_upper_bound
+    || beta > beta_all_source_upper_bound
+    || gamma > gamma_all_source_upper_bound) {
         return;
     }
 
@@ -263,7 +322,7 @@ void ColorTransferMeanSamePolygons::transferColorBetweenTp(vector <vector <int>>
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     fromPCLPointCloud2(main_mesh.cloud, *input_cloud);
-    urban_rec::Texturing_mapping texturing_mapping = urban_rec::Texturing_mapping(2000, 2000);
+    urban_rec::TexturingMapping texturing_mapping = urban_rec::TexturingMapping(2000, 2000);
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
         cv::Mat dest_target = destinations[current_cam];
         for (int face_idx = 0; face_idx < main_mesh.tex_polygons[current_cam].size(); face_idx++) {

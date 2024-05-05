@@ -9,6 +9,8 @@
 
 #define MAX_I 255
 
+using namespace std;
+
 namespace Metrics {
 
     vector<vector<double>> meanBrightness(cv::Mat img, int partition) {

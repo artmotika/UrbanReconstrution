@@ -1,5 +1,8 @@
 #include "BestFittingTexturingQuality.h"
 
+using namespace std;
+using namespace pcl;
+
 void BestFittingTexturingQuality::setNumberCams(int num) {
     number_cams = num;
 }
@@ -17,8 +20,7 @@ void BestFittingTexturingQuality::setInputTextureMeshes(vector<pcl::TextureMesh>
 }
 
 pcl::TextureMesh BestFittingTexturingQuality::fit(vector <string> argv) {
-    cout << number_cams << endl;
-    urban_rec::Texturing_mapping texturing_mapping = urban_rec::Texturing_mapping(2000, 2000);
+    urban_rec::TexturingMapping texturing_mapping = urban_rec::TexturingMapping(2000, 2000);
     // Create the texturemesh object that will contain our UV-mapped mesh
     pcl::TextureMesh mesh;
     mesh.cloud = triangles.cloud;
@@ -57,21 +59,21 @@ pcl::TextureMesh BestFittingTexturingQuality::fit(vector <string> argv) {
     mesh.tex_materials.resize(my_cams.size() + 1);
     for (int i = 0; i <= my_cams.size(); ++i) {
         pcl::TexMaterial mesh_material;
-        mesh_material.tex_Ka.r = 0.2f;
-        mesh_material.tex_Ka.g = 0.2f;
-        mesh_material.tex_Ka.b = 0.2f;
+        mesh_material.tex_Ka.r = KA_R;
+        mesh_material.tex_Ka.g = KA_G;
+        mesh_material.tex_Ka.b = KA_B;
 
-        mesh_material.tex_Kd.r = 0.8f;
-        mesh_material.tex_Kd.g = 0.8f;
-        mesh_material.tex_Kd.b = 0.8f;
+        mesh_material.tex_Kd.r = KD_R;
+        mesh_material.tex_Kd.g = KD_G;
+        mesh_material.tex_Kd.b = KD_B;
 
-        mesh_material.tex_Ks.r = 1.0f;
-        mesh_material.tex_Ks.g = 1.0f;
-        mesh_material.tex_Ks.b = 1.0f;
+        mesh_material.tex_Ks.r = KS_R;
+        mesh_material.tex_Ks.g = KS_G;
+        mesh_material.tex_Ks.b = KS_B;
 
-        mesh_material.tex_d = 1.0f;
-        mesh_material.tex_Ns = 75.0f;
-        mesh_material.tex_illum = 2;
+        mesh_material.tex_d = D;
+        mesh_material.tex_Ns = NS;
+        mesh_material.tex_illum = ILLUM;
 
         std::stringstream tex_name;
         tex_name << "material_" << i;
@@ -186,7 +188,6 @@ pcl::TextureMesh BestFittingTexturingQuality::fit(vector <string> argv) {
         mesh.tex_coordinates[number_cams].push_back(UV2);
         mesh.tex_coordinates[number_cams].push_back(UV3);
     }
-    cout << "end" << endl;
 
     // Compute normals for the mesh
     pcl::NormalEstimation <pcl::PointXYZ, pcl::Normal> n;

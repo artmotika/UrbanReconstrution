@@ -1,4 +1,4 @@
-#include "Texturing/Texturing_mapping.h"
+#include "Texturing/TexturingMapping.h"
 #include "IO/Io_pcl.h"
 #include "Geometry/Geometry_pcl.h"
 #include "Algo_reconstruction.h"
@@ -61,7 +61,7 @@ int main() {
 //    Io_pcl::saveCloud("../example_4/obj_mesh.ply", poisson_mesh); // "../example_mini/obj2_mesh_invertednormals.ply" // check file obj2_mesh.ply
 
     // Texturing Mesh
-    urban_rec::Texturing_mapping texturing_mapping = urban_rec::Texturing_mapping(2000, 2000);
+    urban_rec::TexturingMapping texturing_mapping = urban_rec::TexturingMapping(2000, 2000);
 //    texturing_mapping.setInputPolygonMesh(poisson_mesh);
     std::vector <std::string> argv;
     std::string input_ply_file_path = "../example_2/obj_mesh.ply"; // "../example_mini/obj2_mesh_invertednormals.ply" //obj2_mesh.ply
@@ -85,6 +85,34 @@ int main() {
 
     ColorTransferMeanSamePolygons color_transfer_same_polygons
         = ColorTransferMeanSamePolygons(triangles, tm_best_fitting, cams, tms, "../example_2/"); // "../example_mini5/"
+    double lower_bound_area = 0.0;
+    double min_quality_metric = 0.333333;
+    double alpha_one_source_upper_bound = 2.0;
+    double alpha_one_source_lower_bound = 0.5;
+    double beta_one_source_upper_bound = 2.0;
+    double beta_one_source_lower_bound = 0.5;
+    double gamma_one_source_upper_bound = 2.0;
+    double gamma_one_source_lower_bound = 0.5;
+    double alpha_all_source_upper_bound = 2.0;
+    double alpha_all_source_lower_bound = 0.5;
+    double beta_all_source_upper_bound = 2.0;
+    double beta_all_source_lower_bound = 0.5;
+    double gamma_all_source_upper_bound = 2.0;
+    double gamma_all_source_lower_bound = 0.5;
+    color_transfer_same_polygons.setLowerBoundArea(lower_bound_area);
+    color_transfer_same_polygons.setMinQualityMetric(min_quality_metric);
+    color_transfer_same_polygons.setAlphaOneSourceUpperBound(alpha_one_source_upper_bound);
+    color_transfer_same_polygons.setAlphaOneSourceLowerBound(alpha_one_source_lower_bound);
+    color_transfer_same_polygons.setBetaOneSourceUpperBound(beta_one_source_upper_bound);
+    color_transfer_same_polygons.setBetaOneSourceLowerBound(beta_one_source_lower_bound);
+    color_transfer_same_polygons.setGammaOneSourceUpperBound(gamma_one_source_upper_bound);
+    color_transfer_same_polygons.setGammaOneSourceLowerBound(gamma_one_source_lower_bound);
+    color_transfer_same_polygons.setAlphaAllSourceUpperBound(alpha_all_source_upper_bound);
+    color_transfer_same_polygons.setAlphaAllSourceLowerBound(alpha_all_source_lower_bound);
+    color_transfer_same_polygons.setBetaAllSourceUpperBound(beta_all_source_upper_bound);
+    color_transfer_same_polygons.setBetaAllSourceLowerBound(beta_all_source_lower_bound);
+    color_transfer_same_polygons.setGammaAllSourceUpperBound(gamma_all_source_upper_bound);
+    color_transfer_same_polygons.setGammaAllSourceLowerBound(gamma_all_source_lower_bound);
     color_transfer_same_polygons.transfer();
 
     MtlUtils mtlutils = MtlUtils("../example_2/textured.mtl"); // "../example_mini5/textured.mtl"

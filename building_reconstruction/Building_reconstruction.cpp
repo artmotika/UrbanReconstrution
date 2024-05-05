@@ -1,5 +1,9 @@
 #include "Building_reconstruction.h"
 
+using namespace pcl;
+using namespace pcl::console;
+using namespace Geometry_pcl;
+
 void urban_rec::Building_reconstruction::upsampleByMesh(PointCloud<PointXYZ>::Ptr &cloud_in, PolygonMesh mesh) {
     PointCloud<PointXYZ>::Ptr all_vertices_surf(new PointCloud<PointXYZ>());
     fromPCLPointCloud2(mesh.cloud, *all_vertices_surf);

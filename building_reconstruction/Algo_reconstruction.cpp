@@ -1,5 +1,8 @@
 #include "Algo_reconstruction.h"
 
+using namespace pcl;
+using namespace pcl::console;
+
 namespace algo_rec {
     void computePoisson(const PCLPointCloud2::ConstPtr &input, PolygonMesh &output,
                          int depth, int solver_divide, int iso_divide, float point_weight) {

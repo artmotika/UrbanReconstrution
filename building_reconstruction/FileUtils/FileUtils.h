@@ -5,8 +5,6 @@
 #include <fstream>
 #include <string>
 
-using namespace std;
-
 class FileUtils {
 public:
     FileUtils(std::string input_file_path) {
@@ -17,7 +15,7 @@ public:
 
     std::string getInputFilePath();
 
-    vector <int> getLinesStartingWithString(std::string wordToSearch);
+    std::vector <int> getLinesStartingWithString(std::string wordToSearch);
 
 private:
     std::string input_file_path;

@@ -1,5 +1,7 @@
 #include "Geometry_pcl.h"
 
+using namespace pcl;
+
 bool Geometry_pcl::point_in_radius(PointXYZ p, PointXYZ center, double radius) {
     return pow(p.x - center.x, 2) + pow(p.y - center.y, 2) + pow(p.z - center.z, 2) < pow(radius, 2);
 }

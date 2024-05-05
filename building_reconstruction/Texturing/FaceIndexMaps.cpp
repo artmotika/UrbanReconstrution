@@ -1,5 +1,7 @@
 #include "FaceIndexMaps.h"
 
+using namespace std;
+
 void FaceIndexMaps::setInputNumPoints(int input_num_points) {
     num_points = input_num_points;
 }
