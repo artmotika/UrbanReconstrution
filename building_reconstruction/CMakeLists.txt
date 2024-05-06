@@ -168,4 +168,4 @@ foreach (
     target_link_libraries(${target} PUBLIC Eigen3::Eigen ${PCL_LIBRARIES})
 endforeach ()
 
-target_link_libraries(${texturing_mapping} PUBLIC geometry)
+target_link_libraries(texturing_mapping PUBLIC geometry)
