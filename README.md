@@ -43,6 +43,13 @@ sudo apt-get install -y libboost-all-dev
 ```
 sudo apt-get install -y libeigen3-dev
 ```
+# Компиляция
+```
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
 # Примеры
 Примеры использования можно посмотреть в файле texturing_map_example.cpp.
 
@@ -61,9 +68,9 @@ sudo apt-get install -y libeigen3-dev
 
 #### 5 – алгоритм текстурирования из библиотеки PCL + перенос цвета.
 
-<img src="img/lidar6_metrics_full_presa.jpg" alt="Сравнение мешей">
-<img src="img/lidar6_metrics_presa.jpg" alt="Сравнение мешей">
-<img src="img/lidar10_metrics_full_presa.jpg" alt="Сравнение мешей">
-<img src="img/lidar10_metrics_presa.jpg" alt="Сравнение мешей">
-<img src="img/lidar15_metrics_full_presa.jpg" alt="Сравнение мешей">
-<img src="img/lidar15_metrics_presa.jpg" alt="Сравнение мешей">
+<div style="display: flex; margin-bottom: 1%"><img src="img/lidar6_metrics_full_presa.jpg" alt="Сравнение мешей" style="width: 49%; margin-right: 1%">
+<img src="img/lidar6_metrics_presa.jpg" alt="Сравнение мешей" style="width: 49%"></div>
+<div style="display: flex; margin-bottom: 1%"><img src="img/lidar10_metrics_full_presa.jpg" alt="Сравнение мешей" style="width: 49%; margin-right: 1%">
+<img src="img/lidar10_metrics_presa.jpg" alt="Сравнение мешей" style="width: 49%"></div>
+<div style="display: flex; margin-bottom: 1%"><img src="img/lidar15_metrics_full_presa.jpg" alt="Сравнение мешей" style="width: 49%; margin-right: 1%">
+<img src="img/lidar15_metrics_presa.jpg" alt="Сравнение мешей" style="width: 49%"></div>
