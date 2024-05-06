@@ -169,3 +169,10 @@ foreach (
 endforeach ()
 
 target_link_libraries(texturing_mapping PUBLIC geometry)
+target_link_libraries(texturing_mapping PUBLIC string_utils)
+target_link_libraries(texturing_mapping PUBLIC file_utils)
+
+target_link_libraries(color_transfer PUBLIC texturing_mapping)
+target_link_libraries(color_transfer PUBLIC string_utils)
+
+target_link_libraries(best_fitting_texturing PUBLIC texturing_mapping)
