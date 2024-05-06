@@ -3,12 +3,11 @@
 
 cmake_minimum_required(VERSION 3.1...3.23)
 
-#set(CMAKE_C_COMPILER "gcc-13")
-#set(CMAKE_CXX_COMPILER "g++-13")
-
 project(Polygonal_surface_reconstruction_Examples)
 
 #set(CMAKE_CXX_COMPILER "clang")
+#set(CMAKE_C_COMPILER "gcc-13")
+#set(CMAKE_CXX_COMPILER "g++-13")
 
 #add_compile_options(-std=c++20)
 #add_compile_options(-std=c++14)
@@ -62,6 +61,9 @@ if (NOT Boost_FOUND)
 
 endif ()
 
+# Eigen3
+find_package(Eigen3 3.1.0) #(requires 3.1.0 or greater)
+
 # PCL
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
@@ -73,9 +75,7 @@ link_directories(${OpenCV_LIB_DIR})
 
 # Creating entries for all C++ files with "main" routine
 # ##########################################################
-find_package(Eigen3 3.1.0) #(requires 3.1.0 or greater)
 
-#add_library(iocgal STATIC IO/Io_cgal.h IO/Io_cgal.cpp)
 add_library(iopcl STATIC IO/Io_pcl.h IO/Io_pcl.cpp)
 add_library(geometry STATIC Geometry/Geometry_pcl.h Geometry/Geometry_pcl.cpp)
 add_library(algo_reconstruction STATIC Algo_reconstruction.h Algo_reconstruction.cpp)
@@ -96,9 +96,7 @@ add_library(best_fitting_texturing STATIC BestFittingTexturing/BestFittingTextur
 add_executable(texturing_map_example texturing_map_example.cpp)
 add_executable(metric_image_compare_example metric_image_compare_example.cpp)
 add_executable(metrics_examples metrics_examples.cpp)
-#add_library(surface_reconstruction STATIC surface_reconstruction.cpp)
 add_library(building_reconstruction STATIC Building_reconstruction.h Building_reconstruction.cpp)
-#create_single_source_cgal_program("surface_reconstruction_example.cpp")
 add_executable(building_reconstruction_example building_reconstruction_example.cpp)
 
 foreach (
@@ -112,7 +110,6 @@ endforeach ()
 
 foreach (
         target
-#        iocgal
         iopcl
         geometry
         algo_reconstruction
@@ -120,7 +117,6 @@ foreach (
         string_utils
         texturing_mapping
         metrics
-#        surface_reconstruction
         building_reconstruction
         color_transfer
         best_fitting_texturing
@@ -136,14 +132,12 @@ foreach (
         target
         texturing_map_example
 )
-#    target_link_libraries(${target} PUBLIC iocgal)
     target_link_libraries(${target} PUBLIC iopcl)
     target_link_libraries(${target} PUBLIC geometry)
     target_link_libraries(${target} PUBLIC algo_reconstruction)
     target_link_libraries(${target} PUBLIC shift)
     target_link_libraries(${target} PUBLIC string_utils)
     target_link_libraries(${target} PUBLIC file_utils)
-    #  target_link_libraries(${target} PUBLIC surface_reconstruction)
     target_link_libraries(${target} PUBLIC building_reconstruction)
     target_link_libraries(${target} PUBLIC texturing_mapping)
     target_link_libraries(${target} PUBLIC color_transfer)
@@ -154,15 +148,12 @@ endforeach ()
 foreach (
         target
         building_reconstruction_example
-#        surface_reconstruction_example
 )
-#    target_link_libraries(${target} PUBLIC iocgal)
     target_link_libraries(${target} PUBLIC iopcl)
     target_link_libraries(${target} PUBLIC geometry)
     target_link_libraries(${target} PUBLIC algo_reconstruction)
     target_link_libraries(${target} PUBLIC shift)
     target_link_libraries(${target} PUBLIC string_utils)
-#    target_link_libraries(${target} PUBLIC surface_reconstruction)
     target_link_libraries(${target} PUBLIC building_reconstruction)
     target_link_libraries(${target} PUBLIC texturing_mapping)
     target_link_libraries(${target} PUBLIC Eigen3::Eigen ${PCL_LIBRARIES})
