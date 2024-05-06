@@ -5,7 +5,7 @@ using namespace pcl::console;
 
 namespace algo_rec {
     void computePoisson(const PCLPointCloud2::ConstPtr &input, PolygonMesh &output,
-                         int depth, int solver_divide, int iso_divide, float point_weight) {
+                        int depth, int solver_divide, int iso_divide, float point_weight) {
         PointCloud<PointNormal>::Ptr xyz_cloud(new PointCloud<PointNormal>());
         fromPCLPointCloud2(*input, *xyz_cloud);
 
@@ -29,7 +29,7 @@ namespace algo_rec {
     }
 
     void computePoisson(PointCloud<PointNormal>::Ptr &input, PolygonMesh &output,
-                         int depth, int solver_divide, int iso_divide, float point_weight) {
+                        int depth, int solver_divide, int iso_divide, float point_weight) {
         print_info("Using parameters: depth %d, solverDivide %d, isoDivide %d\n", depth, solver_divide, iso_divide);
 
         Poisson <PointNormal> poisson;
@@ -50,7 +50,7 @@ namespace algo_rec {
     }
 
     void computeGreedyTriangulation(const PCLPointCloud2::ConstPtr &input, PolygonMesh &output,
-                                      double mu, double radius) {
+                                    double mu, double radius) {
         TicToc tt;
         tt.tic();
 
@@ -84,9 +84,9 @@ namespace algo_rec {
     }
 
     void computeHull(const PCLPointCloud2::ConstPtr &cloud_in,
-                      bool convex_concave_hull,
-                      float alpha,
-                      PolygonMesh &mesh_out) {
+                     bool convex_concave_hull,
+                     float alpha,
+                     PolygonMesh &mesh_out) {
         PointCloud<PointXYZ>::Ptr xyz_cloud(new PointCloud<PointXYZ>());
         fromPCLPointCloud2(*cloud_in, *xyz_cloud);
         if (!convex_concave_hull) {
@@ -105,9 +105,9 @@ namespace algo_rec {
     }
 
     void computeHull(const PointCloud<PointXYZ>::ConstPtr &cloud_in,
-                      bool convex_concave_hull,
-                      float alpha,
-                      PolygonMesh &mesh_out) {
+                     bool convex_concave_hull,
+                     float alpha,
+                     PolygonMesh &mesh_out) {
         if (!convex_concave_hull) {
             print_info("Computing the convex hull of a cloud with %lu points.\n", cloud_in->size());
             ConvexHull <PointXYZ> convex_hull;

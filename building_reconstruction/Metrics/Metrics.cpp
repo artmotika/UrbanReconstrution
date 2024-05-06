@@ -13,9 +13,9 @@ using namespace std;
 
 namespace Metrics {
 
-    vector<vector<double>> meanBrightness(cv::Mat img, int partition) {
+    vector <vector<double>> meanBrightness(cv::Mat img, int partition) {
         int r = 0, g = 0, b = 0;
-        vector<vector<double>> mean_brightness(partition, vector<double>(partition, 0.0));
+        vector <vector<double>> mean_brightness(partition, vector<double>(partition, 0.0));
         int width = 0, height = 0, width_prev = 0, height_prev = 0;
         int width_step = img.cols / partition;
         int width_step_remainder = img.cols % partition;
@@ -31,13 +31,15 @@ namespace Metrics {
                 if (j == partition - 1) {
                     height += height_step_remainder;
                 }
-                for (int x = width_prev; x < width; x++ ) {
-                    for (int y = height_prev; y < height; y++ ) {
+                for (int x = width_prev; x < width; x++) {
+                    for (int y = height_prev; y < height; y++) {
                         cv::Vec<unsigned char, 3> pixel_color = img.at<cv::Vec3b>(y, x);
                         r = pixel_color[0];
                         g = pixel_color[1];
                         b = pixel_color[2];
-                        mean_brightness[i][j] = mean_brightness[i][j] + RED_GREY_CONSTANT * r + GREEN_GREY_CONSTANT * g + BLUE_GREY_CONSTANT * b;
+                        mean_brightness[i][j] =
+                                mean_brightness[i][j] + RED_GREY_CONSTANT * r + GREEN_GREY_CONSTANT * g +
+                                BLUE_GREY_CONSTANT * b;
                     }
                 }
                 height_prev = height;
@@ -60,7 +62,8 @@ namespace Metrics {
                                             (width_step * (height_step + height_step_remainder));
                 } else {
                     mean_brightness[i][j] = mean_brightness[i][j] /
-                                            ((width_step + width_step_remainder) * (height_step + height_step_remainder));
+                                            ((width_step + width_step_remainder) *
+                                             (height_step + height_step_remainder));
                 }
             }
         }
@@ -68,9 +71,9 @@ namespace Metrics {
         return mean_brightness;
     }
 
-    vector<vector<double>> varianceBrightness(cv::Mat img, vector<vector<double>> mu, int partition) {
+    vector <vector<double>> varianceBrightness(cv::Mat img, vector <vector<double>> mu, int partition) {
         int r = 0, g = 0, b = 0;
-        vector<vector<double>> variance_brightness(partition, vector<double>(partition, 0.0));
+        vector <vector<double>> variance_brightness(partition, vector<double>(partition, 0.0));
         double curr_brightness = 0.0;
         int width = 0, height = 0, width_prev = 0, height_prev = 0;
         int width_step = img.cols / partition;
@@ -111,13 +114,14 @@ namespace Metrics {
                     variance_brightness[i][j] = variance_brightness[i][j] / n;
                 } else if (i == end && j != end) {
                     variance_brightness[i][j] = variance_brightness[i][j] /
-                                            ((width_step + width_step_remainder) * height_step);
+                                                ((width_step + width_step_remainder) * height_step);
                 } else if (i != end && j == end) {
                     variance_brightness[i][j] = variance_brightness[i][j] /
-                                            (width_step * (height_step + height_step_remainder));
+                                                (width_step * (height_step + height_step_remainder));
                 } else {
                     variance_brightness[i][j] = variance_brightness[i][j] /
-                                            ((width_step + width_step_remainder) * (height_step + height_step_remainder));
+                                                ((width_step + width_step_remainder) *
+                                                 (height_step + height_step_remainder));
                 }
             }
         }
@@ -125,9 +129,11 @@ namespace Metrics {
         return variance_brightness;
     }
 
-    vector<vector<double>> covarianceBrightness(cv::Mat img1, cv::Mat img2, vector<vector<double>> mu1, vector<vector<double>> mu2, int partition) {
+    vector <vector<double>>
+    covarianceBrightness(cv::Mat img1, cv::Mat img2, vector <vector<double>> mu1, vector <vector<double>> mu2,
+                         int partition) {
         int r1 = 0, g1 = 0, b1 = 0, r2 = 0, g2 = 0, b2 = 0;
-        vector<vector<double>> covariance_brightness(partition, vector<double>(partition, 0.0));
+        vector <vector<double>> covariance_brightness(partition, vector<double>(partition, 0.0));
         double curr_brightness1 = 0.0;
         double curr_brightness2 = 0.0;
         int width = 0, height = 0, width_prev = 0, height_prev = 0;
@@ -157,7 +163,8 @@ namespace Metrics {
                         g2 = pixel_color2[1];
                         b2 = pixel_color2[2];
                         curr_brightness2 = RED_GREY_CONSTANT * r2 + GREEN_GREY_CONSTANT * g2 + BLUE_GREY_CONSTANT * b2;
-                        covariance_brightness[i][j] = covariance_brightness[i][j] + (curr_brightness1 - mu1[i][j]) * (curr_brightness2 - mu2[i][j]);
+                        covariance_brightness[i][j] = covariance_brightness[i][j] +
+                                                      (curr_brightness1 - mu1[i][j]) * (curr_brightness2 - mu2[i][j]);
                     }
                 }
                 height_prev = height;
@@ -174,13 +181,14 @@ namespace Metrics {
                     covariance_brightness[i][j] = covariance_brightness[i][j] / n;
                 } else if (i == end && j != end) {
                     covariance_brightness[i][j] = covariance_brightness[i][j] /
-                                                ((width_step + width_step_remainder) * height_step);
+                                                  ((width_step + width_step_remainder) * height_step);
                 } else if (i != end && j == end) {
                     covariance_brightness[i][j] = covariance_brightness[i][j] /
-                                                (width_step * (height_step + height_step_remainder));
+                                                  (width_step * (height_step + height_step_remainder));
                 } else {
                     covariance_brightness[i][j] = covariance_brightness[i][j] /
-                                                ((width_step + width_step_remainder) * (height_step + height_step_remainder));
+                                                  ((width_step + width_step_remainder) *
+                                                   (height_step + height_step_remainder));
                 }
             }
         }
@@ -195,24 +203,26 @@ namespace Metrics {
      */
     double SSIM(cv::Mat image1, cv::Mat image2, int partition) {
         if (partition != 8 && partition != 16 && partition != 1) {
-            throw invalid_argument("Partition must be equals 8 or 16 or 1 but it doesn't equal" + std::to_string(partition));
+            throw invalid_argument(
+                    "Partition must be equals 8 or 16 or 1 but it doesn't equal" + std::to_string(partition));
         }
         // mean of the brightness of the image1
-        vector<vector<double>> mean1 = meanBrightness(image1, partition);
+        vector <vector<double>> mean1 = meanBrightness(image1, partition);
         // mean of the brightness of the image2
-        vector<vector<double>> mean2 = meanBrightness(image2, partition);
+        vector <vector<double>> mean2 = meanBrightness(image2, partition);
         // variance of the brightness of the image1
-        vector<vector<double>> variance1 = varianceBrightness(image1, mean1, partition);
+        vector <vector<double>> variance1 = varianceBrightness(image1, mean1, partition);
         // variance of the brightness of the image2
-        vector<vector<double>> variance2 = varianceBrightness(image2, mean2, partition);
+        vector <vector<double>> variance2 = varianceBrightness(image2, mean2, partition);
         // covariance of the brightness between two images
-        vector<vector<double>> covariance = covarianceBrightness(image1, image2, mean1, mean2, partition);
+        vector <vector<double>> covariance = covarianceBrightness(image1, image2, mean1, mean2, partition);
 
         double mean_ssim = 0.0;
         for (int i = 0; i < partition; i++) {
             for (int j = 0; j < partition; j++) {
                 mean_ssim += ((2 * mean1[i][j] * mean2[i][j] + C1) * (2 * covariance[i][j] + C2)) /
-                             ((pow(mean1[i][j], 2.0) + pow(mean2[i][j], 2.0) + C1) * (variance1[i][j] + variance2[i][j] + C2));
+                             ((pow(mean1[i][j], 2.0) + pow(mean2[i][j], 2.0) + C1) *
+                              (variance1[i][j] + variance2[i][j] + C2));
             }
         }
 

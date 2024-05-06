@@ -35,24 +35,34 @@ int main() {
     // Считаем ssim метрику для одного и того же изображения
     cout << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8) << endl;
     // Считаем ssim метрику для изображения, полученного с камеры и для срендеренного изображения
-    cout << "ssim метрика для изображения, полученного с камеры и для срендеренного изображения: " << Metrics::SSIM(camera_image, rendered_image, 8) << endl;
+    cout << "ssim метрика для изображения, полученного с камеры и для срендеренного изображения: "
+         << Metrics::SSIM(camera_image, rendered_image, 8) << endl;
 
     // Считаем ssim метрику для уменьшенных изображений, для полученного с камеры и для срендеренного
-    cout << "ssim метрика для уменьшенных x10 изображений, для полученного с камеры и для срендеренного: " << Metrics::SSIM(camera_image_shrinked_10, rendered_image_shrinked_10, 8) << endl;
-    cout << "ssim метрика для уменьшенных x2 изображений, для полученного с камеры и для срендеренного: " << Metrics::SSIM(camera_image_shrinked_2, rendered_image_shrinked_2, 8) << endl;
+    cout << "ssim метрика для уменьшенных x10 изображений, для полученного с камеры и для срендеренного: "
+         << Metrics::SSIM(camera_image_shrinked_10, rendered_image_shrinked_10, 8) << endl;
+    cout << "ssim метрика для уменьшенных x2 изображений, для полученного с камеры и для срендеренного: "
+         << Metrics::SSIM(camera_image_shrinked_2, rendered_image_shrinked_2, 8) << endl;
 
-    cv::imwrite("../../data/rendered_images/render_scene_1/pano_000001_000034_cubemapXplus_shrinked_x10.jpg", camera_image_shrinked_10);
-    cv::imwrite("../../data/rendered_images/render_scene_1/pano_000001_000034_cubemapXplus_shrinked_x2.jpg", camera_image_shrinked_2);
-    cv::imwrite("../../data/rendered_images/render_scene_1/pano_000001_000034_cubemapXplus_rendered_shrinked_10.jpg", rendered_image_shrinked_10);
-    cv::imwrite("../../data/rendered_images/render_scene_1/pano_000001_000034_cubemapXplus_rendered_shrinked_2.jpg", rendered_image_shrinked_2);
+    cv::imwrite("../../data/rendered_images/render_scene_1/pano_000001_000034_cubemapXplus_shrinked_x10.jpg",
+                camera_image_shrinked_10);
+    cv::imwrite("../../data/rendered_images/render_scene_1/pano_000001_000034_cubemapXplus_shrinked_x2.jpg",
+                camera_image_shrinked_2);
+    cv::imwrite("../../data/rendered_images/render_scene_1/pano_000001_000034_cubemapXplus_rendered_shrinked_10.jpg",
+                rendered_image_shrinked_10);
+    cv::imwrite("../../data/rendered_images/render_scene_1/pano_000001_000034_cubemapXplus_rendered_shrinked_2.jpg",
+                rendered_image_shrinked_2);
 
     // Считаем psnr метрику для одного и того же изображения
     cout << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image) << endl;
     // Считаем psnr метрику для изображения, полученного с камеры и для срендеренного изображения
-    cout << "psnr метрика для изображения, полученного с камеры и для срендеренного изображения: " << Metrics::PSNR(camera_image, rendered_image) << endl;
+    cout << "psnr метрика для изображения, полученного с камеры и для срендеренного изображения: "
+         << Metrics::PSNR(camera_image, rendered_image) << endl;
     // Считаем psnr метрику для уменьшенных изображений, для полученного с камеры и для срендеренного
-    cout << "psnr метрика для уменьшенных изображений x10, для полученного с камеры и для срендеренного: " << Metrics::PSNR(camera_image_shrinked_10, rendered_image_shrinked_10) << endl;
-    cout << "psnr метрика для уменьшенных изображений x2, для полученного с камеры и для срендеренного: " << Metrics::PSNR(camera_image_shrinked_2, rendered_image_shrinked_2) << endl;
+    cout << "psnr метрика для уменьшенных изображений x10, для полученного с камеры и для срендеренного: "
+         << Metrics::PSNR(camera_image_shrinked_10, rendered_image_shrinked_10) << endl;
+    cout << "psnr метрика для уменьшенных изображений x2, для полученного с камеры и для срендеренного: "
+         << Metrics::PSNR(camera_image_shrinked_2, rendered_image_shrinked_2) << endl;
 
     // Считаем The Blur Effect метрику для изображения с камеры
     BlurEstimation estimater_camera_image(camera_image);

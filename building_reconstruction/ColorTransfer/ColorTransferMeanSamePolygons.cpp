@@ -33,7 +33,7 @@ void ColorTransferMeanSamePolygons::setInputCams(pcl::texture_mapping::CameraVec
     cams = input_cams;
 }
 
-void ColorTransferMeanSamePolygons::setInputTextureMeshes(vector<pcl::TextureMesh> &meshes) {
+void ColorTransferMeanSamePolygons::setInputTextureMeshes(vector <pcl::TextureMesh> &meshes) {
     input_meshes = meshes;
 }
 
@@ -93,12 +93,12 @@ void ColorTransferMeanSamePolygons::setGammaAllSourceLowerBound(double lower_bou
     gamma_all_source_lower_bound = lower_bound;
 }
 
-vector <vector <bool>> ColorTransferMeanSamePolygons::getBorderTp() {
-    pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+vector <vector<bool>> ColorTransferMeanSamePolygons::getBorderTp() {
+    pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud <pcl::PointXYZ>);
     fromPCLPointCloud2(main_mesh.cloud, *input_cloud);
     // Для каждой камеры хранит массив, где по индексу вершины определяется индексы полигонов,
     // которые содержат данную вершину
-    vector < vector <pcl::Indices>> mesh_points_idx_polygons_idx(number_cams, vector<pcl::Indices>(input_cloud->size()));
+    vector <vector<pcl::Indices>> mesh_points_idx_polygons_idx(number_cams, vector<pcl::Indices>(input_cloud->size()));
     // Заполняем индексы точек полигонов для каждой камеры
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
         for (int face_idx = 0; face_idx < main_mesh.tex_polygons[current_cam].size(); face_idx++) {
@@ -111,10 +111,10 @@ vector <vector <bool>> ColorTransferMeanSamePolygons::getBorderTp() {
     }
 
     // Для кажой камеры храним для кадого индекса грани, является ли он границей патча
-    vector< vector <bool>> border_cams_to_face_idx(number_cams);
+    vector <vector<bool>> border_cams_to_face_idx(number_cams);
 
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
-        vector <bool> faceToIsBorder(main_mesh.tex_polygons[current_cam].size(), false);
+        vector<bool> faceToIsBorder(main_mesh.tex_polygons[current_cam].size(), false);
         border_cams_to_face_idx[current_cam] = faceToIsBorder;
     }
 
@@ -124,9 +124,9 @@ vector <vector <bool>> ColorTransferMeanSamePolygons::getBorderTp() {
             // Найти центр по координатам
             pcl::Vertices polygon = main_mesh.tex_polygons[current_cam][j];
             // Находим точку среди облаков других камер
-            for (int cam_idx = current_cam+1; cam_idx < number_cams; cam_idx++) {
-                for (int vertex_idx : polygon.vertices) {
-                    for (int face_idx : mesh_points_idx_polygons_idx[cam_idx][vertex_idx]) {
+            for (int cam_idx = current_cam + 1; cam_idx < number_cams; cam_idx++) {
+                for (int vertex_idx: polygon.vertices) {
+                    for (int face_idx: mesh_points_idx_polygons_idx[cam_idx][vertex_idx]) {
                         border_cams_to_face_idx[current_cam][j] = true;
                         border_cams_to_face_idx[cam_idx][face_idx] = true;
                     }
@@ -139,21 +139,23 @@ vector <vector <bool>> ColorTransferMeanSamePolygons::getBorderTp() {
 }
 
 void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam,
-                                                                 vector <PolygonTextureCoords> &camToPolygonTextureCoords,
-                                                                 vector <vector <int>> &meshFaceIndexMapInputMeshesFullToPart,
-                                                                 vector <vector <int>> &meshFaceIndexMapInputMeshesPartToFull,
-                                                                 vector <cv::Mat> &textures,
-                                                                 cv::Mat &dest_target,
-                                                                 vector <cv::Mat> &destinations) {
-    vector <int> area_cams_idx;
+                                                                     vector <PolygonTextureCoords> &camToPolygonTextureCoords,
+                                                                     vector <vector<int>> &meshFaceIndexMapInputMeshesFullToPart,
+                                                                     vector <vector<int>> &meshFaceIndexMapInputMeshesPartToFull,
+                                                                     vector <cv::Mat> &textures,
+                                                                     cv::Mat &dest_target,
+                                                                     vector <cv::Mat> &destinations) {
+    vector<int> area_cams_idx;
     PolygonTextureCoords polygonTextureCoordsTarget = camToPolygonTextureCoords[cur_cam];
-    double area_target = Geometry_pcl::triangle_area(polygonTextureCoordsTarget.a, polygonTextureCoordsTarget.b, polygonTextureCoordsTarget.c);
-    vector <double> quality_metric(number_cams);
+    double area_target = Geometry_pcl::triangle_area(polygonTextureCoordsTarget.a, polygonTextureCoordsTarget.b,
+                                                     polygonTextureCoordsTarget.c);
+    vector<double> quality_metric(number_cams);
 
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
         if (current_cam == cur_cam) continue;
         PolygonTextureCoords polygonTextureCoords = camToPolygonTextureCoords[current_cam];
-        double area_src = Geometry_pcl::triangle_area(polygonTextureCoords.a, polygonTextureCoords.b, polygonTextureCoords.c);
+        double area_src = Geometry_pcl::triangle_area(polygonTextureCoords.a, polygonTextureCoords.b,
+                                                      polygonTextureCoords.c);
         if (lower_bound_area < area_src) {
             quality_metric[current_cam] = area_src / area_target;
             if (quality_metric[current_cam] < min_quality_metric) continue;
@@ -168,10 +170,10 @@ void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam
     int t2_y1 = int(texture_height - polygonTextureCoordsTarget.b.y * texture_height);
     int t2_x2 = int(polygonTextureCoordsTarget.c.x * texture_width);
     int t2_y2 = int(texture_height - polygonTextureCoordsTarget.c.y * texture_height);
-    int t2_maxX = std::max( t2_x0, std::max( t2_x1, t2_x2) );
-    int t2_maxY = std::max( t2_y0, std::max( t2_y1, t2_y2) );
-    int t2_minX = std::min( t2_x0, std::min( t2_x1, t2_x2) );
-    int t2_minY = std::min( t2_y0, std::min( t2_y1, t2_y2) );
+    int t2_maxX = std::max(t2_x0, std::max(t2_x1, t2_x2));
+    int t2_maxY = std::max(t2_y0, std::max(t2_y1, t2_y2));
+    int t2_minX = std::min(t2_x0, std::min(t2_x1, t2_x2));
+    int t2_minY = std::min(t2_y0, std::min(t2_y1, t2_y2));
 
     // Получаем средние значения цветов для целевого изображения
     int blueSumTarget = 0;
@@ -180,8 +182,9 @@ void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam
     int countTarget = 0;
     for (int x = t2_minX; x <= t2_maxX; x++) {
         for (int y = t2_minY; y <= t2_maxY; y++) {
-            pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
-            if (checkPointInsideTriangle(polygonTextureCoordsTarget.a, polygonTextureCoordsTarget.b, polygonTextureCoordsTarget.c, pt)) {
+            pcl::PointXY pt(float(x) / float(texture_width), float(texture_height - y) / float(texture_height));
+            if (checkPointInsideTriangle(polygonTextureCoordsTarget.a, polygonTextureCoordsTarget.b,
+                                         polygonTextureCoordsTarget.c, pt)) {
                 cv::Vec3b pixel = textures[cur_cam].at<cv::Vec3b>(y, x);
                 blueSumTarget += int(pixel[0]); // синий
                 greenSumTarget += int(pixel[1]); // зеленый
@@ -205,7 +208,7 @@ void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam
     double greenSumSrcAll = 0.0;
     double redSumSrcAll = 0.0;
     double countSrcAll = 0.0;
-    for (int cam_idx : area_cams_idx) {
+    for (int cam_idx: area_cams_idx) {
         int blueSumSrc = 0;
         int greenSumSrc = 0;
         int redSumSrc = 0;
@@ -217,16 +220,17 @@ void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam
         int t1_y1 = int(texture_height - polygonTextureCoordsSrc.b.y * texture_height);
         int t1_x2 = int(polygonTextureCoordsSrc.c.x * texture_width);
         int t1_y2 = int(texture_height - polygonTextureCoordsSrc.c.y * texture_height);
-        int t1_maxX = std::max( t1_x0, std::max( t1_x1, t1_x2) );
-        int t1_maxY = std::max( t1_y0, std::max( t1_y1, t1_y2) );
-        int t1_minX = std::min( t1_x0, std::min( t1_x1, t1_x2) );
-        int t1_minY = std::min( t1_y0, std::min( t1_y1, t1_y2) );
+        int t1_maxX = std::max(t1_x0, std::max(t1_x1, t1_x2));
+        int t1_maxY = std::max(t1_y0, std::max(t1_y1, t1_y2));
+        int t1_minX = std::min(t1_x0, std::min(t1_x1, t1_x2));
+        int t1_minY = std::min(t1_y0, std::min(t1_y1, t1_y2));
         for (int x = t1_minX; x <= t1_maxX; x++) {
             for (int y = t1_minY; y <= t1_maxY; y++) {
                 // Берем MeanColor не из треугольника, а из прямоугольника, который содержит этот треугольник
                 // (чтобы учесть случай неправильной позиции камеры при дальнем расстоянии)
-                pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
-                if (checkPointInsideTriangle(polygonTextureCoordsSrc.a, polygonTextureCoordsSrc.b, polygonTextureCoordsSrc.c, pt)) {
+                pcl::PointXY pt(float(x) / float(texture_width), float(texture_height - y) / float(texture_height));
+                if (checkPointInsideTriangle(polygonTextureCoordsSrc.a, polygonTextureCoordsSrc.b,
+                                             polygonTextureCoordsSrc.c, pt)) {
                     cv::Vec3b pixel = textures[cam_idx].at<cv::Vec3b>(y, x);
                     blueSumSrc += int(pixel[0]); // синий
                     greenSumSrc += int(pixel[1]); // зеленый
@@ -249,8 +253,8 @@ void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam
 
         // Пропускаем изображение, если оно имеет не реалистично большую разницу с исходным target изображением
         if (alphaImage <= alpha_one_source_lower_bound || alphaImage > alpha_one_source_upper_bound
-        || betaImage <= beta_one_source_lower_bound || betaImage > beta_one_source_upper_bound
-        || gammaImage <= gamma_one_source_lower_bound || gammaImage > gamma_one_source_upper_bound) {
+            || betaImage <= beta_one_source_lower_bound || betaImage > beta_one_source_upper_bound
+            || gammaImage <= gamma_one_source_lower_bound || gammaImage > gamma_one_source_upper_bound) {
             continue;
         }
         blueSumSrcAll += quality_metric[cam_idx] * (blueSumSrc / countSrc);
@@ -290,18 +294,19 @@ void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam
 
     // Нереалистично маленькие значения, ошибка в параметрах позы камер
     if (alpha <= alpha_all_source_lower_bound
-    || beta <= beta_all_source_lower_bound
-    || gamma <= gamma_all_source_lower_bound
-    || alpha > alpha_all_source_upper_bound
-    || beta > beta_all_source_upper_bound
-    || gamma > gamma_all_source_upper_bound) {
+        || beta <= beta_all_source_lower_bound
+        || gamma <= gamma_all_source_lower_bound
+        || alpha > alpha_all_source_upper_bound
+        || beta > beta_all_source_upper_bound
+        || gamma > gamma_all_source_upper_bound) {
         return;
     }
 
     for (int x = t2_minX; x <= t2_maxX; x++) {
         for (int y = t2_minY; y <= t2_maxY; y++) {
-            pcl::PointXY pt(float(x)/float(texture_width), float(texture_height - y)/float(texture_height));
-            if (checkPointInsideTriangle(polygonTextureCoordsTarget.a, polygonTextureCoordsTarget.b, polygonTextureCoordsTarget.c, pt)) {
+            pcl::PointXY pt(float(x) / float(texture_width), float(texture_height - y) / float(texture_height));
+            if (checkPointInsideTriangle(polygonTextureCoordsTarget.a, polygonTextureCoordsTarget.b,
+                                         polygonTextureCoordsTarget.c, pt)) {
                 cv::Vec3b pixel = dest_target.at<cv::Vec3b>(y, x);
                 pixel[0] = saturate_cast<uchar>(double(pixel[0]) * alpha);
                 pixel[1] = saturate_cast<uchar>(double(pixel[1]) * beta);
@@ -312,15 +317,15 @@ void ColorTransferMeanSamePolygons::transferMeanColorBetweenPolygons(int cur_cam
     }
 }
 
-void ColorTransferMeanSamePolygons::transferColorBetweenTp(vector <vector <int>> &meshFaceIndexMapMainMeshFullToPart,
-                                                          vector <vector <int>> &meshFaceIndexMapMainMeshPartToFull,
-                                                          vector <vector <int>> &meshFaceIndexMapInputMeshesFullToPart,
-                                                          vector <vector <int>> &meshFaceIndexMapInputMeshesPartToFull,
-                                                          vector <cv::Mat> &masks,
-                                                          vector <cv::Mat> &textures,
-                                                          vector <cv::Mat> &destinations) {
+void ColorTransferMeanSamePolygons::transferColorBetweenTp(vector <vector<int>> &meshFaceIndexMapMainMeshFullToPart,
+                                                           vector <vector<int>> &meshFaceIndexMapMainMeshPartToFull,
+                                                           vector <vector<int>> &meshFaceIndexMapInputMeshesFullToPart,
+                                                           vector <vector<int>> &meshFaceIndexMapInputMeshesPartToFull,
+                                                           vector <cv::Mat> &masks,
+                                                           vector <cv::Mat> &textures,
+                                                           vector <cv::Mat> &destinations) {
 
-    pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud <pcl::PointXYZ>);
     fromPCLPointCloud2(main_mesh.cloud, *input_cloud);
     urban_rec::TexturingMapping texturing_mapping = urban_rec::TexturingMapping(2000, 2000);
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
@@ -332,11 +337,11 @@ void ColorTransferMeanSamePolygons::transferColorBetweenTp(vector <vector <int>>
             vector <PolygonTextureCoords> camToPolygonTextureCoords(number_cams);
             // copy UV coordinates for current_cam of face with face_idx
             pcl::PointXY p0target = PointXY(input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3](0),
-                                      input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3](1));
+                                            input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3](1));
             pcl::PointXY p1target = PointXY(input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3 + 1](0),
-                                      input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3 + 1](1));
+                                            input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3 + 1](1));
             pcl::PointXY p2target = PointXY(input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3 + 2](0),
-                                      input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3 + 2](1));
+                                            input_meshes[current_cam].tex_coordinates[0][target_face_idx * 3 + 2](1));
             PolygonTextureCoords polygonTextureCoordsTarget = {p0target, p1target, p2target};
             camToPolygonTextureCoords[current_cam] = polygonTextureCoordsTarget;
             for (int cam_idx = 0; cam_idx < number_cams; cam_idx++) {
@@ -345,11 +350,11 @@ void ColorTransferMeanSamePolygons::transferColorBetweenTp(vector <vector <int>>
                 if (src_face_idx != -1) {
                     // copy UV coordinates for current_cam of face with j
                     pcl::PointXY p0src = PointXY(input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3](0),
-                                              input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3](1));
+                                                 input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3](1));
                     pcl::PointXY p1src = PointXY(input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3 + 1](0),
-                                              input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3 + 1](1));
+                                                 input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3 + 1](1));
                     pcl::PointXY p2src = PointXY(input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3 + 2](0),
-                                              input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3 + 2](1));
+                                                 input_meshes[cam_idx].tex_coordinates[0][src_face_idx * 3 + 2](1));
                     int mask_num = cam_idx % 6;
                     if (mask_num == 5) continue;
                     if (texturing_mapping.isFaceOnMask(p0src, p1src, p2src, masks[mask_num])) {
@@ -361,27 +366,27 @@ void ColorTransferMeanSamePolygons::transferColorBetweenTp(vector <vector <int>>
                 }
             }
             transferMeanColorBetweenPolygons(current_cam,
-                                         camToPolygonTextureCoords,
-                                         meshFaceIndexMapInputMeshesFullToPart,
-                                         meshFaceIndexMapInputMeshesPartToFull,
-                                         textures, dest_target, destinations);
+                                             camToPolygonTextureCoords,
+                                             meshFaceIndexMapInputMeshesFullToPart,
+                                             meshFaceIndexMapInputMeshesPartToFull,
+                                             textures, dest_target, destinations);
         }
     }
 }
 
 void ColorTransferMeanSamePolygons::transfer() {
-    pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud <pcl::PointXYZ>);
     fromPCLPointCloud2(triangles.cloud, *input_cloud);
 
-    vector <vector <int>> meshFaceIndexMapInputMeshesFullToPart(number_cams);
-    vector <vector <int>> meshFaceIndexMapMainMeshFullToPart(number_cams);
-    vector <vector <int>> meshFaceIndexMapInputMeshesPartToFull(number_cams);
-    vector <vector <int>> meshFaceIndexMapMainMeshPartToFull(number_cams);
+    vector <vector<int>> meshFaceIndexMapInputMeshesFullToPart(number_cams);
+    vector <vector<int>> meshFaceIndexMapMainMeshFullToPart(number_cams);
+    vector <vector<int>> meshFaceIndexMapInputMeshesPartToFull(number_cams);
+    vector <vector<int>> meshFaceIndexMapMainMeshPartToFull(number_cams);
 
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
         FaceIndexMaps faceIndexMaps1 = FaceIndexMaps(triangles.polygons,
-                                                    input_meshes[current_cam].tex_polygons[0],
-                                                    input_cloud->size());
+                                                     input_meshes[current_cam].tex_polygons[0],
+                                                     input_cloud->size());
         faceIndexMaps1.getFaceIndexMaps();
         meshFaceIndexMapInputMeshesFullToPart[current_cam] = faceIndexMaps1.faceIndexMapFullToPart;
         meshFaceIndexMapInputMeshesPartToFull[current_cam] = faceIndexMaps1.faceIndexMapPartToFull;
@@ -458,12 +463,12 @@ void ColorTransferMeanSamePolygons::transfer() {
     }
 
     transferColorBetweenTp(meshFaceIndexMapMainMeshFullToPart,
-                         meshFaceIndexMapMainMeshPartToFull,
-                         meshFaceIndexMapInputMeshesFullToPart,
-                         meshFaceIndexMapInputMeshesPartToFull,
-                         masks,
-                         textures,
-                         destinations);
+                           meshFaceIndexMapMainMeshPartToFull,
+                           meshFaceIndexMapInputMeshesFullToPart,
+                           meshFaceIndexMapInputMeshesPartToFull,
+                           masks,
+                           textures,
+                           destinations);
 
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
         cv::imwrite(dest_paths[current_cam], destinations[current_cam]);

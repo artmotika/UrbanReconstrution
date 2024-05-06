@@ -285,8 +285,8 @@ PolygonMesh urban_rec::Building_reconstruction::filterMeshByMesh(PolygonMesh mes
 
 PolygonMesh
 urban_rec::Building_reconstruction::filterMeshByPoints(PolygonMesh mesh_input,
-                                                          const PCLPointCloud2::ConstPtr &points_filter,
-                                                          double filter_radius) {
+                                                       const PCLPointCloud2::ConstPtr &points_filter,
+                                                       double filter_radius) {
     TicToc tt;
     tt.tic();
 
@@ -336,8 +336,8 @@ urban_rec::Building_reconstruction::filterMeshByPoints(PolygonMesh mesh_input,
 }
 
 PolygonMesh urban_rec::Building_reconstruction::filterMeshPoissonByPoints(PolygonMesh mesh_input,
-                                                                              const PCLPointCloud2::ConstPtr &points_filter,
-                                                                              double filter_radius) {
+                                                                          const PCLPointCloud2::ConstPtr &points_filter,
+                                                                          double filter_radius) {
     TicToc tt;
     tt.tic();
 
@@ -375,7 +375,7 @@ PolygonMesh urban_rec::Building_reconstruction::filterMeshPoissonByPoints(Polygo
         pcl::Indices idxNeighbors;
         std::vector<float> neighborsSquaredDistance;
         // Get points inside circ.circle
-        if (kdtree.radiusSearch (pcenter, filter_radius, idxNeighbors, neighborsSquaredDistance) > 0 ) {
+        if (kdtree.radiusSearch(pcenter, filter_radius, idxNeighbors, neighborsSquaredDistance) > 0) {
             new_polygons_filtering.push_back(*it1);
         }
     }
@@ -389,8 +389,8 @@ PolygonMesh urban_rec::Building_reconstruction::filterMeshPoissonByPoints(Polygo
 }
 
 PolygonMesh urban_rec::Building_reconstruction::filterMeshPoissonByPointsNoExtra(PolygonMesh mesh_input,
-                                                                                       const PCLPointCloud2::ConstPtr &points_filter,
-                                                                                       double filter_radius) {
+                                                                                 const PCLPointCloud2::ConstPtr &points_filter,
+                                                                                 double filter_radius) {
     TicToc tt;
     tt.tic();
 
@@ -535,8 +535,8 @@ PolygonMesh urban_rec::Building_reconstruction::filterMeshPoissonByPointsNoExtra
 
 PointCloud<PointXYZ>::Ptr
 urban_rec::Building_reconstruction::filterPointsByPoints(PolygonMesh mesh_input,
-                                                            const PCLPointCloud2::ConstPtr &points_filter,
-                                                            double filter_radius) {
+                                                         const PCLPointCloud2::ConstPtr &points_filter,
+                                                         double filter_radius) {
     TicToc tt;
     tt.tic();
 
@@ -624,8 +624,8 @@ PointCloud<PointXYZ>::Ptr urban_rec::Building_reconstruction::filterPointsByMesh
 
 void
 urban_rec::Building_reconstruction::upsampleMesh(PointCloud<PointXYZ>::Ptr &cloud_in, PolygonMesh mesh,
-                                                  double max_polygon_size,
-                                                  double max_polygon_side) {
+                                                 double max_polygon_size,
+                                                 double max_polygon_side) {
     std::vector <polygon_struct> new_polygons{};
 
     PointCloud<PointXYZ>::Ptr all_vertices(new PointCloud<PointXYZ>());
@@ -751,9 +751,9 @@ urban_rec::Building_reconstruction::upsampleMesh(PointCloud<PointXYZ>::Ptr &clou
 
 std::pair<unsigned long, double>
 urban_rec::Building_reconstruction::calculateRepeatabilityMetric(PCLPointCloud2::Ptr cloud_ideal,
-                                                                   PCLPointCloud2::Ptr cloud_repeat,
-                                                                   double max_mistake,
-                                                                   std::string cloud_not_repeat_path) {
+                                                                 PCLPointCloud2::Ptr cloud_repeat,
+                                                                 double max_mistake,
+                                                                 std::string cloud_not_repeat_path) {
     double sum = 0.0;
     unsigned long number_points_not_repeated = 0;
     PointCloud<PointXYZ>::Ptr xyz_cloud_ideal(new PointCloud<PointXYZ>());
@@ -789,9 +789,9 @@ urban_rec::Building_reconstruction::calculateRepeatabilityMetric(PCLPointCloud2:
 
 std::pair<unsigned long, double>
 urban_rec::Building_reconstruction::calculateHoleMetric(PCLPointCloud2::Ptr cloud_ideal,
-                                                          PCLPointCloud2::Ptr cloud_repeat,
-                                                          double max_mistake,
-                                                          std::string cloud_hole_path) {
+                                                        PCLPointCloud2::Ptr cloud_repeat,
+                                                        double max_mistake,
+                                                        std::string cloud_hole_path) {
     unsigned long number_hole_points = 0;
     double sum = 0.0;
     PointCloud<PointXYZ>::Ptr xyz_cloud_ideal(new PointCloud<PointXYZ>());
@@ -920,7 +920,7 @@ PolygonMesh urban_rec::Building_reconstruction::reconstruct2() {
     // Apply the Poisson surface reconstruction algorithm
     PolygonMesh poisson_mesh;
     algo_rec::computePoisson(new_vertices_normals, poisson_mesh, poisson_depth, solver_divide, iso_divide,
-                              poisson_point_weight);
+                             poisson_point_weight);
 
     print_info("[done, ");
     print_value("%g", tt.toc());
@@ -964,7 +964,7 @@ PolygonMesh urban_rec::Building_reconstruction::reconstruct() {
     // Apply the Poisson surface reconstruction algorithm
     PolygonMesh poisson_mesh;
     algo_rec::computePoisson(new_vertices, poisson_mesh, poisson_depth, solver_divide, iso_divide,
-                              poisson_point_weight);
+                             poisson_point_weight);
     print_info("[done, ");
     print_value("%g", tt.toc());
     print_info(" ms]\n");

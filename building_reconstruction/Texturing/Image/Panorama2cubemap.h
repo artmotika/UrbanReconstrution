@@ -67,7 +67,8 @@ namespace urban_rec {
 
         shift_coord getShift();
 
-        void setCsvFile(std::string file_path, int pColumnNameIdx=0, int pRowNameIdx=0, char separatorParams='\t');
+        void
+        setCsvFile(std::string file_path, int pColumnNameIdx = 0, int pRowNameIdx = 0, char separatorParams = '\t');
 
         rapidcsv::Document getCsvFile();
 

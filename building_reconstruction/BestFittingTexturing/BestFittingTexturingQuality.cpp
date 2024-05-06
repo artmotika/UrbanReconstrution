@@ -15,7 +15,7 @@ void BestFittingTexturingQuality::setInputPolygonMesh(pcl::PolygonMesh &mesh) {
     triangles = mesh;
 }
 
-void BestFittingTexturingQuality::setInputTextureMeshes(vector<pcl::TextureMesh> &meshes) {
+void BestFittingTexturingQuality::setInputTextureMeshes(vector <pcl::TextureMesh> &meshes) {
     input_meshes = meshes;
 }
 
@@ -121,8 +121,8 @@ pcl::TextureMesh BestFittingTexturingQuality::fit(vector <string> argv) {
     imageMask = cv::imread(masks_path, cv::IMREAD_COLOR);
     masks.push_back(imageMask);
 
-    vector <vector <int>> meshFaceIndexMapInputMeshesFullToPart(number_cams);
-    vector <vector <int>> meshFaceIndexMapInputMeshesPartToFull(number_cams);
+    vector <vector<int>> meshFaceIndexMapInputMeshesFullToPart(number_cams);
+    vector <vector<int>> meshFaceIndexMapInputMeshesPartToFull(number_cams);
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
         FaceIndexMaps faceIndexMaps = FaceIndexMaps(triangles.polygons,
                                                     input_meshes[current_cam].tex_polygons[0],
@@ -133,8 +133,8 @@ pcl::TextureMesh BestFittingTexturingQuality::fit(vector <string> argv) {
     }
 
     for (int current_cam = 0; current_cam < number_cams + 1; current_cam++) {
-        vector  <Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f> > dummy_container;
-        mesh.tex_coordinates.push_back (dummy_container);
+        vector <Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>> dummy_container;
+        mesh.tex_coordinates.push_back(dummy_container);
         vector <pcl::Vertices> polygon_dummy;
         mesh.tex_polygons.push_back(polygon_dummy);
     }
@@ -147,11 +147,11 @@ pcl::TextureMesh BestFittingTexturingQuality::fit(vector <string> argv) {
             int local_face_idx = meshFaceIndexMapInputMeshesFullToPart[current_cam][global_face_idx];
             if (local_face_idx == -1) continue;
             pcl::PointXY p0 = PointXY(input_meshes[current_cam].tex_coordinates[0][local_face_idx * 3](0),
-                                    input_meshes[current_cam].tex_coordinates[0][local_face_idx * 3](1));
+                                      input_meshes[current_cam].tex_coordinates[0][local_face_idx * 3](1));
             pcl::PointXY p1 = PointXY(input_meshes[current_cam].tex_coordinates[0][local_face_idx * 3 + 1](0),
-                                    input_meshes[current_cam].tex_coordinates[0][local_face_idx * 3 + 1](1));
+                                      input_meshes[current_cam].tex_coordinates[0][local_face_idx * 3 + 1](1));
             pcl::PointXY p2 = PointXY(input_meshes[current_cam].tex_coordinates[0][local_face_idx * 3 + 2](0),
-                                    input_meshes[current_cam].tex_coordinates[0][local_face_idx * 3 + 2](1));
+                                      input_meshes[current_cam].tex_coordinates[0][local_face_idx * 3 + 2](1));
             int mask_idx = current_cam % 6;
             if (mask_idx != 5 && texturing_mapping.isFaceOnMask(p0, p1, p2, masks[mask_idx])) {
                 continue;
@@ -179,11 +179,14 @@ pcl::TextureMesh BestFittingTexturingQuality::fit(vector <string> argv) {
         }
     }
 
-    for (std::size_t face_idx = 0 ; face_idx < mesh.tex_polygons[number_cams].size() ; ++face_idx) {
+    for (std::size_t face_idx = 0; face_idx < mesh.tex_polygons[number_cams].size(); ++face_idx) {
         Eigen::Vector2f UV1, UV2, UV3;
-        UV1(0) = -1.0; UV1(1) = -1.0;
-        UV2(0) = -1.0; UV2(1) = -1.0;
-        UV3(0) = -1.0; UV3(1) = -1.0;
+        UV1(0) = -1.0;
+        UV1(1) = -1.0;
+        UV2(0) = -1.0;
+        UV2(1) = -1.0;
+        UV3(0) = -1.0;
+        UV3(1) = -1.0;
         mesh.tex_coordinates[number_cams].push_back(UV1);
         mesh.tex_coordinates[number_cams].push_back(UV2);
         mesh.tex_coordinates[number_cams].push_back(UV3);

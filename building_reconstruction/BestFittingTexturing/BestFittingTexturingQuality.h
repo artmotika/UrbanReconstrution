@@ -11,8 +11,8 @@
 class BestFittingTexturingQuality {
 public:
     BestFittingTexturingQuality(pcl::PolygonMesh &in_triangles,
-                                std::vector<pcl::TextureMesh> &meshes)
-                                : triangles(in_triangles), input_meshes(meshes) {
+                                std::vector <pcl::TextureMesh> &meshes)
+            : triangles(in_triangles), input_meshes(meshes) {
         setNumberCams(input_meshes.size());
     }
 
@@ -22,13 +22,13 @@ public:
 
     void setInputPolygonMesh(pcl::PolygonMesh &mesh);
 
-    void setInputTextureMeshes(std::vector<pcl::TextureMesh> &meshes);
+    void setInputTextureMeshes(std::vector <pcl::TextureMesh> &meshes);
 
     pcl::TextureMesh fit(std::vector <std::string> argv);
 
 private:
     pcl::PolygonMesh &triangles;
-    std::vector<pcl::TextureMesh> &input_meshes;
+    std::vector <pcl::TextureMesh> &input_meshes;
     int number_cams;
 };
 

@@ -13,7 +13,7 @@ std::string MtlUtils::getInputMtlfilePath() {
 
 void MtlUtils::addToMapKd(std::string extraString) {
     FileUtils mtlFile = FileUtils(input_mtlfile_path);
-    vector <int> change_line_indexes = mtlFile.getLinesStartingWithString("map_Kd");
+    vector<int> change_line_indexes = mtlFile.getLinesStartingWithString("map_Kd");
     std::fstream file(input_mtlfile_path, std::ios::in | std::ios::out);
 
     if (file.is_open()) {
@@ -25,7 +25,7 @@ void MtlUtils::addToMapKd(std::string extraString) {
         file.clear();
         file.seekp(0, std::ios::beg);
 
-        for (int indexToReplace : change_line_indexes) {
+        for (int indexToReplace: change_line_indexes) {
             std::string prevLine = lines[indexToReplace];
             std::ostringstream oss;
             std::string output_subpath1;
@@ -38,7 +38,7 @@ void MtlUtils::addToMapKd(std::string extraString) {
             lines[indexToReplace] = newLine;
         }
 
-        for (const auto& l : lines) {
+        for (const auto &l: lines) {
             file << l << std::endl;
         }
         file.close();

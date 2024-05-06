@@ -77,31 +77,34 @@ namespace urban_rec {
 
         pcl::PolygonMesh
         filterMeshByPoints(pcl::PolygonMesh mesh_input, const pcl::PCLPointCloud2::ConstPtr &points_filter,
-                              double filter_radius);
-
-        pcl::PolygonMesh filterMeshPoissonByPoints(pcl::PolygonMesh mesh_input, const pcl::PCLPointCloud2::ConstPtr &points_filter,
-                                                  double filter_radius);
+                           double filter_radius);
 
         pcl::PolygonMesh
-        filterMeshPoissonByPointsNoExtra(pcl::PolygonMesh mesh_input, const pcl::PCLPointCloud2::ConstPtr &points_filter,
-                                               double filter_radius);
+        filterMeshPoissonByPoints(pcl::PolygonMesh mesh_input, const pcl::PCLPointCloud2::ConstPtr &points_filter,
+                                  double filter_radius);
+
+        pcl::PolygonMesh
+        filterMeshPoissonByPointsNoExtra(pcl::PolygonMesh mesh_input,
+                                         const pcl::PCLPointCloud2::ConstPtr &points_filter,
+                                         double filter_radius);
 
         pcl::PointCloud<pcl::PointXYZ>::Ptr
         filterPointsByPoints(pcl::PolygonMesh mesh_input, const pcl::PCLPointCloud2::ConstPtr &points_filter,
-                                double filter_radius);
+                             double filter_radius);
 
         pcl::PointCloud<pcl::PointXYZ>::Ptr filterPointsByMesh(pcl::PolygonMesh mesh_input);
 
         void upsampleMesh(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud_in, pcl::PolygonMesh mesh, double max_polygon_size,
-                           double max_polygon_side);
+                          double max_polygon_side);
 
         std::pair<unsigned long, double>
         calculateRepeatabilityMetric(pcl::PCLPointCloud2::Ptr cloud_ideal, pcl::PCLPointCloud2::Ptr cloud_repeat,
-                                       double max_mistake, std::string cloud_not_repeat_path);
+                                     double max_mistake, std::string cloud_not_repeat_path);
 
         std::pair<unsigned long, double>
-        calculateHoleMetric(pcl::PCLPointCloud2::Ptr cloud_ideal, pcl::PCLPointCloud2::Ptr cloud_repeat, double max_mistake,
-                              std::string cloud_hole_path);
+        calculateHoleMetric(pcl::PCLPointCloud2::Ptr cloud_ideal, pcl::PCLPointCloud2::Ptr cloud_repeat,
+                            double max_mistake,
+                            std::string cloud_hole_path);
 
         pcl::PolygonMesh reconstruct();
 
