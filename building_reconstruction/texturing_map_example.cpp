@@ -74,17 +74,18 @@ int main() {
     pcl::PolygonMesh triangles;
     pcl::io::loadPolygonFilePLY(argv[0], triangles);
     texturing_mapping.setInputPolygonMesh(triangles);
-    tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> res = texturing_mapping.textureMesh(argv);
+    tuple <pcl::TextureMesh, pcl::texture_mapping::CameraVector> res = texturing_mapping.textureMesh(argv);
     pcl::TextureMesh tm = get<0>(res);
     pcl::texture_mapping::CameraVector cams = get<1>(res);
 
-    vector<pcl::TextureMesh> tms = texturing_mapping.textureMeshes(argv);
+    vector <pcl::TextureMesh> tms = texturing_mapping.textureMeshes(argv);
 
     BestFittingTexturingQuality bestFittingTexturingQuality = BestFittingTexturingQuality(triangles, tms);
     pcl::TextureMesh tm_best_fitting = bestFittingTexturingQuality.fit(argv);
 
     ColorTransferMeanSamePolygons color_transfer_same_polygons
-        = ColorTransferMeanSamePolygons(triangles, tm_best_fitting, cams, tms, "../example_2/"); // "../example_mini5/"
+            = ColorTransferMeanSamePolygons(triangles, tm_best_fitting, cams, tms,
+                                            "../example_2/"); // "../example_mini5/"
     double lower_bound_area = 0.0;
     double min_quality_metric = 0.333333;
     double alpha_one_source_upper_bound = 2.0;

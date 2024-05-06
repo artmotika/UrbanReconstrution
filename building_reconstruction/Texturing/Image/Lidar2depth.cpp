@@ -30,14 +30,14 @@ string urban_rec::Lidar2depth::getBaseDirPath() {
     return base_dir_path;
 }
 
-void urban_rec::Lidar2depth::readCamPoses(vector<Camera> *cams, vector<boost::filesystem::path> *filenames) {
+void urban_rec::Lidar2depth::readCamPoses(vector <Camera> *cams, vector <boost::filesystem::path> *filenames) {
     const boost::filesystem::path base_dir(base_dir_path);
     string extension(".txt");
     try {
         for (boost::filesystem::directory_iterator it(base_dir);
              it != boost::filesystem::directory_iterator(); ++it) {
             if (boost::filesystem::is_regular_file(it->status()) &&
-                    (it->path().extension().string() == extension)) {
+                (it->path().extension().string() == extension)) {
                 filenames->push_back(it->path());
             }
         }
@@ -57,17 +57,17 @@ void urban_rec::Lidar2depth::fillPointCoordsSet(Camera cam, PointCoordsSet *poly
     PointCloud<PointXYZ>::Ptr all_vertices(new PointCloud <PointXYZ>);
     fromPCLPointCloud2(input_polygon_mesh->cloud, *all_vertices);
 
-    PointCloud<PointXYZ>::Ptr camera_transformed_cloud (new PointCloud<PointXYZ>());
+    PointCloud<PointXYZ>::Ptr camera_transformed_cloud(new PointCloud<PointXYZ>());
 
     // get camera transform
     Eigen::Affine3f cam_trans = cam.pose;
 
     // transform cloud into current camera frame
-    transformPointCloud (*all_vertices, *camera_transformed_cloud, cam_trans.inverse());
+    transformPointCloud(*all_vertices, *camera_transformed_cloud, cam_trans.inverse());
 
     // fill PointCoordsSet to calculate depth image then
     for (std::vector<Vertices>::iterator it = input_polygon_mesh->polygons.begin();
-    it != input_polygon_mesh->polygons.end(); it++) {
+         it != input_polygon_mesh->polygons.end(); it++) {
         // iterate through all polygons in mesh
         Indices vertecies = it->vertices;
         pcl::PointXYZ p1, p2, p3, p1_original, p2_original, p3_original;
@@ -90,30 +90,30 @@ void urban_rec::Lidar2depth::fillPointCoordsSet(Camera cam, PointCoordsSet *poly
         bool is_projected3 = urban_rec::TexturingMapping::getPointUVCoords(p3, cam, p_xy3);
         if (is_projected1 || is_projected2 || is_projected3) {
             // translating UV coords from pcl to coords onto image frame
-            int iX = int (round(p_xy1.x * cam.width));
-            int iY = int (round((1-p_xy1.y) * cam.height));
-            Eigen::Vector2i pixel1 (iX, iY);
-            iX = int (round(p_xy2.x * cam.width));
-            iY = int (round((1-p_xy2.y) * cam.height));
-            Eigen::Vector2i pixel2 (iX, iY);
-            iX = int (round(p_xy3.x * cam.width));
-            iY = int (round((1-p_xy3.y) * cam.height));
-            Eigen::Vector2i pixel3 (iX, iY);
+            int iX = int(round(p_xy1.x * cam.width));
+            int iY = int(round((1 - p_xy1.y) * cam.height));
+            Eigen::Vector2i pixel1(iX, iY);
+            iX = int(round(p_xy2.x * cam.width));
+            iY = int(round((1 - p_xy2.y) * cam.height));
+            Eigen::Vector2i pixel2(iX, iY);
+            iX = int(round(p_xy3.x * cam.width));
+            iY = int(round((1 - p_xy3.y) * cam.height));
+            Eigen::Vector2i pixel3(iX, iY);
             polygons->push_back(
                     make_tuple(
-                            tuple<PointXYZ, PointXYZ, PointXYZ>{p1_original, p2_original, p3_original},
-                            tuple<Eigen::Vector2i, Eigen::Vector2i, Eigen::Vector2i>{pixel1, pixel2, pixel3},
-                            tuple<bool, bool, bool>{is_projected1, is_projected2, is_projected3}
+                            tuple < PointXYZ, PointXYZ, PointXYZ > {p1_original, p2_original, p3_original},
+                            tuple < Eigen::Vector2i, Eigen::Vector2i, Eigen::Vector2i > {pixel1, pixel2, pixel3},
+                            tuple < bool, bool, bool > {is_projected1, is_projected2, is_projected3}
                     ));
         }
     }
 }
 
 void urban_rec::Lidar2depth::createDepthImages() {
-    vector<Camera> cams;
-    vector<boost::filesystem::path> filenames;
+    vector <Camera> cams;
+    vector <boost::filesystem::path> filenames;
     readCamPoses(&cams, &filenames);
-    for (int i = 0; i < filenames.size(); i++ ) {
+    for (int i = 0; i < filenames.size(); i++) {
         // get current camera parameters
         Camera current_cam = cams[i];
 
@@ -133,9 +133,9 @@ void urban_rec::Lidar2depth::createDepthImages() {
         p_cam.z = current_cam.pose(2, 3);
 
         // fill depth image matching PointCoordsSet
-        for (auto polygon : polygons) {
-            tuple<PointXYZ, PointXYZ, PointXYZ> points = get<0>(polygon);
-            tuple<Eigen::Vector2i, Eigen::Vector2i, Eigen::Vector2i> pixels = get<1>(polygon);
+        for (auto polygon: polygons) {
+            tuple <PointXYZ, PointXYZ, PointXYZ> points = get<0>(polygon);
+            tuple <Eigen::Vector2i, Eigen::Vector2i, Eigen::Vector2i> pixels = get<1>(polygon);
             tuple<bool, bool, bool> is_projected = get<2>(polygon);
             // find the maximum and minimum coordinates in x and y
             vector<int> coords = {get<0>(pixels)(0), get<1>(pixels)(0), get<2>(pixels)(0)};
@@ -162,7 +162,9 @@ void urban_rec::Lidar2depth::createDepthImages() {
             bool is_overlayed = false;
             // draw the points belonging to the current mesh triangle
             if (is_projected1) {
-                dist1_3d = static_cast<uint16_t>(Geometry_pcl::euclidean_dist_between_two_points(get<0>(points), p_cam) * 1000); //(in millimetrs)
+                dist1_3d = static_cast<uint16_t>(
+                        Geometry_pcl::euclidean_dist_between_two_points(get<0>(points), p_cam) *
+                        1000); //(in millimetrs)
                 /*
                 * We check whether the pixel is filled in, if so, then the new distance should be less,
                  * in order to vaporize the existing pixel, it is necessary not to collect invisible ones
@@ -173,13 +175,15 @@ void urban_rec::Lidar2depth::createDepthImages() {
                 } else is_overlayed = true;
             }
             if (is_projected2) {
-                dist2_3d = static_cast<uint16_t>(Geometry_pcl::euclidean_dist_between_two_points(get<1>(points), p_cam) * 1000);
+                dist2_3d = static_cast<uint16_t>(
+                        Geometry_pcl::euclidean_dist_between_two_points(get<1>(points), p_cam) * 1000);
                 if (destination.at<uint16_t>(p2(1), p2(0)) == 0 || dist2_3d <= destination.at<uint16_t>(p2(1), p2(0))) {
                     destination.at<uint16_t>(p2(1), p2(0)) = dist2_3d;
                 } else is_overlayed = true;
             }
             if (is_projected3) {
-                dist3_3d = static_cast<uint16_t>(Geometry_pcl::euclidean_dist_between_two_points(get<2>(points), p_cam) * 1000);
+                dist3_3d = static_cast<uint16_t>(
+                        Geometry_pcl::euclidean_dist_between_two_points(get<2>(points), p_cam) * 1000);
                 if (destination.at<uint16_t>(p3(1), p3(0)) == 0 || dist3_3d <= destination.at<uint16_t>(p3(1), p3(0))) {
                     destination.at<uint16_t>(p3(1), p3(0)) = dist3_3d;
                 } else is_overlayed = true;
@@ -187,10 +191,10 @@ void urban_rec::Lidar2depth::createDepthImages() {
 
             // we walk through the rectangle (min_x, min_y) to (max_x, max_y) in which contains our triangle
             if (!is_overlayed) {
-                for (int x = min_x; x <= max_x; x++ ) {
-                    for(int y = min_y; y <= max_y; y++) {
+                for (int x = min_x; x <= max_x; x++) {
+                    for (int y = min_y; y <= max_y; y++) {
                         if (x >= 0 && y >= 0 && x <= current_cam.width && y <= current_cam.height) {
-                            Eigen::Vector2i p (x, y);
+                            Eigen::Vector2i p(x, y);
                             if (Geometry_pcl::check_point_in_triangle(p, p1, p2, p3)) {
                                 double dist1, dist2, dist3;
                                 if (is_projected1) dist1 = Geometry_pcl::dist_between_two_points(p, p1);
@@ -218,10 +222,10 @@ void urban_rec::Lidar2depth::createDepthImages() {
                     }
                 }
             } else {
-                for (int x = min_x; x <= max_x; x++ ) {
-                    for(int y = min_y; y <= max_y; y++) {
+                for (int x = min_x; x <= max_x; x++) {
+                    for (int y = min_y; y <= max_y; y++) {
                         if (x >= 0 && y >= 0 && x <= current_cam.width && y <= current_cam.height) {
-                            Eigen::Vector2i p (x, y);
+                            Eigen::Vector2i p(x, y);
                             /*
                              * We do not recolor pixels that are already shaded, since the triangle being checked
                              * is located behind the shaded pixels

@@ -91,7 +91,8 @@ int main() {
     file_results << "Значения метрик для lidar6: \n";
 
     // Считаем ssim метрику для одного и того же изображения
-    file_results << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8) << endl;
+    file_results << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8)
+                 << endl;
     // Считаем ssim метрику для изображения, полученного с камеры и для срендеренного изображения
     file_results << "ssim метрика main_part и BF_ct_part: " << Metrics::SSIM(camera_image, rendered_image1, 8) << endl;
     file_results << "ssim метрика main_part и BF_part: " << Metrics::SSIM(camera_image, rendered_image2, 8) << endl;
@@ -99,7 +100,8 @@ int main() {
     file_results << "ssim метрика main_part и PCL_part: " << Metrics::SSIM(camera_image, rendered_image4, 8) << endl;
 
     // Считаем psnr метрику для одного и того же изображения
-    file_results << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image) << endl;
+    file_results << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image)
+                 << endl;
     // Считаем psnr метрику для изображения, полученного с камеры и для срендеренного изображения
     file_results << "psnr метрика main_part и BF_ct_part: " << Metrics::PSNR(camera_image, rendered_image1) << endl;
     file_results << "psnr метрика main_part и BF_part: " << Metrics::PSNR(camera_image, rendered_image2) << endl;
@@ -121,7 +123,8 @@ int main() {
     file_results << "Значения метрик для lidar10: \n";
 
     // Считаем ssim метрику для одного и того же изображения
-    file_results << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8) << endl;
+    file_results << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8)
+                 << endl;
     // Считаем ssim метрику для изображения, полученного с камеры и для срендеренного изображения
     file_results << "ssim метрика main_part и BF_ct_part: " << Metrics::SSIM(camera_image, rendered_image1, 8) << endl;
     file_results << "ssim метрика main_part и BF_part: " << Metrics::SSIM(camera_image, rendered_image2, 8) << endl;
@@ -129,7 +132,8 @@ int main() {
     file_results << "ssim метрика main_part и PCL_part: " << Metrics::SSIM(camera_image, rendered_image4, 8) << endl;
 
     // Считаем psnr метрику для одного и того же изображения
-    file_results << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image) << endl;
+    file_results << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image)
+                 << endl;
     // Считаем psnr метрику для изображения, полученного с камеры и для срендеренного изображения
     file_results << "psnr метрика main_part и BF_ct_part: " << Metrics::PSNR(camera_image, rendered_image1) << endl;
     file_results << "psnr метрика main_part и BF_part: " << Metrics::PSNR(camera_image, rendered_image2) << endl;
@@ -151,7 +155,8 @@ int main() {
     file_results << "Значения метрик для lidar15: \n";
 
     // Считаем ssim метрику для одного и того же изображения
-    file_results << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8) << endl;
+    file_results << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8)
+                 << endl;
     // Считаем ssim метрику для изображения, полученного с камеры и для срендеренного изображения
     file_results << "ssim метрика main_part и BF_ct_part: " << Metrics::SSIM(camera_image, rendered_image1, 8) << endl;
     file_results << "ssim метрика main_part и BF_part: " << Metrics::SSIM(camera_image, rendered_image2, 8) << endl;
@@ -159,7 +164,8 @@ int main() {
     file_results << "ssim метрика main_part и PCL_part: " << Metrics::SSIM(camera_image, rendered_image4, 8) << endl;
 
     // Считаем psnr метрику для одного и того же изображения
-    file_results << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image) << endl;
+    file_results << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image)
+                 << endl;
     // Считаем psnr метрику для изображения, полученного с камеры и для срендеренного изображения
     file_results << "psnr метрика main_part и BF_ct_part: " << Metrics::PSNR(camera_image, rendered_image1) << endl;
     file_results << "psnr метрика main_part и BF_part: " << Metrics::PSNR(camera_image, rendered_image2) << endl;
@@ -183,7 +189,8 @@ int main() {
     file_results << "Значения метрик для lidar6: \n";
 
     // Считаем ssim метрику для одного и того же изображения
-    file_results << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8) << endl;
+    file_results << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8)
+                 << endl;
     // Считаем ssim метрику для изображения, полученного с камеры и для срендеренного изображения
     file_results << "ssim метрика main_part и BF_ct: " << Metrics::SSIM(camera_image, rendered_image1, 8) << endl;
     file_results << "ssim метрика main_part и BF: " << Metrics::SSIM(camera_image, rendered_image2, 8) << endl;
@@ -191,7 +198,8 @@ int main() {
     file_results << "ssim метрика main_part и PCL: " << Metrics::SSIM(camera_image, rendered_image4, 8) << endl;
 
     // Считаем psnr метрику для одного и того же изображения
-    file_results << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image) << endl;
+    file_results << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image)
+                 << endl;
     // Считаем psnr метрику для изображения, полученного с камеры и для срендеренного изображения
     file_results << "psnr метрика main_part и BF_ct: " << Metrics::PSNR(camera_image, rendered_image1) << endl;
     file_results << "psnr метрика main_part и BF: " << Metrics::PSNR(camera_image, rendered_image2) << endl;
@@ -213,7 +221,8 @@ int main() {
     file_results << "Значения метрик для lidar10: \n";
 
     // Считаем ssim метрику для одного и того же изображения
-    file_results << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8) << endl;
+    file_results << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8)
+                 << endl;
     // Считаем ssim метрику для изображения, полученного с камеры и для срендеренного изображения
     file_results << "ssim метрика main_part и BF_ct: " << Metrics::SSIM(camera_image, rendered_image1, 8) << endl;
     file_results << "ssim метрика main_part и BF: " << Metrics::SSIM(camera_image, rendered_image2, 8) << endl;
@@ -221,7 +230,8 @@ int main() {
     file_results << "ssim метрика main_part и PCL: " << Metrics::SSIM(camera_image, rendered_image4, 8) << endl;
 
     // Считаем psnr метрику для одного и того же изображения
-    file_results << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image) << endl;
+    file_results << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image)
+                 << endl;
     // Считаем psnr метрику для изображения, полученного с камеры и для срендеренного изображения
     file_results << "psnr метрика main_part и BF_ct: " << Metrics::PSNR(camera_image, rendered_image1) << endl;
     file_results << "psnr метрика main_part и BF: " << Metrics::PSNR(camera_image, rendered_image2) << endl;
@@ -243,7 +253,8 @@ int main() {
     file_results << "Значения метрик для lidar15: \n";
 
     // Считаем ssim метрику для одного и того же изображения
-    file_results << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8) << endl;
+    file_results << "ssim метрика для одного и того же изображения: " << Metrics::SSIM(camera_image, camera_image, 8)
+                 << endl;
     // Считаем ssim метрику для изображения, полученного с камеры и для срендеренного изображения
     file_results << "ssim метрика main_part и BF_ct: " << Metrics::SSIM(camera_image, rendered_image1, 8) << endl;
     file_results << "ssim метрика main_part и BF: " << Metrics::SSIM(camera_image, rendered_image2, 8) << endl;
@@ -251,7 +262,8 @@ int main() {
     file_results << "ssim метрика main_part и PCL: " << Metrics::SSIM(camera_image, rendered_image4, 8) << endl;
 
     // Считаем psnr метрику для одного и того же изображения
-    file_results << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image) << endl;
+    file_results << "psnr метрика для одного и того же изображения: " << Metrics::PSNR(camera_image, camera_image)
+                 << endl;
     // Считаем psnr метрику для изображения, полученного с камеры и для срендеренного изображения
     file_results << "psnr метрика main_part и BF_ct: " << Metrics::PSNR(camera_image, rendered_image1) << endl;
     file_results << "psnr метрика main_part и BF: " << Metrics::PSNR(camera_image, rendered_image2) << endl;

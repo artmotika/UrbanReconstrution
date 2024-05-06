@@ -13,13 +13,14 @@
 #include <string>
 
 namespace Io_cgal {
-    void readFileToPointSet(std::string filename, CGAL::Point_set_3<Kernel::Point_3, Kernel::Vector_3> *points_start);
+    void readFileToPointSet(std::string filename, CGAL::Point_set_3 <Kernel::Point_3, Kernel::Vector_3> *points_start);
 
-    void saveFileFromPointSet(std::string filename, CGAL::Point_set_3<Kernel::Point_3, Kernel::Vector_3> points_start);
+    void saveFileFromPointSet(std::string filename, CGAL::Point_set_3 <Kernel::Point_3, Kernel::Vector_3> points_start);
 
-    void readFileToPointVector(std::string filename, std::vector<boost::tuple<Kernel::Point_3, Kernel::Vector_3, int>> *points);
+    void readFileToPointVector(std::string filename,
+                               std::vector <boost::tuple<Kernel::Point_3, Kernel::Vector_3, int>> *points);
 
-    void saveFileFromPointVector(std::string filename, CGAL::Surface_mesh<Kernel::Point_3> model);
+    void saveFileFromPointVector(std::string filename, CGAL::Surface_mesh <Kernel::Point_3> model);
 }
 
 #endif //URBANRECONSTRUCTION_IO_CGAL_H

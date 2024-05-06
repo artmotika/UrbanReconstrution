@@ -6,7 +6,7 @@ using namespace std;
 using namespace pcl;
 
 int urban_rec::TexturingMapping::saveOBJFile(const std::string &file_name,
-                const pcl::TextureMesh &tex_mesh, unsigned precision) {
+                                             const pcl::TextureMesh &tex_mesh, unsigned precision) {
     if (tex_mesh.cloud.data.empty()) {
         PCL_ERROR("[pcl::io::saveOBJFile] Input point cloud has no data!\n");
         return (-1);
@@ -93,9 +93,9 @@ int urban_rec::TexturingMapping::saveOBJFile(const std::string &file_name,
                 count = 1; // we simply cannot tolerate 0 counts (coming from older converter code)
             int c = 0;
             // adding vertex
-            if ((   tex_mesh.cloud.fields[d].name == "normal_x" ||
-                    tex_mesh.cloud.fields[d].name == "normal_y" ||
-                    tex_mesh.cloud.fields[d].name == "normal_z")) {
+            if ((tex_mesh.cloud.fields[d].name == "normal_x" ||
+                 tex_mesh.cloud.fields[d].name == "normal_y" ||
+                 tex_mesh.cloud.fields[d].name == "normal_z")) {
                 if (!v_written) {
                     // write vertices beginning with vn
                     fs << "vn ";
@@ -221,10 +221,11 @@ pcl::PolygonMesh urban_rec::TexturingMapping::getInputPolygonMesh() {
     return *input_polygon_mesh;
 }
 
-bool urban_rec::TexturingMapping::getPointUVCoords(const PointXYZ &pt, const pcl::TextureMapping<pcl::PointXYZ>::Camera &cam, PointXY &UV_coordinates) {
+bool
+urban_rec::TexturingMapping::getPointUVCoords(const PointXYZ &pt, const pcl::TextureMapping<pcl::PointXYZ>::Camera &cam,
+                                              PointXY &UV_coordinates) {
     // if the point is in front of the camera
-    if (pt.z > 0)
-    {
+    if (pt.z > 0) {
         // compute image center and dimension
         double sizeX = cam.width;
         double sizeY = cam.height;
@@ -263,7 +264,7 @@ bool urban_rec::TexturingMapping::getPointUVCoords(const PointXYZ &pt, const pcl
 }
 
 bool urban_rec::TexturingMapping::readCamPoseFile(std::string filename,
-                                                      pcl::TextureMapping<pcl::PointXYZ>::Camera &cam) {
+                                                  pcl::TextureMapping<pcl::PointXYZ>::Camera &cam) {
     std::ifstream myReadFile;
     myReadFile.open(filename.c_str(), ios::in);
     if (!myReadFile.is_open()) {
@@ -329,7 +330,8 @@ bool urban_rec::TexturingMapping::readCamPoseFile(std::string filename,
     return true;
 }
 
-bool urban_rec::TexturingMapping::isFaceOnMask (pcl::PointXY &proj1, pcl::PointXY &proj2, pcl::PointXY &proj3, const cv::Mat &mask) {
+bool urban_rec::TexturingMapping::isFaceOnMask(pcl::PointXY &proj1, pcl::PointXY &proj2, pcl::PointXY &proj3,
+                                               const cv::Mat &mask) {
     int x0 = proj1.x * float(texture_width);
     int y0 = float(texture_height) - proj1.y * float(texture_height);
     int x1 = proj2.x * float(texture_width);
@@ -338,19 +340,19 @@ bool urban_rec::TexturingMapping::isFaceOnMask (pcl::PointXY &proj1, pcl::PointX
     int y2 = float(texture_height) - proj3.y * float(texture_height);
     cv::Vec3b black_pixel = cv::Vec3b(0, 0, 0);
     if (mask.at<cv::Vec3b>(y0, x0) == black_pixel
-    || mask.at<cv::Vec3b>(y1, x1) == black_pixel
-    || mask.at<cv::Vec3b>(y2, x2) == black_pixel) {
+        || mask.at<cv::Vec3b>(y1, x1) == black_pixel
+        || mask.at<cv::Vec3b>(y2, x2) == black_pixel) {
         return true;
     }
     return false;
 }
 
-bool urban_rec::TexturingMapping::isFaceProjectedAngleMore (const pcl::PointXYZ &p1,
-                                                             const pcl::PointXYZ &p2,
-                                                             const pcl::PointXYZ &p3,
-                                                             const pcl::PointXYZ &camPose,
-                                                             double angle,
-                                                             double max_dist) {
+bool urban_rec::TexturingMapping::isFaceProjectedAngleMore(const pcl::PointXYZ &p1,
+                                                           const pcl::PointXYZ &p2,
+                                                           const pcl::PointXYZ &p3,
+                                                           const pcl::PointXYZ &camPose,
+                                                           double angle,
+                                                           double max_dist) {
     pcl::PointXYZ center = Geometry_pcl::getTriangleCenterOfMass(p1, p2, p3);
     if (Geometry_pcl::euclidean_dist_between_two_points(center, camPose) < max_dist) return true;
     Eigen::Vector3d vectorAB(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
@@ -358,7 +360,8 @@ bool urban_rec::TexturingMapping::isFaceProjectedAngleMore (const pcl::PointXYZ 
     Eigen::Vector3d vectorNormal = vectorAB.cross(vectorAC);
     Eigen::Vector3d vectorCamPoseToCenter(center.x - camPose.x, center.y - camPose.y, center.z - camPose.z);
     double scalar_product = vectorNormal.dot(vectorCamPoseToCenter);
-    double calculated_angle = std::acos(scalar_product / (vectorNormal.norm() * vectorCamPoseToCenter.norm())) * (180 / M_PI);
+    double calculated_angle =
+            std::acos(scalar_product / (vectorNormal.norm() * vectorCamPoseToCenter.norm())) * (180 / M_PI);
     if (calculated_angle > 90.0) calculated_angle = 180.0 - calculated_angle;
     if (calculated_angle > angle) {
         return true;
@@ -367,7 +370,8 @@ bool urban_rec::TexturingMapping::isFaceProjectedAngleMore (const pcl::PointXYZ 
 }
 
 
-tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> urban_rec::TexturingMapping::textureMesh(vector <string> argv) {
+tuple <pcl::TextureMesh, pcl::texture_mapping::CameraVector>
+urban_rec::TexturingMapping::textureMesh(vector <string> argv) {
     pcl::PolygonMesh triangles;
     if (input_polygon_mesh != nullptr) {
         triangles = *input_polygon_mesh;
@@ -474,7 +478,7 @@ tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> urban_rec::Texturing
     return make_tuple(mesh, my_cams);
 }
 
-vector<pcl::TextureMesh> urban_rec::TexturingMapping::textureMeshes(vector <string> argv) {
+vector <pcl::TextureMesh> urban_rec::TexturingMapping::textureMeshes(vector <string> argv) {
     pcl::PolygonMesh triangles;
     if (input_polygon_mesh != nullptr) {
         triangles = *input_polygon_mesh;
@@ -492,7 +496,7 @@ vector<pcl::TextureMesh> urban_rec::TexturingMapping::textureMeshes(vector <stri
         for (boost::filesystem::directory_iterator it(base_dir);
              it != boost::filesystem::directory_iterator(); ++it) {
             if (boost::filesystem::is_regular_file(it->status()) &&
-                    (it->path().extension().string() == extension)) {
+                (it->path().extension().string() == extension)) {
                 filenames.push_back(it->path());
             }
         }
@@ -502,7 +506,7 @@ vector<pcl::TextureMesh> urban_rec::TexturingMapping::textureMeshes(vector <stri
     std::sort(filenames.begin(), filenames.end());
 
     // Create the texturemesh object that will contain our UV-mapped mesh
-    vector<pcl::TextureMesh> mesh(filenames.size());
+    vector <pcl::TextureMesh> mesh(filenames.size());
     for (int i = 0; i < filenames.size(); i++) {
         mesh[i].cloud = triangles.cloud;
     }
@@ -518,7 +522,7 @@ vector<pcl::TextureMesh> urban_rec::TexturingMapping::textureMeshes(vector <stri
     }
 
     // Load textures and cameras poses and intrinsics
-    vector<pcl::texture_mapping::CameraVector> my_cams(filenames.size());
+    vector <pcl::texture_mapping::CameraVector> my_cams(filenames.size());
 
     for (int i = 0; i < filenames.size(); ++i) {
         std::cout << filenames[i].string() << std::endl;

@@ -45,7 +45,7 @@ namespace Io_pcl {
         return (true);
     }
 
-    bool loadCloud(const std::string &filename, PointCloud<PointXYZ> &cloud) {
+    bool loadCloud(const std::string &filename, PointCloud <PointXYZ> &cloud) {
         TicToc tt;
         print_highlight("Loading ");
         print_value("%s ", filename.c_str());
@@ -95,7 +95,7 @@ namespace Io_pcl {
         print_info(" ms]\n");
     }
 
-    void saveCloud(std::string const &filename, PointCloud<PointXYZ> const &cloud) {
+    void saveCloud(std::string const &filename, PointCloud <PointXYZ> const &cloud) {
         TicToc tt;
         tt.tic();
 
@@ -143,7 +143,7 @@ namespace Io_pcl {
         print_info(" points]\n");
     }
 
-    void saveCloudPCD(std::string const &filename, PointCloud<PointXYZ> const &cloud) {
+    void saveCloudPCD(std::string const &filename, PointCloud <PointXYZ> const &cloud) {
         TicToc tt;
         tt.tic();
 

@@ -17,10 +17,11 @@
 
 namespace urban_rec {
     using Camera = pcl::TextureMapping<pcl::PointXYZ>::Camera;
-    using PointCoordsSet = std::vector<std::tuple<
-            std::tuple<pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ>,
+    using PointCoordsSet = std::vector <std::tuple<
+            std::tuple < pcl::PointXYZ, pcl::PointXYZ, pcl::PointXYZ>,
     std::tuple<Eigen::Vector2i, Eigen::Vector2i, Eigen::Vector2i>,
     std::tuple<bool, bool, bool>>>;
+
     class Lidar2depth {
     public:
         Lidar2depth(std::string base_dir_path, std::string input_mesh_file_path = "") {
@@ -49,7 +50,7 @@ namespace urban_rec {
         std::string base_dir_path;
         pcl::PolygonMesh::Ptr input_polygon_mesh{nullptr};
 
-        void readCamPoses(std::vector<Camera> *cams, std::vector<boost::filesystem::path> *filenames);
+        void readCamPoses(std::vector <Camera> *cams, std::vector <boost::filesystem::path> *filenames);
 
         void fillPointCoordsSet(Camera cam, PointCoordsSet *polygons);
     };

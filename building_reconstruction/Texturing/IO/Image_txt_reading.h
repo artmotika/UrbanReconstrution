@@ -6,10 +6,9 @@
 #include <sstream>
 #include <limits>
 
-namespace urban_rec
-{
+namespace urban_rec {
     namespace image_txt_read {
-        std::ifstream& go_to_line(std::ifstream& file, unsigned int num);
+        std::ifstream &go_to_line(std::ifstream &file, unsigned int num);
     }
 }
 

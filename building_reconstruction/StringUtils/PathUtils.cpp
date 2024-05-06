@@ -7,7 +7,8 @@ namespace path_utils {
             if (path[i] == sign) return i;
         }
         std::ostringstream oss;
-        oss << "path argument in Panorama2cubemap::getIndexBeforeChar(std::string path, char sign) doesn't have a " << sign
+        oss << "path argument in Panorama2cubemap::getIndexBeforeChar(std::string path, char sign) doesn't have a "
+            << sign
             << " :  " << path << "!\n";
         throw std::invalid_argument(oss.str());
     }

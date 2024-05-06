@@ -46,13 +46,12 @@ double Geometry_pcl::min_euclidean_dist_between_point_and_polygon_points(PointXY
     return min_dist;
 }
 
-double sign(Eigen::Vector2i p1, Eigen::Vector2i p2, Eigen::Vector2i p3)
-{
+double sign(Eigen::Vector2i p1, Eigen::Vector2i p2, Eigen::Vector2i p3) {
     return (p1(0) - p3(0)) * (p2(1) - p3(1)) - (p2(0) - p3(0)) * (p1(1) - p3(1));
 }
 
-bool Geometry_pcl::check_point_in_triangle(Eigen::Vector2i pt, Eigen::Vector2i p1, Eigen::Vector2i p2, Eigen::Vector2i p3)
-{
+bool
+Geometry_pcl::check_point_in_triangle(Eigen::Vector2i pt, Eigen::Vector2i p1, Eigen::Vector2i p2, Eigen::Vector2i p3) {
     double d1, d2, d3;
     bool has_neg, has_pos;
 
@@ -66,13 +65,16 @@ bool Geometry_pcl::check_point_in_triangle(Eigen::Vector2i pt, Eigen::Vector2i p
     return !(has_neg && has_pos);
 }
 
-bool Geometry_pcl::check_point_in_triangle_vector(Eigen::Vector2i pt, Eigen::Vector2i p1, Eigen::Vector2i p2, Eigen::Vector2i p3)
-{
+bool Geometry_pcl::check_point_in_triangle_vector(Eigen::Vector2i pt, Eigen::Vector2i p1, Eigen::Vector2i p2,
+                                                  Eigen::Vector2i p3) {
     // Compute vectors
     Eigen::Vector2d v0, v1, v2;
-    v0(0) = p3(0) - p1(0); v0(1) = p3(1) - p1(1); // v0= C - A
-    v1(0) = p2(0) - p1(0); v1(1) = p2(1) - p1(1); // v1= B - A
-    v2(0) = pt(0) - p1(0); v2(1) = pt(1) - p1(1); // v2= P - A
+    v0(0) = p3(0) - p1(0);
+    v0(1) = p3(1) - p1(1); // v0= C - A
+    v1(0) = p2(0) - p1(0);
+    v1(1) = p2(1) - p1(1); // v1= B - A
+    v2(0) = pt(0) - p1(0);
+    v2(1) = pt(1) - p1(1); // v2= P - A
 
     // Compute dot products
     double dot00 = v0.dot(v0); // dot00 = dot(v0, v0)
@@ -82,9 +84,9 @@ bool Geometry_pcl::check_point_in_triangle_vector(Eigen::Vector2i pt, Eigen::Vec
     double dot12 = v1.dot(v2); // dot12 = dot(v1, v2)
 
     // Compute barycentric coordinates
-    double invDenom = 1.0 / (dot00*dot11 - dot01*dot01);
-    double u = (dot11*dot02 - dot01*dot12) * invDenom;
-    double v = (dot00*dot12 - dot01*dot02) * invDenom;
+    double invDenom = 1.0 / (dot00 * dot11 - dot01 * dot01);
+    double u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+    double v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
     // Check if point is in triangle
     return ((u >= 0) && (v >= 0) && (u + v < 1));
@@ -108,19 +110,19 @@ bool Geometry_pcl::isPointInsideSegment(pcl::PointXYZ a, pcl::PointXYZ b, pcl::P
 
 double Geometry_pcl::distanceToSegment(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ p) {
     float epsilon = std::numeric_limits<float>::epsilon();
-    double l2 = (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y) + (a.z - b.z)*(a.z - b.z);
+    double l2 = (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y) + (a.z - b.z) * (a.z - b.z);
     if (l2 < epsilon) {
-        return sqrt((p.x - a.x)*(p.x - a.x) + (p.y - a.y)*(p.y - a.y) + (p.z - a.z)*(p.z - a.z));
+        return sqrt((p.x - a.x) * (p.x - a.x) + (p.y - a.y) * (p.y - a.y) + (p.z - a.z) * (p.z - a.z));
     }
 
-    double t = ((p.x - a.x)*(b.x - a.x) + (p.y - a.y)*(b.y - a.y) + (p.z - a.z)*(b.z - a.z)) / l2;
+    double t = ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y) + (p.z - a.z) * (b.z - a.z)) / l2;
     t = std::max(0.0, std::min(1.0, t));
 
     double x = a.x + t * (b.x - a.x);
     double y = a.y + t * (b.y - a.y);
     double z = a.z + t * (b.z - a.z);
 
-    return sqrt((p.x - x)*(p.x - x) + (p.y - y)*(p.y - y) + (p.z - z)*(p.z - z));
+    return sqrt((p.x - x) * (p.x - x) + (p.y - y) * (p.y - y) + (p.z - z) * (p.z - z));
 }
 
 
@@ -145,13 +147,16 @@ pcl::PointXYZ Geometry_pcl::getTriangleCenterOfMass(pcl::PointXYZ a, pcl::PointX
     return center;
 }
 
-bool Geometry_pcl::checkPointInsideTriangle(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3, const pcl::PointXY &pt)
-{
+bool Geometry_pcl::checkPointInsideTriangle(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3,
+                                            const pcl::PointXY &pt) {
     // Compute vectors
     Eigen::Vector2d v0, v1, v2;
-    v0(0) = p3.x - p1.x; v0(1) = p3.y - p1.y; // v0= C - A
-    v1(0) = p2.x - p1.x; v1(1) = p2.y - p1.y; // v1= B - A
-    v2(0) = pt.x - p1.x; v2(1) = pt.y - p1.y; // v2= P - A
+    v0(0) = p3.x - p1.x;
+    v0(1) = p3.y - p1.y; // v0= C - A
+    v1(0) = p2.x - p1.x;
+    v1(1) = p2.y - p1.y; // v1= B - A
+    v2(0) = pt.x - p1.x;
+    v2(1) = pt.y - p1.y; // v2= P - A
 
     // Compute dot products
     double dot00 = v0.dot(v0); // dot00 = dot(v0, v0)
@@ -161,16 +166,16 @@ bool Geometry_pcl::checkPointInsideTriangle(const pcl::PointXY &p1, const pcl::P
     double dot12 = v1.dot(v2); // dot12 = dot(v1, v2)
 
     // Compute barycentric coordinates
-    double invDenom = 1.0 / (dot00*dot11 - dot01*dot01);
-    double u = (dot11*dot02 - dot01*dot12) * invDenom;
-    double v = (dot00*dot12 - dot01*dot02) * invDenom;
+    double invDenom = 1.0 / (dot00 * dot11 - dot01 * dot01);
+    double u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+    double v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
     // Check if point is in triangle
     return ((u >= 0) && (v >= 0) && (u + v < 1));
 }
 
 double Geometry_pcl::triangle_area(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3) {
-    return 0.5 * abs((p2.x - p1.x)*(p3.y - p1.y) - (p3.x - p1.x)*(p2.y - p1.y));
+    return 0.5 * abs((p2.x - p1.x) * (p3.y - p1.y) - (p3.x - p1.x) * (p2.y - p1.y));
 }
 
 

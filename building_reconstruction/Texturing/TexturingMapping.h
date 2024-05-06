@@ -48,27 +48,27 @@ namespace urban_rec {
 
         pcl::PolygonMesh getInputPolygonMesh();
 
-        std::tuple<pcl::TextureMesh, pcl::texture_mapping::CameraVector> textureMesh(std::vector <std::string> argv);
+        std::tuple <pcl::TextureMesh, pcl::texture_mapping::CameraVector> textureMesh(std::vector <std::string> argv);
 
-        std::vector<pcl::TextureMesh> textureMeshes(std::vector <std::string> argv);
+        std::vector <pcl::TextureMesh> textureMeshes(std::vector <std::string> argv);
 
         static bool readCamPoseFile(std::string filename,
-                                pcl::TextureMapping<pcl::PointXYZ>::Camera &cam);
+                                    pcl::TextureMapping<pcl::PointXYZ>::Camera &cam);
 
         static bool getPointUVCoords(const pcl::PointXYZ &pt, const pcl::TextureMapping<pcl::PointXYZ>::Camera &cam,
                                      pcl::PointXY &UV_coordinates);
 
-        bool isFaceOnMask (pcl::PointXY &proj1, pcl::PointXY &proj2, pcl::PointXY &proj3, const cv::Mat &mask);
+        bool isFaceOnMask(pcl::PointXY &proj1, pcl::PointXY &proj2, pcl::PointXY &proj3, const cv::Mat &mask);
 
-        static bool isFaceProjectedAngleMore (const pcl::PointXYZ &p1,
-                                           const pcl::PointXYZ &p2,
-                                           const pcl::PointXYZ &p3,
-                                           const pcl::PointXYZ &camPose,
-                                           double angle,
-                                           double max_dist);
+        static bool isFaceProjectedAngleMore(const pcl::PointXYZ &p1,
+                                             const pcl::PointXYZ &p2,
+                                             const pcl::PointXYZ &p3,
+                                             const pcl::PointXYZ &camPose,
+                                             double angle,
+                                             double max_dist);
 
         static int saveOBJFile(const std::string &file_name,
-                              const pcl::TextureMesh &tex_mesh, unsigned precision);
+                               const pcl::TextureMesh &tex_mesh, unsigned precision);
 
     private:
         pcl::PolygonMesh::Ptr input_polygon_mesh{nullptr};

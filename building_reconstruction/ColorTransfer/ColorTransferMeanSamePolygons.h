@@ -18,14 +18,15 @@
 class ColorTransferMeanSamePolygons {
 public:
     using Camera = pcl::texture_mapping::Camera;
+
     ColorTransferMeanSamePolygons(pcl::PolygonMesh &in_triangles, pcl::TextureMesh &mesh,
                                   pcl::texture_mapping::CameraVector &cams,
-                                  std::vector<pcl::TextureMesh> &meshes,
+                                  std::vector <pcl::TextureMesh> &meshes,
                                   std::string dir_image_path)
-                                  : triangles(in_triangles), main_mesh(mesh), input_meshes(meshes){
+            : triangles(in_triangles), main_mesh(mesh), input_meshes(meshes) {
         setDirPath(dir_image_path);
         setInputCams(cams);
-        setNumberCams(mesh.tex_materials.size()-1);
+        setNumberCams(mesh.tex_materials.size() - 1);
     }
 
     void setDirPath(std::string image_path);
@@ -42,7 +43,7 @@ public:
 
     void setInputCams(pcl::texture_mapping::CameraVector &input_cams);
 
-    void setInputTextureMeshes(std::vector<pcl::TextureMesh> &meshes);
+    void setInputTextureMeshes(std::vector <pcl::TextureMesh> &meshes);
 
     void setLowerBoundArea(double lower_bound);
 
@@ -72,7 +73,7 @@ public:
 
     void setGammaAllSourceLowerBound(double lower_bound);
 
-    std::vector <std::vector <bool>> getBorderTp();
+    std::vector <std::vector<bool>> getBorderTp();
 
     void transfer();
 
@@ -80,7 +81,7 @@ private:
     pcl::PolygonMesh &triangles;
     pcl::TextureMesh &main_mesh;
     pcl::texture_mapping::CameraVector cams;
-    std::vector<pcl::TextureMesh> &input_meshes;
+    std::vector <pcl::TextureMesh> &input_meshes;
     std::string dir_path;
     int number_cams;
     int texture_height;
@@ -102,16 +103,16 @@ private:
 
     void transferMeanColorBetweenPolygons(int cur_cam,
                                           std::vector <PolygonTextureCoords> &camToPolygonTextureCoords,
-                                          std::vector <std::vector <int>> &meshFaceIndexMapInputMeshesFullToPart,
-                                          std::vector <std::vector <int>> &meshFaceIndexMapInputMeshesPartToFull,
+                                          std::vector <std::vector<int>> &meshFaceIndexMapInputMeshesFullToPart,
+                                          std::vector <std::vector<int>> &meshFaceIndexMapInputMeshesPartToFull,
                                           std::vector <cv::Mat> &textures,
-                                         cv::Mat &dest_target,
+                                          cv::Mat &dest_target,
                                           std::vector <cv::Mat> &destinations);
 
-    void transferColorBetweenTp(std::vector <std::vector <int>> &meshFaceIndexMapMainMeshFullToPart,
-                                std::vector <std::vector <int>> &meshFaceIndexMapMainMeshPartToFull,
-                                std::vector <std::vector <int>> &meshFaceIndexMapInputMeshesFullToPart,
-                                std::vector <std::vector <int>> &meshFaceIndexMapInputMeshesPartToFull,
+    void transferColorBetweenTp(std::vector <std::vector<int>> &meshFaceIndexMapMainMeshFullToPart,
+                                std::vector <std::vector<int>> &meshFaceIndexMapMainMeshPartToFull,
+                                std::vector <std::vector<int>> &meshFaceIndexMapInputMeshesFullToPart,
+                                std::vector <std::vector<int>> &meshFaceIndexMapInputMeshesPartToFull,
                                 std::vector <cv::Mat> &masks,
                                 std::vector <cv::Mat> &textures,
                                 std::vector <cv::Mat> &destinations);

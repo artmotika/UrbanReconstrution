@@ -97,7 +97,7 @@ add_executable(texturing_map_example texturing_map_example.cpp)
 add_executable(metric_image_compare_example metric_image_compare_example.cpp)
 add_executable(metrics_examples metrics_examples.cpp)
 #add_library(surface_reconstruction STATIC surface_reconstruction.cpp)
-add_library(building_reconstruction STATIC building_reconstruction.cpp)
+add_library(building_reconstruction STATIC Building_reconstruction.h Building_reconstruction.cpp)
 #create_single_source_cgal_program("surface_reconstruction_example.cpp")
 add_executable(building_reconstruction_example building_reconstruction_example.cpp)
 

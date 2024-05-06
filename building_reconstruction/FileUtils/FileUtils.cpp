@@ -1,4 +1,5 @@
 #include "FileUtils.h"
+
 using namespace std;
 
 void FileUtils::setInputFilePath(std::string file_path) {
@@ -9,9 +10,9 @@ std::string FileUtils::getInputFilePath() {
     return input_file_path;
 }
 
-vector <int> FileUtils::getLinesStartingWithString(std::string wordToSearch) {
+vector<int> FileUtils::getLinesStartingWithString(std::string wordToSearch) {
     std::ifstream file(input_file_path);
-    vector <int> indexes;
+    vector<int> indexes;
     if (file.is_open()) {
         std::string line;
         int index = 0;

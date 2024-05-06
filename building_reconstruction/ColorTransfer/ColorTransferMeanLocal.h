@@ -26,6 +26,7 @@ struct NeighborPolygonTextureCoordsMap {
 class ColorTransferMeanLocal {
 public:
     using Camera = pcl::texture_mapping::Camera;
+
     ColorTransferMeanLocal(pcl::TextureMesh &mesh, std::string dir_image_path) {
         setDirPath(dir_image_path);
         setInputTextureMesh(mesh);
@@ -46,7 +47,9 @@ public:
 
     void setInputTextureMesh(pcl::TextureMesh &mesh);
 
-    std::vector< std::vector <std::vector <std::vector <NeighborPolygonTextureCoordsMap>>>> getNeighboringTp();
+    std::vector <std::vector<std::vector < std::vector < NeighborPolygonTextureCoordsMap>>>>
+
+    getNeighboringTp();
 
     void transfer();
 
@@ -57,15 +60,23 @@ private:
     int number_cams;
     int texture_height;
     int texture_width;
+
     void transferColorBetweenPolygons(NeighborPolygonTextureCoordsMap neighborPolygonTextureCoordsMap,
-                                                              cv::Mat & texture_src,
-                                                              cv::Mat & texture_target,
-                                                              cv::Mat & dest_target, int c);
-    void transferColorBetweenTpBorder(std::vector< std::vector <std::vector <std::vector <NeighborPolygonTextureCoordsMap>>>> &neighboring_cams_to_polygons_texture_coords,
-    std::vector <cv::Mat> &textures, std::vector <cv::Mat> &destinations,
-    std::vector <std::string> &dest_paths);
+                                      cv::Mat &texture_src,
+                                      cv::Mat &texture_target,
+                                      cv::Mat &dest_target, int c);
+
+    void
+    transferColorBetweenTpBorder(std::vector <std::vector<std::vector < std::vector < NeighborPolygonTextureCoordsMap>>
+
+    >> &neighboring_cams_to_polygons_texture_coords,
+    std::vector <cv::Mat> &textures, std::vector<cv::Mat>
+    &destinations,
+    std::vector <std::string> &dest_paths
+    );
+
     std::pair<int, int> isNeighboringPolygons(pcl::PointXYZ p01, pcl::PointXYZ p02, pcl::PointXYZ p03,
-                               pcl::PointXYZ p11, pcl::PointXYZ p12, pcl::PointXYZ p13);
+                                              pcl::PointXYZ p11, pcl::PointXYZ p12, pcl::PointXYZ p13);
 };
 
 #endif //URBAN_RECONSTRUCTION_COLORTRANSFERMEANLOCAL_H

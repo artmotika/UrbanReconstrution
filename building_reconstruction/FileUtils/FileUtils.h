@@ -16,7 +16,7 @@ public:
 
     std::string getInputFilePath();
 
-    std::vector <int> getLinesStartingWithString(std::string wordToSearch);
+    std::vector<int> getLinesStartingWithString(std::string wordToSearch);
 
 private:
     std::string input_file_path;

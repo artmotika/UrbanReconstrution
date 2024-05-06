@@ -12,7 +12,7 @@ public:
     FaceIndexMaps(std::vector <pcl::Vertices> &input_polygons,
                   std::vector <pcl::Vertices> &input_tex_polygons,
                   int input_num_points)
-                  : polygons(input_polygons), tex_polygons(input_tex_polygons) {
+            : polygons(input_polygons), tex_polygons(input_tex_polygons) {
         faceIndexMapFullToPart.assign(polygons.size(), -1);
         faceIndexMapPartToFull.assign(tex_polygons.size(), -1);
         setInputNumPoints(input_num_points);
@@ -26,8 +26,8 @@ public:
 
     void getFaceIndexMaps();
 
-    std::vector <int> faceIndexMapFullToPart;
-    std::vector <int> faceIndexMapPartToFull;
+    std::vector<int> faceIndexMapFullToPart;
+    std::vector<int> faceIndexMapPartToFull;
 
 private:
     std::vector <pcl::Vertices> &polygons;

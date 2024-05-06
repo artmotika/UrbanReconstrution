@@ -39,7 +39,8 @@ namespace Geometry_pcl {
 
     pcl::PointXYZ getTriangleCenterOfMass(pcl::PointXYZ a, pcl::PointXYZ b, pcl::PointXYZ c);
 
-    bool checkPointInsideTriangle(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3, const pcl::PointXY &pt);
+    bool checkPointInsideTriangle(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3,
+                                  const pcl::PointXY &pt);
 
     double triangle_area(const pcl::PointXY &p1, const pcl::PointXY &p2, const pcl::PointXY &p3);
 
