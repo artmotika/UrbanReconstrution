@@ -86,14 +86,20 @@ private:
     int number_cams;
     int texture_height;
     int texture_width;
+    // Наименьшая площадь которая учавствует в переносе цвета
     double lower_bound_area = 0.0;
+    // Наименьшее соотношение площадей src- и target-текстур, которое будет учавствовать в переносе цвета
     double min_quality_metric = 0.333333;
+    // Константы для ограничения переноса цвета, чтобы не переносить цвет, если коэффициенты (alphaImage, betaImage, gammaImage)
+    // имеют не реалистично большую разницу с исходным target-изображением
     double alpha_one_source_upper_bound = 2.0;
     double alpha_one_source_lower_bound = 0.5;
     double beta_one_source_upper_bound = 2.0;
     double beta_one_source_lower_bound = 0.5;
     double gamma_one_source_upper_bound = 2.0;
     double gamma_one_source_lower_bound = 0.5;
+    // Константы для ограничения переноса цвета, чтобы не переносить цвет, если коэффициенты (alpha, beta, gamma)
+    // имеют не реалистично большую разницу с исходным target-изображением
     double alpha_all_source_upper_bound = 2.0;
     double alpha_all_source_lower_bound = 0.5;
     double beta_all_source_upper_bound = 2.0;
