@@ -3,8 +3,8 @@
 
 cmake_minimum_required(VERSION 3.1...3.23)
 
-set(CMAKE_C_COMPILER "gcc-13")
-set(CMAKE_CXX_COMPILER "g++-13")
+#set(CMAKE_C_COMPILER "gcc-13")
+#set(CMAKE_CXX_COMPILER "g++-13")
 
 project(Polygonal_surface_reconstruction_Examples)
 
