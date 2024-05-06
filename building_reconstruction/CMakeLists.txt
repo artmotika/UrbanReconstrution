@@ -5,12 +5,13 @@ cmake_minimum_required(VERSION 3.1...3.23)
 
 project(Polygonal_surface_reconstruction_Examples)
 
-#set(CMAKE_CXX_COMPILER "clang")
 #set(CMAKE_C_COMPILER "gcc-13")
 #set(CMAKE_CXX_COMPILER "g++-13")
 
 #add_compile_options(-std=c++20)
 #add_compile_options(-std=c++14)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=undefined")
 
 set(CMAKE_THREAD_LIBS_INIT "-lpthread")
 set(CMAKE_HAVE_THREADS_LIBRARY 1)
@@ -18,14 +19,16 @@ set(CMAKE_USE_WIN32_THREADS_INIT 0)
 set(CMAKE_USE_PTHREADS_INIT 1)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-## OPENMP variables
-#set(OpenMP_CXX_FLAGS "-fopenmp=lomp")
-#set(OpenMP_CXX_LIB_NAMES "libomp")
+# OPENMP variables
+set(OpenMP_CXX_FLAGS "-fopenmp=lomp")
+set(OpenMP_CXX_LIB_NAMES "libomp")
 #set(OpenMP_libomp_LIBRARY "/usr/local/Cellar/libomp/18.1.3/lib/libomp.dylib")
 #set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp /usr/local/Cellar/libomp/18.1.3/lib/libomp.dylib -I/usr/local/Cellar/libomp/18.1.3/include")
 
+# Vulkan
 find_package(Vulkan)
 
+## Threads
 #find_package(Threads REQUIRED)
 
 find_package(OpenMP)
