@@ -12,32 +12,37 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get -y install cmake g++ make libpcl-dev libvulkan-dev
+        sudo apt-get -y install cmake g++ make
+
+    - name: Install PCL
+      run: |
+        sudo apt-get install -y libpcl-dev
+
+    - name: Install Vulkan
+      run: |
+        sudo apt-get install -y libvulkan-dev
 
     - name: Install VTK
       run: |
-        sudo apt-get update
         sudo apt-get install -y libvtk9-dev
 
     - name: Set up OpenCV
       run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
-        sudo apt-get install -y libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
+        sudo apt install -y build-essential cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+        git clone https://github.com/opencv/opencv.git
+        cd opencv
         mkdir build
         cd build
-        cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_opencv_world=ON ..
-        make
+        cmake ..
+        make -j$(nproc)
         sudo make install
 
     - name: Install Boost
       run: |
-        sudo apt-get update
         sudo apt-get install -y libboost-all-dev
 
     - name: Install Eigen3
       run: |
-        sudo apt-get update
         sudo apt-get install -y libeigen3-dev
 
     - name: Build
