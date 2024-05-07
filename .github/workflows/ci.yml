@@ -33,8 +33,13 @@ jobs:
 
     - name: Install Boost
       run: |
-        sudo apt-get install -y libboost-all-dev
-        sudo apt install libboost-json-dev
+        # sudo apt-get install -y libboost-all-dev
+        it clone --recurse-submodules https://github.com/CPPAlliance/json.git
+        cd json
+        mkdir build && cd build
+        cmake ..
+        make
+        sudo make install
 
     - name: Install Eigen3
       run: |
