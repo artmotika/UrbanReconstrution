@@ -52,7 +52,7 @@ find_package(VTK)
 find_package(OpenCV REQUIRED)
 
 # Boost and its components
-find_package(Boost REQUIRED) # COMPONENTS json
+find_package(Boost REQUIRED COMPONENTS json)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
