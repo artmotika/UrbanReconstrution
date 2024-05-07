@@ -16,8 +16,14 @@ jobs:
 
     - name: Install Boost
       run: |
-        sudo apt install aptitude
-        aptitude search boost
+        sudo apt update
+        sudo apt install build-essential
+        wget https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.gz
+        tar -xzvf boost_1_75_0.tar.gz
+        cd boost_1_75_0
+        ./bootstrap.sh --prefix=/usr/local
+        sudo ./b2 install
+        ls /usr/local/include/boost
 
     - name: Install PCL
       run: |
