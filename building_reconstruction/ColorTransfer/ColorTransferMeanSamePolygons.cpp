@@ -4,6 +4,7 @@ using namespace cv;
 using namespace std;
 using namespace pcl;
 using namespace Geometry_pcl;
+using namespace boost;
 
 void ColorTransferMeanSamePolygons::setDirPath(std::string image_path) {
     dir_path = image_path;
@@ -91,6 +92,51 @@ void ColorTransferMeanSamePolygons::setGammaAllSourceUpperBound(double upper_bou
 
 void ColorTransferMeanSamePolygons::setGammaAllSourceLowerBound(double lower_bound) {
     gamma_all_source_lower_bound = lower_bound;
+}
+
+void ColorTransferMeanSamePolygons::setParamsFromJson(json::object json_obj) {
+    if (json_obj.contains("lower_bound_area")) {
+        lower_bound_area = json_obj["lower_bound_area"].as_double();
+    }
+    if (json_obj.contains("min_quality_metric")) {
+        min_quality_metric = json_obj["min_quality_metric"].as_double();
+    }
+    if (json_obj.contains("alpha_one_source_upper_bound")) {
+        alpha_one_source_upper_bound = json_obj["alpha_one_source_upper_bound"].as_double();
+    }
+    if (json_obj.contains("alpha_one_source_lower_bound")) {
+        alpha_one_source_lower_bound = json_obj["alpha_one_source_lower_bound"].as_double();
+    }
+    if (json_obj.contains("beta_one_source_upper_bound")) {
+        beta_one_source_upper_bound = json_obj["beta_one_source_upper_bound"].as_double();
+    }
+    if (json_obj.contains("beta_one_source_lower_bound")) {
+        beta_one_source_lower_bound = json_obj["beta_one_source_lower_bound"].as_double();
+    }
+    if (json_obj.contains("gamma_one_source_upper_bound")) {
+        gamma_one_source_upper_bound = json_obj["gamma_one_source_upper_bound"].as_double();
+    }
+    if (json_obj.contains("gamma_one_source_lower_bound")) {
+        gamma_one_source_lower_bound = json_obj["gamma_one_source_lower_bound"].as_double();
+    }
+    if (json_obj.contains("alpha_all_source_upper_bound")) {
+        alpha_all_source_upper_bound = json_obj["alpha_all_source_upper_bound"].as_double();
+    }
+    if (json_obj.contains("alpha_all_source_lower_bound")) {
+        alpha_all_source_lower_bound = json_obj["alpha_all_source_lower_bound"].as_double();
+    }
+    if (json_obj.contains("beta_all_source_upper_bound")) {
+        beta_all_source_upper_bound = json_obj["beta_all_source_upper_bound"].as_double();
+    }
+    if (json_obj.contains("beta_all_source_lower_bound")) {
+        beta_all_source_lower_bound = json_obj["beta_all_source_lower_bound"].as_double();
+    }
+    if (json_obj.contains("gamma_all_source_upper_bound")) {
+        gamma_all_source_upper_bound = json_obj["gamma_all_source_upper_bound"].as_double();
+    }
+    if (json_obj.contains("gamma_all_source_lower_bound")) {
+        gamma_all_source_lower_bound = json_obj["gamma_all_source_lower_bound"].as_double();
+    }
 }
 
 vector <vector<bool>> ColorTransferMeanSamePolygons::getBorderTp() {

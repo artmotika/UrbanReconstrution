@@ -36,6 +36,18 @@ sudo apt-get install -y build-essential cmake git libgtk2.0-dev pkg-config libav
 sudo apt-get install -y libopencv-dev
 ```
 ### Установка Boost:
+apt-get устанавливает версию старее 1.75.0, поэтому устанавливаем вручную 
+```
+sudo apt update
+sudo apt install build-essential
+wget https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.gz
+tar -xzvf boost_1_75_0.tar.gz
+cd boost_1_75_0
+./bootstrap.sh --prefix=/usr/local
+sudo ./b2 install
+ls /usr/local/include/boost
+```
+Установка с помощью apt-get (нужна версия boost >= 1.75.0)
 ```
 sudo apt-get install -y libboost-all-dev
 ```

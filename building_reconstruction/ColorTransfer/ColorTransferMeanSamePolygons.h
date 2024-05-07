@@ -8,6 +8,7 @@
 #include <pcl/surface/texture_mapping.h>
 #include <string>
 #include <chrono>
+#include <boost/json.hpp>
 
 #include "../StringUtils/PathUtils.h"
 #include "../Geometry/Geometry_pcl.h"
@@ -72,6 +73,8 @@ public:
     void setGammaAllSourceUpperBound(double upper_bound);
 
     void setGammaAllSourceLowerBound(double lower_bound);
+
+    void setParamsFromJson(boost::json::object json_obj);
 
     std::vector <std::vector<bool>> getBorderTp();
 

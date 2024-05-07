@@ -1,0 +1,16 @@
+{
+        "lower_bound_area": 0.0,
+        "min_quality_metric": 0.333333,
+        "alpha_one_source_upper_bound": 2.0,
+        "alpha_one_source_lower_bound": 0.5,
+        "beta_one_source_upper_bound": 2.0,
+        "beta_one_source_lower_bound": 0.5,
+        "gamma_one_source_upper_bound": 2.0,
+        "gamma_one_source_lower_bound": 0.5,
+        "alpha_all_source_upper_bound": 2.0,
+        "alpha_all_source_lower_bound": 0.5,
+        "beta_all_source_upper_bound": 2.0,
+        "beta_all_source_lower_bound": 0.5,
+        "gamma_all_source_upper_bound": 2.0,
+        "gamma_all_source_lower_bound": 0.5
+}   

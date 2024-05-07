@@ -29,3 +29,21 @@ vector<int> FileUtils::getLinesStartingWithString(std::string wordToSearch) {
     return indexes;
 }
 
+std::string FileUtils::getFileAsString() {
+    std::ifstream file(input_file_path);
+    std::string content;
+    if (file.is_open()) {
+        std::string line;
+        while (std::getline(file, line)) {
+            content += line;
+            content += "\n";
+        }
+        file.close();
+    } else {
+        std::cerr << "Unable to open file" << std::endl;
+    }
+    return content;
+}
+
+
+
