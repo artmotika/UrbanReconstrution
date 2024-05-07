@@ -38,6 +38,7 @@ sudo apt-get install -y libopencv-dev
 ### Установка Boost:
 ```
 sudo apt-get install -y libboost-all-dev
+sudo apt install -y libboost-json-dev
 ```
 ### Установка Eigen3:
 ```

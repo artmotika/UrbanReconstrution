@@ -33,7 +33,8 @@ jobs:
 
     - name: Install Boost
       run: |
-        sudo apt-get install -y libboost-all-dev libboost-json-dev
+        sudo apt-get install -y libboost-all-dev
+        sudo apt install -y libboost-json-dev
 
     - name: Install Eigen3
       run: |
