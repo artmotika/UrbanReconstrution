@@ -52,7 +52,12 @@ find_package(VTK)
 find_package(OpenCV REQUIRED)
 
 # Boost and its components
-find_package(Boost REQUIRED) #COMPONENTS json
+find_package(Boost REQUIRED COMPONENTS json)
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    target_link_libraries(your_target_name ${Boost_LIBRARIES})
+endif()
+
 
 if (NOT Boost_FOUND)
 
@@ -146,7 +151,7 @@ foreach (
     target_link_libraries(${target} PUBLIC texturing_mapping)
     target_link_libraries(${target} PUBLIC color_transfer)
     target_link_libraries(${target} PUBLIC best_fitting_texturing)
-    target_link_libraries(${target} PUBLIC Eigen3::Eigen ${PCL_LIBRARIES} Boost::boost) # Boost::json
+    target_link_libraries(${target} PUBLIC Eigen3::Eigen ${PCL_LIBRARIES} Boost::boost Boost::json)
 endforeach ()
 
 foreach (
@@ -169,7 +174,7 @@ target_link_libraries(texturing_mapping PUBLIC file_utils)
 
 target_link_libraries(color_transfer PUBLIC texturing_mapping)
 target_link_libraries(color_transfer PUBLIC string_utils)
-target_link_libraries(color_transfer PUBLIC Boost::boost) # Boost::json
+target_link_libraries(color_transfer PUBLIC Boost::boost Boost::json)
 
 target_link_libraries(best_fitting_texturing PUBLIC texturing_mapping)
 
