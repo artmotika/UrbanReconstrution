@@ -33,7 +33,6 @@ jobs:
 
     - name: Install Boost
       run: |
-        # sudo apt-get install -y libboost-all-dev
         it clone --recurse-submodules https://github.com/CPPAlliance/json.git
         cd json
         mkdir build && cd build
