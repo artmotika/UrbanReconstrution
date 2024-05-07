@@ -16,6 +16,7 @@ jobs:
 
     - name: Install Boost
       run: |
+        sudo apt install aptitude
         aptitude search boost
 
     - name: Install PCL
