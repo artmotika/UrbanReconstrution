@@ -11,7 +11,7 @@ project(Polygonal_surface_reconstruction_Examples)
 #add_compile_options(-std=c++20)
 #add_compile_options(-std=c++14)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=undefined")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=undefined")
 
 set(CMAKE_THREAD_LIBS_INIT "-lpthread")
 set(CMAKE_HAVE_THREADS_LIBRARY 1)
@@ -31,6 +31,7 @@ find_package(Vulkan)
 ## Threads
 #find_package(Threads REQUIRED)
 
+# OpenMP
 find_package(OpenMP)
 #if (OPENMP_FOUND)
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
@@ -51,7 +52,7 @@ find_package(VTK)
 find_package(OpenCV REQUIRED)
 
 # Boost and its components
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS json)
 
 if (NOT Boost_FOUND)
 
@@ -145,7 +146,7 @@ foreach (
     target_link_libraries(${target} PUBLIC texturing_mapping)
     target_link_libraries(${target} PUBLIC color_transfer)
     target_link_libraries(${target} PUBLIC best_fitting_texturing)
-    target_link_libraries(${target} PUBLIC Eigen3::Eigen ${PCL_LIBRARIES})
+    target_link_libraries(${target} PUBLIC Eigen3::Eigen ${PCL_LIBRARIES} Boost::boost Boost::json)
 endforeach ()
 
 foreach (
@@ -168,5 +169,8 @@ target_link_libraries(texturing_mapping PUBLIC file_utils)
 
 target_link_libraries(color_transfer PUBLIC texturing_mapping)
 target_link_libraries(color_transfer PUBLIC string_utils)
+target_link_libraries(color_transfer PUBLIC Boost::boost Boost::json)
 
 target_link_libraries(best_fitting_texturing PUBLIC texturing_mapping)
+
+

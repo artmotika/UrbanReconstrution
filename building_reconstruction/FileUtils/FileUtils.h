@@ -18,6 +18,8 @@ public:
 
     std::vector<int> getLinesStartingWithString(std::string wordToSearch);
 
+    std::string getFileAsString();
+
 private:
     std::string input_file_path;
 };
