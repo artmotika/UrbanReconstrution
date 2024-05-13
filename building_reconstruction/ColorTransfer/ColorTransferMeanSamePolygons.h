@@ -87,8 +87,8 @@ private:
     std::vector <pcl::TextureMesh> &input_meshes;
     std::string dir_path;
     int number_cams;
-    int texture_height;
-    int texture_width;
+    int texture_height = 2000;
+    int texture_width = 2000;
     // Наименьшая площадь которая учавствует в переносе цвета
     double lower_bound_area = 0.0;
     // Наименьшее соотношение площадей src- и target-текстур, которое будет учавствовать в переносе цвета

@@ -373,7 +373,7 @@ void ColorTransferMeanSamePolygons::transferColorBetweenTp(vector <vector<int>> 
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud <pcl::PointXYZ>);
     fromPCLPointCloud2(main_mesh.cloud, *input_cloud);
-    urban_rec::TexturingMapping texturing_mapping = urban_rec::TexturingMapping(2000, 2000);
+    urban_rec::TexturingMapping texturing_mapping = urban_rec::TexturingMapping(texture_width, texture_height);
     for (int current_cam = 0; current_cam < number_cams; current_cam++) {
         cv::Mat dest_target = destinations[current_cam];
         for (int face_idx = 0; face_idx < main_mesh.tex_polygons[current_cam].size(); face_idx++) {
