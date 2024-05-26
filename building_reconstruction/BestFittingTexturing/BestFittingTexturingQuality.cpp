@@ -19,8 +19,16 @@ void BestFittingTexturingQuality::setInputTextureMeshes(vector <pcl::TextureMesh
     input_meshes = meshes;
 }
 
+void BestFittingTexturingQuality::setTextureHeight(int height) {
+    texture_height = height;
+}
+
+void BestFittingTexturingQuality::setTextureWidth(int width) {
+    texture_width = width;
+}
+
 pcl::TextureMesh BestFittingTexturingQuality::fit(vector <string> argv) {
-    urban_rec::TexturingMapping texturing_mapping = urban_rec::TexturingMapping(2000, 2000);
+    urban_rec::TexturingMapping texturing_mapping = urban_rec::TexturingMapping(texture_width, texture_height);
     // Create the texturemesh object that will contain our UV-mapped mesh
     pcl::TextureMesh mesh;
     mesh.cloud = triangles.cloud;

@@ -24,12 +24,18 @@ public:
 
     void setInputTextureMeshes(std::vector <pcl::TextureMesh> &meshes);
 
+    void setTextureHeight(int height);
+
+    void setTextureWidth(int width);
+
     pcl::TextureMesh fit(std::vector <std::string> argv);
 
 private:
     pcl::PolygonMesh &triangles;
     std::vector <pcl::TextureMesh> &input_meshes;
     int number_cams;
+    int texture_height = 2000;
+    int texture_width = 2000;
 };
 
 #endif //URBAN_RECONSTRUCTION_BESTFITTINGTEXTURINGQUALITY_H
